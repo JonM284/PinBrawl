@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4951d71b2ae34cebad8e4748daea7b7f, type: 3}
+  m_Name: Buff@Category
+  m_EditorClassIdentifier: 
+  abilityCategoryName: Buff
+  abilityCategoryGUID: bcae6d8a-bad2-4cbb-bbc5-2ea1481eadcd
+  abilityIcon: {fileID: 0}

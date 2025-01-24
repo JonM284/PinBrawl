@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceab5f0e2e6e4faba6b157b9a711e4ac, type: 3}
+  m_Name: Bunt@Ability
+  m_EditorClassIdentifier: 
+  abilityName: Bunt
+  abilityDescription: Bunt ball
+  abilityIconRef: {fileID: 0}
+  abilityCooldownTimeMax: 1
+  abilityKnockbackAmount: 80
+  abilityDamageAmount: 125
+  abilityRange: 0
+  abilityScale: 2
+  abilityAnimationTime: 0.15
+  isHaultMovement: 0
+  isHitOnce: 0
+  isReactivatable: 0
+  reactivationTime: 1
+  knockbackDirectionMod: 1
+  ballHitStrength: 0
+  collisionDetectionLayers:
+    serializedVersion: 2
+    m_Bits: 192
+  abilityCategories:
+  - {fileID: 11400000, guid: 1dd039770abdc6841a397585c196d714, type: 2}
+  applicableStatusesOnHit: []
+  abilityGameObject: {fileID: 91726550271325563, guid: 9161e006739c26c4aa4f5dafba6af023, type: 3}
+  meleeType: 0

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5be02edc8e84bfd9e3b40f83e2c0114, type: 3}
+  m_Name: AllAbilityPower 2
+  m_EditorClassIdentifier: 
+  perkName: Compact Carnage
+  perkDescription: 
+  perkIconRef: {fileID: -1961220794, guid: a10cb3573e0dca140b847908d070e55c, type: 3}
+  perkRarity: 0
+  rarityWeight: 21
+  perkIdentifierGUID: c2e6857f-ffa2-4cf0-b82f-b3047374eb7b
+  perkGameObject: {fileID: 382883639006803584, guid: 8129f19db12700043a4bab214e0345bf, type: 3}
+  isAllAbilityTypes: 0
+  abilityCategoryList: []
+  cooldownChangeAmount: -0.2
+  hitChangeAmount: 0.35
+  scaleChangeAmount: 0
+  lifeTimeChangeAmount: 0
+  speedChangeAmount: 0
+  rangeChangeAmount: -0.1

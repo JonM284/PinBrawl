@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24b71266b26c480f8ae55ca28cfe58cb, type: 3}
+  m_Name: Chrona@CharacterData
+  m_EditorClassIdentifier: 
+  characterName: Chrona
+  characterArmorAmount: 400
+  characterIdentifierGUID: b376b84a-6bbe-4582-b5f5-30ff4914a87c
+  characterNaturalKnockbackResistance: 0.15
+  characterWalkSpeed: 7.6
+  meleeChargeWalkSpeed: 6
+  characterColliderRadius: 1
+  ballMeleeColliderRadius: 2
+  ballMeleeCooldownTimer: 1
+  healthBarOffset: {x: 0, y: 1.5, z: 0.5}
+  ballMeleeLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  characterModelRef: {fileID: 5440341712856961590, guid: 454891ca9c4564c45ab445d5fddd89c6, type: 3}
+  characterIconRef: {fileID: 21300000, guid: 2b63ede568fc2be4e8c437476d21e07c, type: 3}
+  allCharacterAbilities:
+  - {fileID: 11400000, guid: d141bfa859ee63941a8f2da6e863b86b, type: 2}
+  - {fileID: 11400000, guid: 618a87c8e95942b44af620eeffb6d668, type: 2}

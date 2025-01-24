@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24b71266b26c480f8ae55ca28cfe58cb, type: 3}
+  m_Name: WubWub@CharacterData
+  m_EditorClassIdentifier: 
+  characterName: WubWub
+  characterArmorAmount: 500
+  characterIdentifierGUID: 7c5a4e70-e8ba-4b11-8066-eb4d1eee1b2e
+  characterNaturalKnockbackResistance: 0.15
+  characterWalkSpeed: 7.6
+  meleeChargeWalkSpeed: 6
+  characterColliderRadius: 1
+  ballMeleeColliderRadius: 2
+  ballMeleeCooldownTimer: 1
+  healthBarOffset: {x: 0, y: 1.5, z: 0.5}
+  ballMeleeLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  characterModelRef: {fileID: 5440341712856961590, guid: 32ef7f08aa6ca9d498beec8e2dfa808c, type: 3}
+  characterIconRef: {fileID: 21300000, guid: d8b852db7d51f8442ab9ddd446db7931, type: 3}
+  allCharacterAbilities:
+  - {fileID: 11400000, guid: be92ce29d212d4b47859379ae3d1ffc0, type: 2}
+  - {fileID: 11400000, guid: b7409e2cda4c4f646ba387c5d9a011f5, type: 2}

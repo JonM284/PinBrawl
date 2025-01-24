@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24b71266b26c480f8ae55ca28cfe58cb, type: 3}
+  m_Name: Fuse@CharacterData
+  m_EditorClassIdentifier: 
+  characterName: Fuse
+  characterArmorAmount: 400
+  characterIdentifierGUID: 26c5c54c-2a54-4938-b88e-a3b1c200d2f9
+  characterNaturalKnockbackResistance: 0.15
+  characterWalkSpeed: 7.6
+  meleeChargeWalkSpeed: 6
+  characterColliderRadius: 1
+  ballMeleeColliderRadius: 2
+  ballMeleeCooldownTimer: 1
+  healthBarOffset: {x: 0, y: 1.5, z: 0.5}
+  ballMeleeLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  characterModelRef: {fileID: 4747015858248881573, guid: ee972b5f2fecd9045800e028793f4bec, type: 3}
+  characterIconRef: {fileID: 21300000, guid: 26f3bc828f2c2cd4aa7846a6ab580e18, type: 3}
+  allCharacterAbilities:
+  - {fileID: 11400000, guid: b9d41b8978a462d47b3f62bb1b56f931, type: 2}
+  - {fileID: 11400000, guid: d9a62bf3c7d484949b3b55f9ccb1896a, type: 2}

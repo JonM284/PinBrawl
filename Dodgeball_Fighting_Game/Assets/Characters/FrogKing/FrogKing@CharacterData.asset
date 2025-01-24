@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24b71266b26c480f8ae55ca28cfe58cb, type: 3}
+  m_Name: FrogKing@CharacterData
+  m_EditorClassIdentifier: 
+  characterName: FrogKing
+  characterArmorAmount: 500
+  characterIdentifierGUID: 250994ac-7592-4a21-9f56-baa42b319f6b
+  characterNaturalKnockbackResistance: 0.15
+  characterWalkSpeed: 7.6
+  meleeChargeWalkSpeed: 6
+  characterColliderRadius: 1
+  ballMeleeColliderRadius: 2
+  ballMeleeCooldownTimer: 1
+  healthBarOffset: {x: 0, y: 1.5, z: 0.5}
+  ballMeleeLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  characterModelRef: {fileID: 5440341712856961590, guid: 9cef9e0578d869b419a82946dcdf5af4, type: 3}
+  characterIconRef: {fileID: 21300000, guid: 8608591fe2a28364b9c600504912e54a, type: 3}
+  allCharacterAbilities:
+  - {fileID: 11400000, guid: caba48e6466213648b5e99428975137d, type: 2}
+  - {fileID: 11400000, guid: e7a5891e2b61e3940b6ad54d78d3e79b, type: 2}

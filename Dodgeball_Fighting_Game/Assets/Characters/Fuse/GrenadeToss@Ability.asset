@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e51373bf5d24cdda846d8c49aaf3af4, type: 3}
+  m_Name: GrenadeToss@Ability
+  m_EditorClassIdentifier: 
+  abilityName: Grenade Toss
+  abilityDescription: Toss Grenade
+  abilityIconRef: {fileID: 21300000, guid: cdad34cc022a31c408548d2aea049c6f, type: 3}
+  abilityCooldownTimeMax: 10
+  abilityKnockbackAmount: 70
+  abilityDamageAmount: 300
+  abilityRange: 5
+  abilityScale: 2.5
+  abilityAnimationTime: 0.15
+  isHaultMovement: 1
+  isHitOnce: 0
+  isReactivatable: 0
+  reactivationTime: 1
+  knockbackDirectionMod: 1
+  ballHitStrength: 2
+  collisionDetectionLayers:
+    serializedVersion: 2
+    m_Bits: 192
+  abilityCategories:
+  - {fileID: 11400000, guid: 9bc2c31746b5b0043b48f5700d13e785, type: 2}
+  applicableStatusesOnHit: []
+  abilityGameObject: {fileID: 1064917074733220923, guid: bdb23b0eed13cf4489ea7f3b7d952982, type: 3}
+  creationPrefab: {fileID: 4408058020297105724, guid: 23dd7aed60500f04f95a8cf5bbd20fff, type: 3}
+  maxTimeAlive: 0
+  isExplosion: 1
+  isSavePointedDirection: 0
+  isHitBall: 0
+  isWall: 0
+  wallCenter: {x: 0, y: 0, z: 0}
+  wallHalfExtents: {x: 0, y: 0, z: 0}

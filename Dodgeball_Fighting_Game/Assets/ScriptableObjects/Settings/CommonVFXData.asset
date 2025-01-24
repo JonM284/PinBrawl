@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 904a5b1c0f3a4d1c9577561e3227cc58, type: 3}
+  m_Name: CommonVFXData
+  m_EditorClassIdentifier: 
+  buffVFXPrefab: {fileID: 8558497060013626204, guid: 6881dd9cf2f1abf478dfa5d94f34fbfa, type: 3}
+  debuffVFXPrefab: {fileID: 5715602797676005003, guid: d5e8023eb42e93f4f8b76024dc35fc79, type: 3}
+  damageVFXPrefab: {fileID: 4959007414415217957, guid: f48c07eb83091984fbc2886f6d64a604, type: 3}
+  deathVFXPrefab: {fileID: 8602489550213212429, guid: 353cbfc7c27333642b5dc0dd0a5b8470, type: 3}

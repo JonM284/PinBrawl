@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d8f0d2c66b743f5912fe6bca7163e5a, type: 3}
+  m_Name: VULNERABLE@Status
+  m_EditorClassIdentifier: 
+  statusName: VULERNABLE
+  statusDescription: Increase damage intake by {0}%
+  statusIconRef: {fileID: -374902398, guid: a10cb3573e0dca140b847908d070e55c, type: 3}
+  statusIdentifierGUID: 00c29545-7cff-441c-9351-7b2146c1c1a7
+  timeMax: 7
+  shieldChangeOverTick: 0
+  statusGameObject: {fileID: 7300367635611019053, guid: 6693f9e2a79ca994ea21019178721740, type: 3}
+  damageIntakeModifier: 2

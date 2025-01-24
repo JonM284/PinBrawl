@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b924cc7a371148f79f2119ad8f88d686, type: 3}
+  m_Name: HunterShot@Ability
+  m_EditorClassIdentifier: 
+  abilityName: Shot
+  abilityDescription: Shoot Projectile in aimed direction
+  abilityIconRef: {fileID: 1271024694, guid: 196d10f5134bb204ebdd81278f30a190, type: 3}
+  abilityCooldownTimeMax: 10
+  abilityKnockbackAmount: 30
+  abilityDamageAmount: 125
+  abilityRange: 8
+  abilityScale: 2
+  abilityAnimationTime: 0.15
+  isHaultMovement: 0
+  isHitOnce: 0
+  isReactivatable: 0
+  reactivationTime: 1
+  knockbackDirectionMod: 1
+  ballHitStrength: 1
+  collisionDetectionLayers:
+    serializedVersion: 2
+    m_Bits: 704
+  abilityCategories:
+  - {fileID: 11400000, guid: ccbfea8e7ddb7204c9c62fadb3d024c3, type: 2}
+  applicableStatusesOnHit: []
+  abilityGameObject: {fileID: 4351572726978402741, guid: 0299e847645882f4eb2eb636e309e116, type: 3}
+  projectileMaxLifetime: 1.25
+  projectileShootSpeed: 22
+  projectileDetectionRange: 1
+  projectileExplosionRange: 1
+  projectileEndType: 0
+  isPassThroughObjects: 0
+  isMultiStage: 0
+  isSpreadShotOnStart: 0
+  projectileAmount: 1
+  projectileSpread: 0
+  timeBetweenShots: 0.1
+  amountOfStages: 0
+  isSlowDownOverTime: 0
+  slowDownModifier: 0
+  slowDownType: 0
+  projeciltePrefab: {fileID: 4489087516859698224, guid: 444f35089b8947b40a579298db55928d, type: 3}
+  endCreatable: {fileID: 0}

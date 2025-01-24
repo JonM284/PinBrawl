@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eed12d8193ba43d2a1e36c62721e5be4, type: 3}
+  m_Name: POISON@Status
+  m_EditorClassIdentifier: 
+  statusName: POiSON
+  statusDescription: Deal {0} damage, every second
+  statusIconRef: {fileID: 1020896172, guid: a10cb3573e0dca140b847908d070e55c, type: 3}
+  statusIdentifierGUID: d73f85c4-5254-4727-9abc-9bcf1847f493
+  timeMax: 5
+  shieldChangeOverTick: 0
+  statusGameObject: {fileID: 0}
+  amountOfTimePerTick: 0.5
+  amountChangePerTick: 75
+  isHealing: 0

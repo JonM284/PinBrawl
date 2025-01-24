@@ -1,0 +1,155 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f05d522bd5bc72b42ae9f0fe4c3d3382, type: 3}
+  m_Name: GameSettings
+  m_EditorClassIdentifier: 
+  wackIcon: {fileID: 21300000, guid: 3027cff9715e823409dd20ca730d5988, type: 3}
+  colorblindOptions: 0
+  playerSideColor: {r: 0, g: 1, b: 1, a: 1}
+  enemySideColor: {r: 1, g: 0, b: 0, a: 1}
+  neutralSideColor: {r: 0, g: 0, b: 0, a: 1}
+  maxAmountOfPlayer: 4
+  colorsByPlayerIndex:
+  - {r: 0.9607843, g: 0.95017713, b: 0.28627452, a: 1}
+  - {r: 0.9607843, g: 0.3556735, b: 0.28627452, a: 1}
+  - {r: 0.28627452, g: 0.8844636, b: 0.9607843, a: 1}
+  - {r: 0.28627452, g: 0.9607843, b: 0.4, a: 1}
+  midColorsByPlayerIndex:
+  - {r: 0.83396226, g: 0.8238899, b: 0.25648266, a: 1}
+  - {r: 0.81886786, g: 0.29458043, b: 0.2333001, a: 1}
+  - {r: 0.23760058, g: 0.7680851, b: 0.83396226, a: 1}
+  - {r: 0.22469918, g: 0.78867924, b: 0.3197888, a: 1}
+  darkColorsByPlayerIndex:
+  - {r: 0.7132075, g: 0.7045936, b: 0.21934488, a: 1}
+  - {r: 0.690566, g: 0.23909216, b: 0.1863225, a: 1}
+  - {r: 0.18106796, g: 0.6007169, b: 0.6528301, a: 1}
+  - {r: 0.18316126, g: 0.6603774, b: 0.2636221, a: 1}
+  gradientsByPlayerIndex:
+  - serializedVersion: 2
+    key0: {r: 0.98404014, g: 1, b: 0.5411765, a: 1}
+    key1: {r: 0.938081, g: 1, b: 0, a: 1}
+    key2: {r: 0.8660095, g: 1, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 30634
+    ctime2: 65535
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 54713
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 2
+  - serializedVersion: 2
+    key0: {r: 1, g: 0.56339854, b: 0.5411765, a: 1}
+    key1: {r: 1, g: 0.13192493, b: 0, a: 1}
+    key2: {r: 1, g: 0.29011518, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 30634
+    ctime2: 65535
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 54713
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 2
+  - serializedVersion: 2
+    key0: {r: 0.5411765, g: 0.91567516, b: 1, a: 1}
+    key1: {r: 0, g: 0.61397314, b: 1, a: 1}
+    key2: {r: 0, g: 0.33355236, b: 1, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 30634
+    ctime2: 65535
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 54713
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 2
+  - serializedVersion: 2
+    key0: {r: 0.5911574, g: 1, b: 0.5411765, a: 1}
+    key1: {r: 0.6109071, g: 1, b: 0, a: 1}
+    key2: {r: 0.101122975, g: 1, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 30634
+    ctime2: 65535
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 54713
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 2
+  playerKillEnergyAddAmount: 20
+  hitBallEnergyAddAmount: 3
+  pvpDamageEnergyAddAmount: 6

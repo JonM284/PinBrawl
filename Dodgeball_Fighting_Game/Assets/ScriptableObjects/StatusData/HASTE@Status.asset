@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fcafbb49cfb4d52a72a7e6edf23bf76, type: 3}
+  m_Name: HASTE@Status
+  m_EditorClassIdentifier: 
+  statusName: Haste
+  statusDescription: Speed up players by {0}%
+  statusIconRef: {fileID: 625216058, guid: a10cb3573e0dca140b847908d070e55c, type: 3}
+  statusIdentifierGUID: 89242570-f18d-4653-89c0-ec7f49e0ad30
+  timeMax: 4
+  shieldChangeOverTick: 0
+  statusGameObject: {fileID: 1116135411170261533, guid: 6595bbe7f5ab8af46b3881ad9746a730, type: 3}
+  speedChangeModifier: 1.5

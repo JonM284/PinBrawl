@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1628c63666c346deb6c2b123c8af9004, type: 3}
+  m_Name: Hook@Ability
+  m_EditorClassIdentifier: 
+  abilityName: HookTest
+  abilityDescription: Hook yourself to player
+  abilityIconRef: {fileID: 21300000, guid: 32e997e0819a91f47b82ccda58d580bc, type: 3}
+  abilityCooldownTimeMax: 10
+  abilityKnockbackAmount: 0
+  abilityDamageAmount: 50
+  abilityRange: 8.5
+  abilityScale: 1
+  abilityAnimationTime: 0.15
+  isHaultMovement: 1
+  isHitOnce: 0
+  isReactivatable: 0
+  reactivationTime: 1
+  knockbackDirectionMod: 1
+  ballHitStrength: 1
+  collisionDetectionLayers:
+    serializedVersion: 2
+    m_Bits: 192
+  abilityCategories:
+  - {fileID: 11400000, guid: c19c5f548adbbd6418529620952d8599, type: 2}
+  applicableStatusesOnHit: []
+  abilityGameObject: {fileID: 6024836479982765611, guid: 33afdf15b5a64a541be3222858a7e370, type: 3}
+  hookTravelTime: 0.4
+  hookedPlayerReturnTime: 0.35
+  bringHookedPlayerBack: 0

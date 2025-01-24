@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fcafbb49cfb4d52a72a7e6edf23bf76, type: 3}
+  m_Name: SLOW@Status
+  m_EditorClassIdentifier: 
+  statusName: SLOW
+  statusDescription: Slow down enemies to {0}% their current speed.
+  statusIconRef: {fileID: 1839061305, guid: a10cb3573e0dca140b847908d070e55c, type: 3}
+  statusIdentifierGUID: f2347701-ec08-4a88-ad68-b8e79ddc116e
+  timeMax: 4
+  shieldChangeOverTick: 0
+  statusGameObject: {fileID: 331177149634693620, guid: d161a552ee5118a41ad5bb3281747d89, type: 3}
+  speedChangeModifier: 0.5
