@@ -30,17 +30,27 @@ namespace Runtime.GameModes
 
         private void OnEnable()
         {
-            MatchGameController.Instance.AssignGameMode(this);
+            EnabledFunctions();
         }
 
         private void OnDisable()
         {
-            MatchGameController.Instance.UnassignGameMode(this);
+            DisabledFunctions();
         }
 
         #endregion
 
         #region Class Implementation
+
+        protected virtual void EnabledFunctions()
+        {
+            MatchGameController.Instance.AssignGameMode(this);
+        }
+
+        protected virtual void DisabledFunctions()
+        {
+            MatchGameController.Instance.UnassignGameMode(this);
+        }
 
         public virtual async UniTask Initialize(int _pointsNeededToWin = 0)
         {

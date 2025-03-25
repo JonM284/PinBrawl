@@ -19,8 +19,8 @@ namespace Runtime.Gameplay
             m_lineRenderer.SetPosition(0, _startPos);
             m_lineRenderer.SetPosition(1, _endPos);
 
-            m_lineRenderer.startWidth = _scale;
-            m_lineRenderer.endWidth = _scale;
+            m_lineRenderer.startWidth = _scale * 2;
+            m_lineRenderer.endWidth = _scale * 2;
             
             TickGameController.Instance.CreateNewTimer($"lineRend{_startPos.ToString()}", _duration, false, Close);
         }

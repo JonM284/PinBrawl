@@ -8,7 +8,6 @@ using Runtime.Character;
 using Runtime.GameControllers;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utils;
 
@@ -32,10 +31,10 @@ namespace Runtime.UI.Items
         #endregion
         
         #region Serialized Fields
-        
-        [Header("General")]
-        [SerializeField] private Color m_energyColorNormal, m_energyColorCharged;
+
+        [Header("General")] 
         [SerializeField] private float m_burnSpeedMod = 1f;
+        [SerializeField] private Color m_percentColorNormal, m_percentColorDamaged, m_percentColorDanger;
         
         [Header("Player Follow Armor Bar")]
         [SerializeField] private RectTransform m_followBarVisuals;
@@ -62,23 +61,13 @@ namespace Runtime.UI.Items
         #region Private Fields
 
         private BaseCharacter m_assignedCharacter;
-
-        private float m_maxShield;
-
+        
         private Camera m_cameraRef;
 
         private Transform m_healthBarFollow;
         
-        private float m_HealthIncrements = 100f;
-
-        private float m_maxEnergy, m_currentArmorPercentage, m_currentEnergyPercentage;
-
         private bool m_hasTakenDamage;
-
-        private float m_previousShield;
-
-        private int m_amountofTicks;
-
+        
         private List<StatusData> m_appliedStatuses = new List<StatusData>();
 
         private List<AbilityVisuals> m_abilitiesOnCooldown = new List<AbilityVisuals>();
@@ -98,9 +87,7 @@ namespace Runtime.UI.Items
 
         private void OnEnable()
         {
-            BaseCharacter.OnArmorAmountChanged += UpdateHealthValue;
-            BaseCharacter.OnMaxArmorChanged += UpdateMaxHealth;
-            BaseCharacter.OnEnergyAmountChanged += UpdateShieldValue;
+            BaseCharacter.OnDamagePercentageChanged += UpdatePercentageValue;
             BaseCharacter.OnPlayerDeath += OnPlayerDeath;
             BaseCharacter.OnPlayerRevived += OnPlayerRevived;
             BaseCharacter.OnStatusApplied += OnStatusApplied;
@@ -112,9 +99,7 @@ namespace Runtime.UI.Items
 
         private void OnDisable()
         {
-            BaseCharacter.OnArmorAmountChanged -= UpdateHealthValue;
-            BaseCharacter.OnMaxArmorChanged -= UpdateMaxHealth;
-            BaseCharacter.OnEnergyAmountChanged -= UpdateShieldValue;
+            BaseCharacter.OnDamagePercentageChanged -= UpdatePercentageValue;
             BaseCharacter.OnPlayerDeath -= OnPlayerDeath;
             BaseCharacter.OnPlayerRevived -= OnPlayerRevived;
             BaseCharacter.OnStatusApplied -= OnStatusApplied;
@@ -137,20 +122,8 @@ namespace Runtime.UI.Items
                 return;
             }
 
-            Vector3 screenPos =
-                cameraRef.WorldToScreenPoint(new Vector3(characterFollowTransform.position.x, characterFollowTransform.position.y, characterFollowTransform.position.z));
-
-            m_followBarVisuals.position = screenPos;
-
             CheckWackCooldown();
             CheckAbilityCooldown();
-            
-            if (!m_hasTakenDamage)
-            {
-                return;
-            }
-
-            DoBurnHealthAnim();
         }
 
         #endregion
@@ -166,28 +139,26 @@ namespace Runtime.UI.Items
 
             m_assignedCharacter = _baseCharacter;
             
-            //Follow Bar
-            m_currentArmorFollowImage.fillAmount = 1f;
-            m_burnDamageFollowImage.fillAmount = 1f;
-            m_energyFollowImage.fillAmount = 0.25f;
-            m_armorAmountFollowText.text = $"{_maxShield}";
-            Vector3 screenPos =
-                cameraRef.WorldToScreenPoint(new Vector3(characterFollowTransform.position.x, characterFollowTransform.position.y, characterFollowTransform.position.z));
-            m_followBarVisuals.position = screenPos;
-            
             //Static Area
             m_characterPortrait.sprite = m_assignedCharacter.characterData.characterIconRef;
             m_playerInfoAreaVisuals.parent = _staticHealthParent;
-            m_currentArmorStaticImage.fillAmount = 1f;
+            /*m_currentArmorStaticImage.fillAmount = 1f;
             m_burnDamageStaticImage.fillAmount = 1f;
-            m_energyStaticImage.fillAmount = 0.25f;
-            m_armorAmountStaticText.text = $"{_maxShield}";
+            m_energyStaticImage.fillAmount = 0.25f;*/
+            m_armorAmountStaticText.text = "0.0%";
             
             //General
-            m_previousShield = _maxShield;
-            UpdateMaxHealth(m_assignedCharacter,_maxShield);
-            m_maxEnergy = _maxEnergy;
+            //UpdateMaxHealth(m_assignedCharacter,_maxShield);
+            //m_maxEnergy = _maxEnergy;
             SetColor();
+        }
+
+        private void UpdateFollowPos()
+        {
+            Vector3 screenPos =
+                cameraRef.WorldToScreenPoint(new Vector3(characterFollowTransform.position.x, characterFollowTransform.position.y, characterFollowTransform.position.z));
+
+            m_followBarVisuals.position = screenPos;
         }
 
         private void SetupAbilities()
@@ -230,12 +201,12 @@ namespace Runtime.UI.Items
         
         private void ChangeTicksAmount()
         {
-            m_amountofTicks = (int)Mathf.Floor(m_maxShield / m_HealthIncrements);
+            //m_amountofTicks = (int)Mathf.Floor(m_maxShield / m_HealthIncrements);
 
             for (int i = 0; i < m_followHealthTicks.Count; i++)
             {
-                m_followHealthTicks[i].SetActive(i < m_amountofTicks);
-                m_staticHealthTicks[i].SetActive(i < m_amountofTicks);
+                //m_followHealthTicks[i].SetActive(i < m_amountofTicks);
+                //m_staticHealthTicks[i].SetActive(i < m_amountofTicks);
             }
         }
 
@@ -371,59 +342,14 @@ namespace Runtime.UI.Items
         }
 
 
-        private void UpdateHealthValue(BaseCharacter _baseCharacter, float _currentArmor, BaseCharacter _attackingCharacter)
-        {
-            if (_baseCharacter != m_assignedCharacter)
-            {
-                return;
-            }
-            
-            _currentArmor = Mathf.Max(Mathf.CeilToInt(_currentArmor), 0);
-
-            m_currentArmorPercentage = _currentArmor / m_maxShield;
-            
-            m_currentArmorFollowImage.fillAmount = m_currentArmorPercentage;
-            m_armorAmountFollowText.text = $"{_currentArmor}";
-
-            m_currentArmorStaticImage.fillAmount = m_currentArmorPercentage;
-            m_armorAmountStaticText.text = $"{_currentArmor}";
-
-            if (m_previousShield > _currentArmor)
-            {
-                m_hasTakenDamage = true;   
-            }
-            else
-            {
-                m_burnDamageFollowImage.fillAmount = _currentArmor / m_maxShield;
-                m_burnDamageStaticImage.fillAmount = _currentArmor / m_maxShield;
-            }
-            
-            m_barVisuals.SetActive(m_currentArmorPercentage > 0);
-            m_followSkullVisuals.SetActive(m_currentArmorPercentage <= 0);
-            
-            m_staticBarVisuals.SetActive(m_currentArmorPercentage > 0);
-            m_staticSkullVisuals.SetActive(m_currentArmorPercentage <= 0);
-            
-            m_previousShield = _currentArmor;
-        }
-
-        private void UpdateShieldValue(BaseCharacter _baseCharacter, float _currentEnergy)
+        private void UpdatePercentageValue(BaseCharacter _baseCharacter, float _currentArmor, BaseCharacter _attackingCharacter)
         {
             if (_baseCharacter != m_assignedCharacter)
             {
                 return;
             }
 
-            m_currentEnergyPercentage = _currentEnergy / m_maxEnergy;
-            
-            m_energyFollowImage.fillAmount = m_currentEnergyPercentage;
-            m_energyStaticImage.fillAmount = m_currentEnergyPercentage;
-            
-            m_energyFollowImage.color =
-                m_energyFollowImage.fillAmount == 1 ? m_energyColorCharged : m_energyColorNormal;
-            m_energyStaticImage.color =
-                m_energyStaticImage.fillAmount == 1 ? m_energyColorCharged : m_energyColorNormal;
-            
+            m_armorAmountStaticText.text = $"{_currentArmor}%";
         }
 
         private void DoBurnHealthAnim()
@@ -470,12 +396,12 @@ namespace Runtime.UI.Items
                 return;
             }
             
-            m_maxShield = _newMaxHealth;
+            //m_maxShield = _newMaxHealth;
             
-            m_armorAmountStaticText.text = $"{m_maxShield}";
-            m_armorAmountFollowText.text = $"{m_maxShield}";
+            //m_armorAmountStaticText.text = $"{m_maxShield}";
+            //m_armorAmountFollowText.text = $"{m_maxShield}";
 
-            ChangeTicksAmount();
+            //ChangeTicksAmount();
         }
         
         

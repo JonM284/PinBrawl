@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
@@ -66,6 +67,16 @@ namespace Runtime.Gameplay
         #endregion
         
         #region Unity Events
+
+        private void OnEnable()
+        {
+            MatchGameController.OnRoundEnd += DeleteObject;
+        }
+
+        private void OnDisable()
+        {
+            MatchGameController.OnRoundEnd -= DeleteObject;
+        }
 
         private void Update()
         {

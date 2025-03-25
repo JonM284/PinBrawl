@@ -19,7 +19,7 @@ MonoBehaviour:
   characterWalkSpeed: 0
   meleeChargeWalkSpeed: 0
   characterColliderRadius: 1
-  ballMeleeColliderRadius: 2
+  ballMeleeColliderRadius: 3
   ballMeleeCooldownTimer: 1
   healthBarOffset: {x: 0, y: 1.5, z: 0}
   ballMeleeLayerMask:
@@ -28,3 +28,4 @@ MonoBehaviour:
   characterModelRef: {fileID: 0}
   characterIconRef: {fileID: 0}
   allCharacterAbilities: []
+  largeAbility: {fileID: 0}

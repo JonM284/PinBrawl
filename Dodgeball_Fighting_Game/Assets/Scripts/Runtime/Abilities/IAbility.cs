@@ -19,7 +19,7 @@ namespace Runtime.Abilities
 
         public BaseCharacter currentOwner { get; set; }
 
-        public abstract void InitializeAbility(BaseCharacter _owner, AbilityData _data);
+        public abstract void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart);
 
         public abstract UniTask PreLoadNecessaryObjects();
         

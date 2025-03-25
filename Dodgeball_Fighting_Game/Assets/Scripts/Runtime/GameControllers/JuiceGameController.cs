@@ -4,11 +4,14 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using DG.Tweening;
+using MoreMountains.Feedbacks;
 using Project.Scripts.Utils;
+using Runtime.Character;
 using Runtime.Gameplay;
 using Runtime.UI.Items;
 using Runtime.VFX;
 using Utils;
+using WaterRippleForScreens;
 using Random = UnityEngine.Random;
 
 namespace Runtime.GameControllers
@@ -22,6 +25,12 @@ namespace Runtime.GameControllers
 
         #endregion
 
+        #region Actions
+
+        public static Action<Vector3> RequestRipple;
+
+        #endregion
+
         #region Serialized Fields
 
         [SerializeField] private float m_stageY;
@@ -30,6 +39,8 @@ namespace Runtime.GameControllers
 
         [SerializeField] private RangeIndicatorEntity m_rangeAttackPrefab;
 
+        [SerializeField] private MMFeedbacks m_playerDeathFeedback;
+        
         #endregion
 
         #region Private Fields
@@ -52,6 +63,20 @@ namespace Runtime.GameControllers
         
         private Transform textPool => CommonUtils.GetRequiredComponent(ref m_textPool, () => TransformUtils.CreatePool(this.transform, false));
         
+        #endregion
+
+        #region Unity Events
+
+        private void OnEnable()
+        {
+            BaseCharacter.OnPlayerDeath += DoPlayerDeathEffect;
+        }
+
+        private void OnDisable()
+        {
+            BaseCharacter.OnPlayerDeath -= DoPlayerDeathEffect;
+        }
+
         #endregion
         
         #region GameControllerBase Inherited Methods
@@ -158,6 +183,18 @@ namespace Runtime.GameControllers
         private Vector3 FlattenToStage(Vector3 _inputPos)
         {
             return new Vector3(_inputPos.x, m_stageY , _inputPos.z);
+        }
+
+        
+        private void DoPlayerDeathEffect(BaseCharacter arg1, BaseCharacter arg2, Vector3 arg3)
+        {
+            m_playerDeathFeedback?.PlayFeedbacks();
+            Debug.Log("Playing feedback");
+        }
+
+        public void CreateScreenRipple(Vector2 _worldPosition)
+        {
+            RequestRipple?.Invoke(_worldPosition);
         }
 
         #endregion

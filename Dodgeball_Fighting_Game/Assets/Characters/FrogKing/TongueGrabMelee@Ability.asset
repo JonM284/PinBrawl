@@ -16,10 +16,10 @@ MonoBehaviour:
   abilityDescription: Extend tongue to pull ball or enemies towards you.
   abilityIconRef: {fileID: 21300000, guid: 3c23d7ab9f718124aaca260d2ab173cf, type: 3}
   abilityCooldownTimeMax: 10
-  abilityKnockbackAmount: 55
-  abilityDamageAmount: 80
-  abilityRange: 5
-  abilityScale: 1
+  abilityKnockbackAmount: 100
+  abilityDamageAmount: 300
+  abilityRange: 10
+  abilityScale: 2
   abilityAnimationTime: 0.15
   isHaultMovement: 1
   isHitOnce: 0

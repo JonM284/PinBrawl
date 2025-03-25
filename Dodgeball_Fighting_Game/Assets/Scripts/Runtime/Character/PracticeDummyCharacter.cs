@@ -64,8 +64,8 @@ namespace Runtime.Character
             
             characterData = _characterData;
 
-            m_currentMaxArmor = characterData.characterArmorAmount;
-            m_currentArmor = characterData.characterArmorAmount;
+            m_currentDamagedAmount = 0;
+            m_damagePercentage = 0;
 
             m_originalSpeed = characterData.characterWalkSpeed;
             m_currentSpeed = m_originalSpeed;
@@ -92,16 +92,18 @@ namespace Runtime.Character
 
         public override void OnRevive()
         {
-            m_currentArmor = m_currentMaxArmor;
+            m_currentDamagedAmount = 0;
+            m_damagePercentage = 0;
             m_isAlive = true;
         }
 
         public override void OnHeal(float _healAmount)
         {
-            m_currentArmor = Mathf.Clamp(m_currentArmor + Mathf.RoundToInt(_healAmount), 0, m_currentMaxArmor);
+            m_currentDamagedAmount -= Mathf.RoundToInt(_healAmount);
+            UpdateDamagePercentage();
         }
 
-        public void OnDealDamage(Transform _attacker, float _damageAmount, BaseCharacter _attackingCharacter = null)
+        public override void OnDealDamage(Transform _attacker, float _damageAmount, BaseCharacter _attackingCharacter = null)
         {
             
             if (_damageAmount <= 0)
@@ -112,7 +114,7 @@ namespace Runtime.Character
             _damageAmount = Mathf.CeilToInt(_damageAmount);
 
             var _damageIntakeAmount = Mathf.CeilToInt(_damageAmount * m_damageIntakeMod);
-            m_currentArmor = Mathf.Clamp(m_currentArmor - _damageIntakeAmount, 0, m_currentMaxArmor);
+            m_currentDamagedAmount += _damageIntakeAmount;
 
             if (!_attackingCharacter.IsNull())
             {
@@ -120,6 +122,12 @@ namespace Runtime.Character
             }
             
             JuiceGameController.Instance.CreateDamageText(_damageIntakeAmount, transform.position);
+            UpdateDamagePercentage();
+        }
+        
+        protected override void UpdateDamagePercentage()
+        {
+            m_damagePercentage = m_currentDamagedAmount / m_damageAmountThreshold;
         }
 
         public override void OnKillPlayer(Vector3 _deathPosition, Vector3 _deathDirection)
@@ -153,7 +161,7 @@ namespace Runtime.Character
             StartKnockBack();
         }
 
-        public void ApplyKnockback(Transform _attackerTransform, BaseCharacter _lastAttacker, 
+        public override void ApplyKnockback(Transform _attackerTransform, BaseCharacter _lastAttacker, 
             float _baseKnockbackAmount, Vector3 _forcedDirection, bool _isBallHit = false)
         {
             if (_baseKnockbackAmount <= 0)
@@ -163,7 +171,7 @@ namespace Runtime.Character
 
             PlayDamageSFX();
             
-            m_knockbackForce = _baseKnockbackAmount * (m_currentArmor > 0 ? 1 : _isBallHit ? 10 : 2.5f) *
+            m_knockbackForce = _baseKnockbackAmount * (m_damagePercentage * 10f) *
                                (1 - 0.2f);
             
             m_knockbackMoveVector = _forcedDirection == Vector3.zero ? transform.position - _attackerTransform.position : _forcedDirection.FlattenVector3Y();

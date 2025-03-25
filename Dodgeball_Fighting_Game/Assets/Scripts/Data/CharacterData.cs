@@ -43,6 +43,8 @@ namespace Data
         [Tooltip("Max Amount = 3")]
         public List<AbilityData> allCharacterAbilities = new List<AbilityData>();
 
+        public AbilityData largeAbility;
+
 
         [ContextMenu("Make Identifier")]
         public void CreateGUID()

@@ -62,6 +62,8 @@ namespace Runtime.GameControllers
 
         public static event Action OnRoundStart;
 
+        public static event Action OnRoundEnd;
+
         public static event Action OnNewSetStart;
         
         #endregion
@@ -95,7 +97,7 @@ namespace Runtime.GameControllers
         [SerializeField] private int m_pointsNeededToWin = 3;
 
         [SerializeField] private bool m_isShowTutorial;
-
+        
         #endregion
 
         #region Private Fields
@@ -606,6 +608,8 @@ namespace Runtime.GameControllers
             _foundStats.roundPoints++;
             
             m_roundHasEnded = true;
+            
+            OnRoundEnd?.Invoke();
 
             if (_foundStats.roundPoints >= m_pointsNeededToWin)
             {
@@ -798,7 +802,7 @@ namespace Runtime.GameControllers
                 _ball.Initialize(m_currentLevelManager.GetLevelMinMax()._min.position, m_currentLevelManager.GetLevelMinMax()._max.position);
             
                 _ball.transform.position = m_currentLevelManager.GetTutorialBallSpawnLocation(m_selectedCharacters.Count, i).position;
-            
+                
                 m_createdBalls.Add(_ball);
                 
                 Debug.Log("Created Tutorial Dummy and Ball");

@@ -34,7 +34,6 @@ namespace Runtime.Character
         //Shaders
         private static readonly int markerColorName = Shader.PropertyToID("_Tint");
         private static readonly int aimColorName = Shader.PropertyToID("_Color");
-        
 
         //Timer Identifiers
         private readonly string ballHitTimerIdentifier = "Ball_Hit_Timer";
@@ -61,6 +60,8 @@ namespace Runtime.Character
         public static event Action<BaseCharacter> OnPlayerRevived;
 
         public static event Action<BaseCharacter, float, BaseCharacter> OnArmorAmountChanged;
+
+        public static event Action<BaseCharacter, float, BaseCharacter> OnDamagePercentageChanged; 
 
         public static event Action<BaseCharacter, float> OnMaxArmorChanged;
 
@@ -101,6 +102,7 @@ namespace Runtime.Character
         [SerializeField] private VFXPlayer m_wackChargeVFX;
         [SerializeField] private VFXPlayer m_shieldPopVFX;
         [SerializeField] private VFXPlayer m_shieldPopStunVFX;
+        [SerializeField] private VFXPlayer m_knockbackVFX;
 
         [SerializeField] private MeshRenderer m_marker;
 
@@ -122,7 +124,10 @@ namespace Runtime.Character
         
         //float
         protected float m_originalSpeed, m_currentSpeed;
-        protected float m_currentArmor, m_currentMaxArmor;
+        protected float m_currentDamagedAmount, m_damageAmountThreshold = 100f;
+        protected float m_damagePercentage, m_damagePercentageKnockbackMod;
+        protected float m_ballConnectBuildUpTimerCurrent, m_ballConnectBuildUpTimerMax = 1.1f, m_calcMaxBuildUpTimer, 
+            m_ballBuildUpPercentage;
         protected float m_currentEnergy, m_energyMax = 100, m_energyDepleteAmount = 9f, m_energyShieldPopStunDuration = 10f;
         protected float m_evadeDuration = 2f;
         protected float m_playerKillEnergyAddAmount, m_pvpDamageEnergyAddAmount; 
@@ -135,7 +140,7 @@ namespace Runtime.Character
         protected float m_currentHitStunTime, m_currentHitStunFrequency;
         protected float m_armoredKnockbackReductionRate = 15f, m_unarmoredKnockbackReductionRate = 8f;
         protected float m_speedModifier = 1f, m_armorModifier = 1f, m_wackSizeModifier = 1f;
-        protected float m_wackRangeCurrent, m_wackTimeMax = 0.1f;
+        protected float m_wackRangeCurrent, m_wackTimeMax = 0.15f;
         
         //bool
         protected bool m_isAlive = true;
@@ -185,6 +190,8 @@ namespace Runtime.Character
 
         private List<PerkEntityBase> m_currentPerks = new List<PerkEntityBase>();
 
+        private int m_abilityUseCharges = 0;
+
         #endregion
 
         #region Accessors
@@ -215,11 +222,6 @@ namespace Runtime.Character
         public float meleeChargeSpeed => m_currentSpeed / 1.5f;
 
         protected float m_currentApplySpeed => m_isCharging && m_isPastThreshold ? meleeChargeSpeed : m_currentSpeed;
-
-        protected bool m_isDepletedArmor => m_currentArmor <= 0;
-
-        public float currentArmor => m_currentArmor;
-
 
         public Vector3 m_playerAimVector { get; private set; }
 
@@ -275,7 +277,7 @@ namespace Runtime.Character
             
             ReadPlayerInputs();
             CheckLocalTimers();
-            CheckAbilityCooldowns();
+            
             CheckStatusCooldown();
 
             CheckCharacterRotation();
@@ -299,6 +301,11 @@ namespace Runtime.Character
         #endregion
         
         #region Class Implementation
+
+        public void AddAbilityCharge()
+        {
+            m_abilityUseCharges++;
+        }
 
         public void ResetCharacter()
         {
@@ -332,8 +339,9 @@ namespace Runtime.Character
 
             characterData = _characterData;
 
-            m_currentMaxArmor = characterData.characterArmorAmount;
-            m_currentArmor = characterData.characterArmorAmount;
+            m_currentDamagedAmount = 0;
+            m_damagePercentage = 0;
+            m_damagePercentageKnockbackMod = 0.01f;
 
             m_originalSpeed = characterData.characterWalkSpeed;
             m_currentSpeed = m_originalSpeed;
@@ -409,6 +417,28 @@ namespace Runtime.Character
             OnAbilitiesAssigned?.Invoke();
         }
 
+        public async UniTask T_AssignLargeAbility()
+        {
+            if (characterData.IsNull() || characterData.allCharacterAbilities.Count == 0)
+            {
+                return;
+            }
+            
+            var _currentAbilityPrefab = Instantiate(characterData.largeAbility.abilityGameObject);
+
+            _currentAbilityPrefab.TryGetComponent(out AbilityBase _ability);
+
+            if (_ability.IsNull())
+            {
+                return;
+            }
+            
+            m_assignedAbilities.Add(_ability);
+            _ability.InitializeAbility(this, characterData.largeAbility, false);
+            
+            OnAbilitiesAssigned?.Invoke();
+        }
+
         public async UniTask AssignSpecificNewAbility(AbilityData _newAbility)
         {
             if (_newAbility.IsNull() || m_assignedAbilities.Count >= 3)
@@ -456,7 +486,7 @@ namespace Runtime.Character
 
         protected void CheckCharacterRotation()
         {
-            if (m_characterModelHolder.IsNull() || m_characterMoveVector == Vector3.zero)
+            if (m_characterModelHolder.IsNull() || m_characterMoveVector == Vector3.zero || !m_canReadPlayerInput)
             {
                 return;
             }
@@ -692,11 +722,12 @@ namespace Runtime.Character
         public void ChangeCharacterStatsValues(params object[] _arguments)
         {
             m_speedModifier += (float)_arguments[0];
+            //ToDo:Change what m_armorModifier is for
             m_armorModifier += (float)_arguments[1];
             m_wackSizeModifier += (float)_arguments[2];
             
             SetSpeed();
-            SetMaxArmor();
+            //SetMaxArmor();
             SetSize();
         }
 
@@ -708,8 +739,8 @@ namespace Runtime.Character
 
         private void SetMaxArmor()
         {
-            m_currentMaxArmor = characterData.characterArmorAmount * m_armorModifier;
-            OnMaxArmorChanged?.Invoke(this, m_currentMaxArmor);
+            //m_current = characterData.characterArmorAmount * m_armorModifier;
+            //OnMaxArmorChanged?.Invoke(this, m_currentMaxArmor);
         }
 
         private void SetSize()
@@ -1017,9 +1048,69 @@ namespace Runtime.Character
                     continue;
                 }
 
-                _ball.HitBall(m_playerAimVector, m_ballMeleeChargeAmount / m_ballMeleeChargeAmountMax > m_meleeChargeThreshold ? HitStrength.MEDIUM : HitStrength.LIGHT ,this);
-                EarlyEndTimer(ballHitTimerIdentifier);
+                if (m_ballMeleeChargeAmount / m_ballMeleeChargeAmountMax >= m_meleeChargeThreshold)
+                {
+                    OnHitBallConnect(_ball);
+                }
+                else
+                {
+                    _ball.HitBall(m_playerAimVector, HitStrength.LIGHT ,this);
+                    EarlyEndTimer(ballHitTimerIdentifier);
+                }
             }
+        }
+
+        protected async UniTask OnHitBallConnect(BallBehavior _ball)
+        {
+            HaltCharacterMovement();
+            EarlyEndTimer(ballHitTimerIdentifier);
+            
+            JuiceGameController.Instance.DoCameraShake(0.1f, 0.1f, 10, 10);
+
+            if (_ball.isFastBall)
+            {
+                JuiceGameController.Instance.CreateScreenRipple(new Vector2(transform.position.x, transform.position.z));
+            }
+            
+            _ball.StopBall();
+
+            m_ballConnectBuildUpTimerCurrent = 0f;
+
+            m_calcMaxBuildUpTimer = m_ballConnectBuildUpTimerMax * _ball.speedPercentage;
+            
+            _ball.SetBuildUp(true, this);
+            
+            _ball.ForceChangeColorTo(playerColor);
+
+            _ball.ChargedWackResizeBall();
+
+            while (m_ballConnectBuildUpTimerCurrent < m_calcMaxBuildUpTimer)
+            {
+                if (m_ballConnectBuildUpTimerCurrent >= m_calcMaxBuildUpTimer)
+                {
+                    break;
+                }
+                
+                m_ballConnectBuildUpTimerCurrent += Time.deltaTime;
+
+                m_ballBuildUpPercentage = m_ballConnectBuildUpTimerCurrent / m_calcMaxBuildUpTimer;
+                
+                _ball.UpdateBallCharge(m_ballBuildUpPercentage, m_playerAimVector);
+                
+                Debug.Log("Building UP");
+
+                await UniTask.Yield();
+            }
+            
+            //ToDo: Ball Hit VFX when going fast?
+            
+            JuiceGameController.Instance.DoCameraShake(0.1f, 0.1f, 10, 10);
+            
+            _ball.SetBuildUp(false, this);
+            
+            _ball.HitBall(m_playerAimVector, HitStrength.MEDIUM,this);
+
+            ResetCharacterMovementSpeed();
         }
 
         protected void StopCheckingBall()
@@ -1058,7 +1149,6 @@ namespace Runtime.Character
                 m_isCharging = false;
             }
             
-            m_canReadPlayerInput = false;
             m_isKnockedBack = true;
         }
 
@@ -1085,7 +1175,7 @@ namespace Runtime.Character
             m_characterMoveVector *= m_knockbackForce * Time.deltaTime;
             characterController.Move(Vector3.ClampMagnitude(m_characterMoveVector, m_knockbackForce));
 
-            m_knockbackForce *= Mathf.Exp((m_isDepletedArmor ? -m_unarmoredKnockbackReductionRate : -m_armoredKnockbackReductionRate) * Time.deltaTime);
+            m_knockbackForce *= Mathf.Exp((m_damagePercentageKnockbackMod > 1f ? -m_unarmoredKnockbackReductionRate : -m_armoredKnockbackReductionRate) * Time.deltaTime);
         }
 
         protected bool HasHitArenaBorder()
@@ -1095,6 +1185,10 @@ namespace Runtime.Character
 
         protected void EndKnockBack()
         {
+            if (!m_knockbackVFX.IsNull())
+            {
+                m_knockbackVFX.Stop();
+            }
             m_canReadPlayerInput = true;
             m_isKnockedBack = false;
             m_knockbackForce = 0;
@@ -1355,25 +1449,39 @@ namespace Runtime.Character
 
         #endregion
 
+        #region Damage Related
+
+        protected virtual void UpdateDamagePercentage()
+        {
+            //Round to nearest tenth => multiply by 10, round to int, divide by 10
+            m_damagePercentage = Mathf.CeilToInt(m_currentDamagedAmount * 10f) / 10f;
+            m_damagePercentageKnockbackMod = m_damagePercentage / 10f;
+            OnDamagePercentageChanged?.Invoke(this, m_damagePercentage, null);
+        }
+
+        #endregion
+
         #endregion
 
         #region IDamagable Inherited Methods
 
         public virtual void OnRevive()
         {
-            m_currentArmor = m_currentMaxArmor;
+            m_currentDamagedAmount = 0;
+            m_damagePercentage = 0;
+            m_damagePercentageKnockbackMod = 0.01f;
             m_isAlive = true;
             OnPlayerRevived?.Invoke(this);
-            OnArmorAmountChanged?.Invoke(this, m_currentArmor, null);
+            UpdateDamagePercentage();
         }
 
         public virtual void OnHeal(float _healAmount)
         {
-            m_currentArmor = Mathf.Clamp(m_currentArmor + Mathf.RoundToInt(_healAmount), 0, m_currentMaxArmor);
-            OnArmorAmountChanged?.Invoke(this, m_currentArmor, null);
+            m_currentDamagedAmount = Mathf.Max(m_currentDamagedAmount - Mathf.RoundToInt(_healAmount), 0);
+            UpdateDamagePercentage();
         }
-
-        public void OnDealDamage(Transform _attacker, float _damageAmount, BaseCharacter _attackingCharacter = null)
+        
+        public virtual void OnDealDamage(Transform _attacker, float _damageAmount, BaseCharacter _attackingCharacter = null)
         {
             if (isEvading)
             {
@@ -1387,25 +1495,27 @@ namespace Runtime.Character
 
             _damageAmount = Mathf.CeilToInt(_damageAmount);
 
-            if (isShielding)
+            /*if (isShielding)
             {
                 //** Formula => AmountReduction = (_damageAmount / characterMaxArmor) * maxShieldEnergy
                 //--- This will reduce the energyAmount by an amount equal to damage the player would have taken 
                 
                 RemoveEnergy((_damageAmount / m_currentMaxArmor) * m_energyMax);
                 return;
-            }
+            }*/
 
             var _damageIntakeAmount = Mathf.CeilToInt(_damageAmount * m_damageIntakeMod);
-            m_currentArmor = Mathf.Clamp(m_currentArmor - _damageIntakeAmount, 0, m_currentMaxArmor);
+            m_currentDamagedAmount += _damageIntakeAmount;
 
+            //ToDo: check if needed
             if (!_attackingCharacter.IsNull())
             {
                 _attackingCharacter.AddEnergy(m_pvpDamageEnergyAddAmount);
             }
             
             JuiceGameController.Instance.CreateDamageText(_damageIntakeAmount, transform.position);
-            OnArmorAmountChanged?.Invoke(this, m_currentArmor, _attackingCharacter);
+            
+            UpdateDamagePercentage();
         }
 
         public virtual void OnKillPlayer(Vector3 _deathPosition, Vector3 _deathDirection)
@@ -1430,7 +1540,7 @@ namespace Runtime.Character
 
         #region IKnockbackable Inherited Methods
 
-        private async UniTask T_OnKnockback()
+        protected virtual async UniTask T_OnKnockback()
         {
             Debug.Log($"Current Hit Stun Settings: Time= {m_currentHitStunTime} Frequency= {m_hitStunV3FrequencyCurrent}, Vibrato= {m_currentVirbrato}");
             
@@ -1444,7 +1554,7 @@ namespace Runtime.Character
             StartKnockBack();
         }
 
-        public void ApplyKnockback(Transform _attackerTransform, BaseCharacter _lastAttacker, 
+        public virtual void ApplyKnockback(Transform _attackerTransform, BaseCharacter _lastAttacker, 
             float _baseKnockbackAmount, Vector3 _forcedDirection, bool _isBallHit = false)
         {
             if (_baseKnockbackAmount <= 0 || isShielding || isEvading)
@@ -1452,13 +1562,18 @@ namespace Runtime.Character
                 return;
             }
 
+            m_canReadPlayerInput = false;
+
+            
             PlayDamageSFX();
             
-            m_knockbackForce = _baseKnockbackAmount * (m_currentArmor > 0 ? 1 : _isBallHit ? 10 : 2.5f) *
+            m_knockbackForce = _baseKnockbackAmount * (m_damagePercentageKnockbackMod) *
                                (1 - characterData.characterNaturalKnockbackResistance);
             
             m_knockbackMoveVector = _forcedDirection == Vector3.zero ? transform.position - _attackerTransform.position : _forcedDirection.FlattenVector3Y();
 
+            m_characterModelHolder.forward = m_knockbackMoveVector.normalized;
+            
             m_lastAttackingPlayer = _lastAttacker;
             
             //ToDo: can use end point calculation to do a SmashBros last hit FX
@@ -1472,6 +1587,15 @@ namespace Runtime.Character
             m_hitStunV3FrequencyCurrent = m_knockbackMoveVector.normalized * m_currentHitStunFrequency;
 
             VFXController.Instance.PlayDamageVFX(transform.position, Quaternion.identity);
+            
+            
+
+            if (!m_knockbackVFX.IsNull())
+            {
+                m_knockbackVFX.transform.forward = -m_knockbackMoveVector.normalized;
+                m_knockbackVFX.ChangeAllStartColor(_lastAttacker.playerColor);
+                m_knockbackVFX.Play();
+            }
             
             //ToDo: Controller Vibration
             //m_player.SetVibration(0, 0.1f, 0.1f);

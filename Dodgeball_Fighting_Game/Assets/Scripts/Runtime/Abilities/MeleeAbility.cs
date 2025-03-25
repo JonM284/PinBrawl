@@ -223,13 +223,13 @@ namespace Runtime.Abilities
             m_lineMeleeIndicator.SetPosition(1, currentOwner.spawnerLocation.position +
                                                 (aimDirection.normalized * currentRange));
 
-            m_lineMeleeIndicator.startWidth = currentScale;
-            m_lineMeleeIndicator.endWidth = currentScale;
+            m_lineMeleeIndicator.startWidth = currentScale * 2;
+            m_lineMeleeIndicator.endWidth = currentScale * 2;
             
             m_lineMeleeIndicator.gameObject.SetActive(_isActive);
         }
 
-        public override void InitializeAbility(BaseCharacter _owner, AbilityData _data)
+        public override void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart = true)
         {
             base.InitializeAbility(_owner, _data);
 

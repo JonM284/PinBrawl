@@ -396,7 +396,7 @@ namespace Runtime.Abilities
         
         #region IAbility Inherited Methods
         
-        public override void InitializeAbility(BaseCharacter _owner, AbilityData _data)
+        public override void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart = true)
         {
             base.InitializeAbility(_owner, _data);
             

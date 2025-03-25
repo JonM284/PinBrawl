@@ -67,7 +67,6 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        AndroidSharedLibraryType: Executable
         CPU: ARMv7
   - first:
       Any: 
@@ -147,8 +146,7 @@ PluginImporter:
       Standalone: OSXUniversal
     second:
       enabled: 1
-      settings:
-        CPU: AnyCPU
+      settings: {}
   - first:
       Standalone: Win
     second:
@@ -182,7 +180,7 @@ PluginImporter:
       enabled: 0
       settings:
         CPU: AnyCPU
-        DontProcess: false
+        DontProcess: False
         PlaceholderPath: 
         SDK: AnySDK
         ScriptingBackend: AnyScriptingBackend
@@ -191,8 +189,6 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        AddToEmbeddedBinaries: false
-        CPU: AnyCPU
         CompileFlags: 
         FrameworkDependencies: 
   - first:
@@ -200,7 +196,6 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CPU: AnyCPU
         CompileFlags: 
         FrameworkDependencies: 
   userData: 

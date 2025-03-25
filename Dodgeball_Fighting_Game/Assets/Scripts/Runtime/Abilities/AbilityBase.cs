@@ -92,7 +92,7 @@ namespace Runtime.Abilities
         /// </summary>
         /// <param name="_owner">Owner Player</param>
         /// <param name="_data">Actual Data</param>
-        public virtual void InitializeAbility(BaseCharacter _owner, AbilityData _data)
+        public virtual void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart = true)
         {
             if (_owner.IsNull())
             {
@@ -107,7 +107,7 @@ namespace Runtime.Abilities
             knockbackAmountMax = abilityData.abilityKnockbackAmount;
             rangeAmountMax = abilityData.abilityRange;
             currentScale = abilityData.abilityScale;
-            canUseAbility = true;
+            canUseAbility = _canUseOnStart;
             SetCategoryGUIDs();
             PreLoadNecessaryObjects();
             ChangeMRColor();

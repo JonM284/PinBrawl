@@ -9,6 +9,9 @@ Shader "Custom/MeepleToonLighting"
         _LightInt ("Light Instensity", Range(0,1)) = 1
         _OutlineColor ("Outline Color", Color) = (1,1,1,1)
         _OutlineThickness ("Outline Thickness", Range(0.001, 0.2)) = 0.1
+        _EmissionTexture("EmissionTexture", 2D) = "white" {}
+        [HDR]_EmissionColor("EmissionColor", Color) = (1,1,1,1)
+        _EmissionForce("EmissionForce", Float) = 0
     }
     SubShader
     {
@@ -50,6 +53,10 @@ Shader "Custom/MeepleToonLighting"
 
             #include "UnityCG.cginc"
 
+            uniform sampler2D _EmissionTexture;
+            uniform float4 _EmissionTexture_ST;
+            uniform float4 _EmissionColor;
+            uniform float _EmissionForce;
             sampler2D _MainTex;
             float4 _MainTex_ST;
             half4 _LightColor;
@@ -61,7 +68,7 @@ Shader "Custom/MeepleToonLighting"
 
             float3 LambertShading(float3 colorRefl, float lightInt, float3 normal, float3 lightDir)
 			{
-				return colorRefl * lightInt * max(0, dot(normal, lightDir));
+				return colorRefl * lightInt * max(0.1, dot(normal, lightDir));
 			}
 
             v2f vert (appdata v)
@@ -87,7 +94,10 @@ Shader "Custom/MeepleToonLighting"
 				float3 diffuse = LambertShading(colorRefl, _LightInt, normal, lightDir);
                 float2 diffuseUV = diffuse.xy;
                 fixed4 ramp = tex2D(_RampTex, diffuseUV);
-                col.rgb *= modelColor;
+                float2 uv_EmissionTexture = i.uv * _EmissionTexture_ST.xy + _EmissionTexture_ST.zw;
+                float4 staticSwitch58 = ((tex2D(_EmissionTexture, uv_EmissionTexture) * _EmissionColor) * _EmissionForce);
+
+                col.rgb *= modelColor +  staticSwitch58;
                 return col * ramp;
             }
             ENDCG

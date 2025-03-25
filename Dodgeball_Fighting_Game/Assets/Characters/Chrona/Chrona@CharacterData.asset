@@ -16,10 +16,10 @@ MonoBehaviour:
   characterArmorAmount: 400
   characterIdentifierGUID: b376b84a-6bbe-4582-b5f5-30ff4914a87c
   characterNaturalKnockbackResistance: 0.15
-  characterWalkSpeed: 7.6
+  characterWalkSpeed: 12
   meleeChargeWalkSpeed: 6
   characterColliderRadius: 1
-  ballMeleeColliderRadius: 2
+  ballMeleeColliderRadius: 2.8
   ballMeleeCooldownTimer: 1
   healthBarOffset: {x: 0, y: 1.5, z: 0.5}
   ballMeleeLayerMask:
@@ -30,3 +30,4 @@ MonoBehaviour:
   allCharacterAbilities:
   - {fileID: 11400000, guid: d141bfa859ee63941a8f2da6e863b86b, type: 2}
   - {fileID: 11400000, guid: 618a87c8e95942b44af620eeffb6d668, type: 2}
+  largeAbility: {fileID: 0}
