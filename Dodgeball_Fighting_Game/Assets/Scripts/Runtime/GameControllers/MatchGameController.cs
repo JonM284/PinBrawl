@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data;
 using Data.PerkDatas;
@@ -93,6 +94,8 @@ namespace Runtime.GameControllers
         [SerializeField] private List<CharacterData> m_allCharacters = new List<CharacterData>();
 
         [SerializeField] private List<PerkDataBase> m_allPerks = new List<PerkDataBase>();
+        
+        [SerializeField] private List<PerkDataBase> allUpgrades = new List<PerkDataBase>();
 
         [SerializeField] private int m_pointsNeededToWin = 3;
 
@@ -143,6 +146,8 @@ namespace Runtime.GameControllers
         private List<PerkDataBase> m_availableMatchPerks = new List<PerkDataBase>();
 
         private List<PlayerHealthDataModel> m_usedHealthBars = new List<PlayerHealthDataModel>();
+
+        private CancellationTokenSource cts = new CancellationTokenSource();
         
         #endregion
         
@@ -248,11 +253,12 @@ namespace Runtime.GameControllers
             //Show round update
             AddRoundPoint(roundWinningCharacter);
             
-            ResetAllForRound(false);
+            ResetAllForRound(false).Forget();
         }
         
-        public async UniTask StartMatch()
+        public async UniTask StartMatch(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             m_roundHasEnded = false;
             m_gameHasEnded = false;
 
@@ -271,11 +277,11 @@ namespace Runtime.GameControllers
 
             if (m_currentGameMode.IsNull())
             {
-                await UniTask.WaitUntil(() => !m_currentGameMode.IsNull());
+                await UniTask.WaitUntil(() => !m_currentGameMode.IsNull(), cancellationToken: token);
             }
             
             //Add points needed to win a setting
-            await m_currentGameMode.Initialize(m_pointsNeededToWin);
+            await m_currentGameMode.Initialize(m_pointsNeededToWin, token);
             
             UIController.Instance.FadeBlackScreen(false);
             
@@ -284,7 +290,7 @@ namespace Runtime.GameControllers
                 await StartTutorial();
             }
             
-            await UniTask.WaitForSeconds(1.25f);
+            await UniTask.WaitForSeconds(1.25f, cancellationToken: token);
 
             if (m_isShowTutorial)
             {
@@ -300,6 +306,12 @@ namespace Runtime.GameControllers
 
         private async UniTask ResetAllForRound(bool _isSkipCelebration)
         {
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
+            
+            cts.Token.ThrowIfCancellationRequested();
             if (!_isSkipCelebration)
             {
                 //small wait before celebration
@@ -349,17 +361,17 @@ namespace Runtime.GameControllers
             }
             
             //Do Gameplay Related things
-            await m_currentGameMode.UpdateScores();
+            await m_currentGameMode.UpdateScores(cts.Token);
 
             if (m_roundHasEnded && !m_gameHasEnded)
             {
-                await m_currentGameMode.ExtraActions();
+                await m_currentGameMode.ExtraActions(cts.Token);
                 m_roundHasEnded = false;
                 //ResetAllPlayersRoundsScores();
             }else if (m_gameHasEnded)
             {
                 matchWinningCharacter = m_playersStats.FirstOrDefault(pms => pms.roundPoints >= m_pointsNeededToWin).playerCharacter;
-                await m_currentGameMode.ShowFinalScreen();
+                await m_currentGameMode.ShowFinalScreen(cts.Token);
                 //Game over screen
                 await m_currentLevelManager.EndMatch(matchWinningCharacter);
                 return;
@@ -450,7 +462,12 @@ namespace Runtime.GameControllers
 
         public async UniTask EndGame()
         {
-            m_currentGameMode.DeInitialize();
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
+            
+            await m_currentGameMode.DeInitialize(cts.Token);
             
             UnassignGameMode();
             UnassignLevelManager();
@@ -490,7 +507,12 @@ namespace Runtime.GameControllers
             
             Debug.Log("Starting Match");
 
-            StartMatch();
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
+            
+            StartMatch(cts.Token).Forget();
         }
 
         //end game
@@ -778,6 +800,11 @@ namespace Runtime.GameControllers
             return m_maxPossibleWeight;
         }
 
+        public List<PerkDataBase> GetAllUpgrades()
+        {
+            return allUpgrades.ToList();
+        }
+        
         private async UniTask StartTutorial()
         {
 
@@ -860,7 +887,7 @@ namespace Runtime.GameControllers
             
             m_currentLevelManager.SetTutorialActive(false, m_selectedCharacters.Count);
 
-            ResetAllForRound(true);
+            ResetAllForRound(true).Forget();
         }
 
         public void TempKillDummyCharacter(PracticeDummyCharacter _character, Vector3 _deathLocation, Vector3 _deathDirection, Vector3 _spawnLocation)

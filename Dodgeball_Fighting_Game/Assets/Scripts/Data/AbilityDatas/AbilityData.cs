@@ -2,6 +2,7 @@
 using Data.StatusDatas;
 using Runtime.Gameplay;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Data.AbilityDatas
 {
@@ -34,7 +35,7 @@ namespace Data.AbilityDatas
 
         public float knockbackDirectionMod = 1f;
 
-        public HitStrength ballHitStrength;
+        [FormerlySerializedAs("ballHitStrength")] public HitStrengthType ballHitStrengthType;
 
         public LayerMask collisionDetectionLayers;
 

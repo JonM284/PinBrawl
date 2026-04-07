@@ -1,6 +1,6 @@
 ﻿namespace Runtime.Gameplay
 {
-    public enum HitStrength
+    public enum HitStrengthType
     {
         LIGHT,
         MEDIUM,

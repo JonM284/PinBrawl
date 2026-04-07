@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef79a6f250cc43cd9697112da8e7854d, type: 3}
+  m_Name: PlayerEvadeDurationUpgrade
+  m_EditorClassIdentifier: 
+  perkName: PlayerEvadeDurationUpgrade
+  perkDescription: Increase Evade Duration
+  perkIconRef: {fileID: -100672807, guid: a10cb3573e0dca140b847908d070e55c, type: 3}
+  UpgradeType: 0
+  perkRarity: 0
+  rarityWeight: 0
+  perkIdentifierGUID: 75f4a96a-8bfb-4c04-82e0-479baf21b21e
+  perkGameObject: {fileID: 5845045226385195876, guid: 886a7d61e069c7f46b357bdde47ec628, type: 3}
+  baseSpeedChangeAmount: 0
+  baseArmorChangeAmount: 0
+  baseSizeChangeAmount: 0
+  baseWackRangeChangeAmount: 0
+  baseEvasiveDurationChangeAmount: 0.2
+  baseDashRangeChangeAmount: 0

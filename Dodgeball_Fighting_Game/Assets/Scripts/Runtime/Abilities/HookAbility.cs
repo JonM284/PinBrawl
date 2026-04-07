@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
 using Runtime.Character;
@@ -65,25 +66,25 @@ namespace Runtime.Abilities
 
         #region Class Implementation
         
-        
-
-        protected async UniTask T_DoHookAction()
+        protected async UniTask T_DoHookAction(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             canUseAbility = false;
             
             GetEndPosition();
 
-            await T_HookMovement();
+            await T_HookMovement(token);
 
             if(m_hasConnected)
             {
-                await T_DoMovement();
+                await T_DoMovement(token);
                 Debug.Log("Connected");
             }
         }
 
-        protected async UniTask T_HookMovement()
+        protected async UniTask T_HookMovement(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             while (m_hookPercentage < m_percentThreshold && !m_hasConnected)
             {
                 if (m_hasConnected)
@@ -100,13 +101,14 @@ namespace Runtime.Abilities
                 m_hookPoint.transform.position = Vector3.Lerp(currentOwner.transform.position, m_endPosition, m_hookPercentage);
                 m_ropeVisuals.SetPosition(1, m_hookPoint.transform.position);
 
-                await UniTask.Yield();
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
             
         }
         
-        protected async UniTask T_DoMovement()
+        protected async UniTask T_DoMovement(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             m_targetMoveCharacter = m_hookAbilityData.bringHookedPlayerBack ? m_hitCharacter : currentOwner;
             
             m_hitCharacter.Pause_UnPause_Character(true);
@@ -125,7 +127,7 @@ namespace Runtime.Abilities
             
             m_targetMoveCharacter.EnableCharacterController(false);
             
-            await T_PathMovement();
+            await T_PathMovement(token);
             
             m_targetMoveCharacter.EnableCharacterController(true);
             
@@ -133,8 +135,9 @@ namespace Runtime.Abilities
             m_hitCharacter.Pause_UnPause_Character(false);
         }
 
-        protected async UniTask T_PathMovement()
+        protected async UniTask T_PathMovement(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             while (m_movementPercentage < m_percentThreshold)
             {
                 m_currentPlayerMoveTime += Time.deltaTime;
@@ -152,7 +155,7 @@ namespace Runtime.Abilities
                     m_ropeVisuals.SetPosition(0, m_targetMoveCharacter.transform.position);
                 }
                 
-                await UniTask.Yield();
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
         
@@ -203,7 +206,7 @@ namespace Runtime.Abilities
             if (!_ball.IsNull())
             {
                 _ball.HitBall(aimDirection * -1, 
-                    m_hookAbilityData.ballHitStrength, currentOwner);
+                    m_hookAbilityData.ballHitStrengthType, currentOwner);
                 return;
             }
             
@@ -218,9 +221,11 @@ namespace Runtime.Abilities
         
         #region IAbility Inherited Methods
 
-        public override void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart = true)
+        public override async UniTask InitializeAbilityAsync(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart,
+            CancellationToken token)
         {
-            base.InitializeAbility(_owner, _data);
+            token.ThrowIfCancellationRequested();
+            await base.InitializeAbilityAsync(_owner, _data, true, token);
             
             lifeTimeMax = m_hookAbilityData.hookTravelTime;
             
@@ -251,9 +256,9 @@ namespace Runtime.Abilities
             m_hookPoint.transform.localPosition = Vector3.zero;
         }
 
-        public override async UniTask DoAbility()
+        public override async UniTask DoAbilityAsync(CancellationToken token)
         {
-            base.DoAbility();
+            await base.DoAbilityAsync(token);
             canUseAbility = false;
             
             m_hookPoint.SetActive(true);
@@ -265,7 +270,7 @@ namespace Runtime.Abilities
 
             PlayRandomSound();
             
-            await T_DoHookAction();
+            await T_DoHookAction(token);
             
             currentOwner.Pause_UnPause_Character(false);
             

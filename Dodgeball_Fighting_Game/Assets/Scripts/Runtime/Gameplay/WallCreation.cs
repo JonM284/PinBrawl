@@ -1,4 +1,6 @@
-﻿using Project.Scripts.Utils;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
+using Project.Scripts.Utils;
 using Runtime.Character;
 using UnityEngine;
 
@@ -22,6 +24,11 @@ namespace Runtime.Gameplay
                 return;
             }
 
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
+            
             for (int i = 0; i < m_hitAmount; i++)
             {
                 m_hitColliders[i].TryGetComponent(out BaseCharacter _character);
@@ -39,7 +46,7 @@ namespace Runtime.Gameplay
                             continue;   
                         }
 
-                        _character.ApplyStatus(_statusData);
+                        _character.ApplyStatus(_statusData, cts.Token).Forget();
                     }
                 }
                 

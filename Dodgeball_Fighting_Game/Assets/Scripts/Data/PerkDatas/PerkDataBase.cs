@@ -12,6 +12,7 @@ namespace Data.PerkDatas
         public string perkDescription;
         public Sprite perkIconRef;
 
+        public UpgradeType UpgradeType;
         public PerkRarity perkRarity;
         public int rarityWeight;
         

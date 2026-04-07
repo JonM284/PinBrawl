@@ -11,6 +11,13 @@ namespace Data.PerkDatas
         public float baseArmorChangeAmount;
         [Range(-1.0f, 1.0f)]
         public float baseSizeChangeAmount;
+        [Range(-1.0f, 1.0f)]
+        public float baseWackRangeChangeAmount;
+        [Range(-1.0f, 1.0f)]
+        public float baseEvasiveDurationChangeAmount;
+        [Range(-1.0f, 1.0f)]
+        public float baseDashRangeChangeAmount;
+        
         
         public override string GetFormatDescription()
         {

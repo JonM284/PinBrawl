@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Project.Scripts.Utils;
 using Runtime.Character;
 using Runtime.GameControllers;
+using Runtime.Gameplay.Sensors;
 using Runtime.VFX;
 using Unity.Mathematics;
 using UnityEngine;
@@ -63,6 +64,7 @@ namespace Runtime.Gameplay
 
         [SerializeField] private float m_ballSpeedReduceRate = 1f;
         
+        [SerializeField] private PlayerDetectionSensor playerDetectionSensor;
         
         [Header("Ball Variables")]
         [Header("Speed")]
@@ -177,6 +179,21 @@ namespace Runtime.Gameplay
             Gizmos.DrawWireSphere(transform.position, playerCheckRadius * m_currentScale);
         }
 
+        private void Awake()
+        {
+            playerDetectionSensor.SetColliderRadius(playerCheckRadius);
+        }
+
+        private void OnEnable()
+        {
+            playerDetectionSensor.OnCharacterEnter += OnHitPlayer;
+        }
+
+        private void OnDisable()
+        {
+            playerDetectionSensor.OnCharacterEnter -= OnHitPlayer;
+        }
+
         private void Update()
         {
             if (m_currentSpeed <= 0 || m_isBuildingUp)
@@ -188,8 +205,6 @@ namespace Runtime.Gameplay
             {
                 ReflectBall();
             }
-
-            CheckForPlayers();
             
             m_ballMoveDirection = m_ballMoveDirection.normalized * (m_currentSpeed * Time.deltaTime);
             cc.Move(m_ballMoveDirection);
@@ -325,7 +340,7 @@ namespace Runtime.Gameplay
             m_trail.startWidth = m_currentScale/2;
         }
 
-        public void HitBall(Vector3 direction, HitStrength _hitLevel, BaseCharacter _currentHittingCharacter)
+        public void HitBall(Vector3 direction, HitStrengthType _hitLevel, BaseCharacter _currentHittingCharacter)
         {
             //ToDo: speed (x2 or so) if charged hit
             //ToDo: on charged hit, pause wacking player and ball for a second or so, [build up to new speed] then release. 
@@ -339,7 +354,7 @@ namespace Runtime.Gameplay
                 return;
             }
             
-            if (_hitLevel == HitStrength.LIGHT)
+            if (_hitLevel == HitStrengthType.LIGHT)
             {
                 m_trackedSpeed += 1f;
             }
@@ -438,31 +453,19 @@ namespace Runtime.Gameplay
             m_currentWallBounceNormal = _hit.normal;
         }
 
-        private void CheckForPlayers()
+        private void OnHitPlayer(BaseCharacter hitCharacter)
         {
-            m_amountHit = Physics.OverlapSphereNonAlloc(transform.position, playerCheckRadius * m_currentScale, 
-                m_hitColliders, playerCheckLayer);
-
-            if (m_amountHit == 0)
+            if (m_lastWackCharacter.IsNull()) return;
+            if (m_currentSpeed <= 0 || m_isBuildingUp) return;
+            if (hitCharacter.IsNull() || hitCharacter == m_lastWackCharacter || m_recentlyHitCharacters.Contains(hitCharacter))
             {
                 return;
             }
-
-            for (int i = 0; i < m_amountHit; i++)
-            {
-                m_hitColliders[i].TryGetComponent(out BaseCharacter _character);
-
-                if (_character.IsNull() || _character == m_lastWackCharacter || m_recentlyHitCharacters.Contains(_character))
-                {
-                    continue;
-                }
                 
-                _character.OnDealDamage(this.transform, Mathf.RoundToInt(m_ballDamageAmount * (m_currentSpeed / m_ballMaxSpeed)));
-                _character.ApplyKnockback(this.transform , m_lastWackCharacter ,m_currentSpeed > m_ballLightHit ? 30 : 15, m_ballMoveDirection, true);
-                m_recentlyHitCharacters.Add(_character);
-                TickGameController.Instance.CreateNewTimer("Hit_Player", 0.7f, false, RemoveCharacterFromRecentlyHit);
-            }
-            
+            hitCharacter.OnDealDamage(this.transform, Mathf.RoundToInt(m_ballDamageAmount * (m_currentSpeed / m_ballMaxSpeed)));
+            hitCharacter.ApplyKnockback(this.transform , m_lastWackCharacter ,m_currentSpeed > m_ballLightHit ? 30 : 15, m_ballMoveDirection, true);
+            m_recentlyHitCharacters.Add(hitCharacter);
+            TickGameController.Instance.CreateNewTimer("Hit_Player", 0.7f, false, RemoveCharacterFromRecentlyHit);
         }
 
         private void RemoveCharacterFromRecentlyHit()

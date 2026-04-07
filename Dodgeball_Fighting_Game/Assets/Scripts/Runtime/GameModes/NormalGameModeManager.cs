@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Project.Scripts.Utils;
 using Runtime.Character;
@@ -58,8 +59,9 @@ namespace Runtime.GameModes
         
         #region GameModeManagerBase Inherited Methods
 
-        public override async UniTask Initialize(int _pointsNeededToWin = 0)
+        public override async UniTask Initialize(int _pointsNeededToWin, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             //ToDo: Settings
             isSetBased = m_isSetBased;
             
@@ -74,7 +76,7 @@ namespace Runtime.GameModes
             
             for (int i = 0; i < m_playerList.Count; i++)
             {
-                await m_playerList[i].InitializeAssignedAbilities();
+                await m_playerList[i].InitializeAssignedAbilities(token);
             }
 
             await UniTask.Yield();
@@ -88,17 +90,18 @@ namespace Runtime.GameModes
                 }
                 
                 await m_playerStatsBlocks[i].Initialize(m_playerList[i], m_pointsNeededToWin, m_isSetBased);
-                await UniTask.Yield();
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
             
             m_pointsUI.SetActive(false);
             m_augmentationsUI.SetActive(false);
             
-            await base.Initialize(m_pointsNeededToWin);
+            await base.Initialize(m_pointsNeededToWin, token);
         }
         
-        public override async UniTask UpdateScores()
+        public override async UniTask UpdateScores(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             //Show Round scores
             m_pointsUI.SetActive(true);
             
@@ -113,14 +116,15 @@ namespace Runtime.GameModes
                 await _statsBlock.AwardWholePoint(_stats.roundPoints);
             }
 
-            await UniTask.WaitForSeconds(2.25f);
+            await UniTask.WaitForSeconds(2.25f, cancellationToken: token);
 
             m_pointsUI.SetActive(false);
-            await base.UpdateScores();
+            await base.UpdateScores(token);
         }
         
-        public override async UniTask ExtraActions()
+        public override async UniTask ExtraActions(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             //If a player wins enough rounds, show Sets won score
             m_augmentationsUI.SetActive(true);
             
@@ -146,19 +150,19 @@ namespace Runtime.GameModes
                     await m_perkSelectionDataModel.SetupSelectionScreenPlayer(_playerStat.playerCharacter);
                     m_perkSelectionDataModel.SetActiveState(true);
 
-                    await UniTask.WaitUntil(() => !m_perkSelectionDataModel.isSelecting);
+                    await UniTask.WaitUntil(() => !m_perkSelectionDataModel.isSelecting, cancellationToken: token);
                 }
             }
             
             //ToDo: End Animation
             
             m_augmentationsUI.SetActive(false);
-            await base.ExtraActions();
+            await base.ExtraActions(token);
         }
         
-        public override async UniTask ShowFinalScreen()
+        public override async UniTask ShowFinalScreen(CancellationToken token)
         {
-            
+            token.ThrowIfCancellationRequested();
             m_pointsUI.SetActive(true);
             
             foreach (var _statsBlock in m_playerStatsBlocks)
@@ -172,21 +176,21 @@ namespace Runtime.GameModes
                 await _statsBlock.AwardWholePoint(_stats.roundPoints);
             }
             
-            await UniTask.WaitForSeconds(1.5f);
+            await UniTask.WaitForSeconds(1.5f, cancellationToken: token);
             
             m_pointsUI.SetActive(false);
             
-            await base.ShowFinalScreen();
+            await base.ShowFinalScreen(token);
         }
 
-        public override async UniTask ShowEnd()
+        public override async UniTask ShowEnd(CancellationToken token)
         {
-
+            token.ThrowIfCancellationRequested();
             m_pointsUI.SetActive(false);
             
             //ToDo: Winning Animation!
             
-            await base.ShowEnd();
+            await base.ShowEnd(token);
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
@@ -62,7 +63,7 @@ namespace Runtime.Gameplay
         
         private LayerMask m_detectableLayers;
 
-        private HitStrength m_ballHitStrength;
+        private HitStrengthType _mBallHitStrengthType;
 
         private ProjectileAbilityData m_projectileAbilityData;
         
@@ -73,6 +74,7 @@ namespace Runtime.Gameplay
         
         protected Collider[] m_explosionHitColliders = new Collider[6];
         protected int m_explosionHitAmount;
+        protected CancellationTokenSource cts = new CancellationTokenSource();
         
         #endregion
 
@@ -131,7 +133,7 @@ namespace Runtime.Gameplay
 
             m_explosionRange = _scale;
 
-            m_ballHitStrength = _abilityData.ballHitStrength;
+            _mBallHitStrengthType = _abilityData.ballHitStrengthType;
 
             m_isPassThroughObjects = _abilityData.isPassThroughObjects;
 
@@ -310,7 +312,7 @@ namespace Runtime.Gameplay
                 {
                     _ball.HitBall(m_projectileEndType == ProjectileEndType.EXPLODE ? 
                         _collider.transform.position - transform.position :
-                        m_moveDir, m_ballHitStrength, m_owner);
+                        m_moveDir, _mBallHitStrengthType, m_owner);
                     
                     OnProjectileEnd();
                     return;
@@ -350,6 +352,11 @@ namespace Runtime.Gameplay
             {
                 return;
             }
+
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
             
             foreach (var _statusData in m_projectileAbilityData.applicableStatusesOnHit)
             {
@@ -357,7 +364,7 @@ namespace Runtime.Gameplay
                     continue;   
                 }
 
-                _character.ApplyStatus(_statusData);
+                _character.ApplyStatus(_statusData, cts.Token).Forget();
             }
         }
 

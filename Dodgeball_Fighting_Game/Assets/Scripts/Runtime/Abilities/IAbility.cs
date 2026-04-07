@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
 using Runtime.Character;
@@ -19,12 +20,24 @@ namespace Runtime.Abilities
 
         public BaseCharacter currentOwner { get; set; }
 
-        public abstract void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart);
+        public virtual async UniTask InitializeAbilityAsync(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            await UniTask.CompletedTask;
+        }
 
-        public abstract UniTask PreLoadNecessaryObjects();
+        public virtual async UniTask PreLoadNecessaryObjectsAsync(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            await UniTask.CompletedTask;
+        }
         
         //Definitely 
-        public abstract UniTask DoAbility();
+        public virtual async UniTask DoAbilityAsync(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            await UniTask.CompletedTask;
+        }
 
         public abstract void ResetAbilityUse();
     }

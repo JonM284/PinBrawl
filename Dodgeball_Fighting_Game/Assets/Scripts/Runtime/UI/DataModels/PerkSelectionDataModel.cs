@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data.PerkDatas;
 using Project.Scripts.Utils;
@@ -73,6 +74,8 @@ namespace Runtime.UI.Items
         private int m_currentHoveredPerkIndex, m_nextIndex, m_previousIndex;
 
         private List<PerkDataBase> m_randomPerks = new List<PerkDataBase>();
+
+        private CancellationTokenSource cts = new CancellationTokenSource();
         
         #endregion
         
@@ -259,9 +262,14 @@ namespace Runtime.UI.Items
             }
             
             //ToDo: Selected Animation
+
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
             
             //Add to character
-            currentPlayer.AddPerk(m_currentHightlightPerk.assignedPerk);
+            currentPlayer.AddPerk(m_currentHightlightPerk.assignedPerk, cts.Token).Forget();
             
             //Remove from available perks
             MatchGameController.Instance.SetPerkSelected(m_currentHightlightPerk.assignedPerk);

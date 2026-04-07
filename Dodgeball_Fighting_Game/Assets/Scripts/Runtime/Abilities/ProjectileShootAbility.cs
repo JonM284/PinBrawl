@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
 using Runtime.Character;
@@ -41,28 +42,27 @@ namespace Runtime.Abilities
                 return;
             }
 
-
             m_rangeIndicator.startColor = currentOwner.playerColor;
             m_rangeIndicator.endColor = currentOwner.playerColor;
         }
         
         
-        private async UniTask T_ShootMultipleProjectiles()
+        private async UniTask T_ShootMultipleProjectiles(CancellationToken token)
         {
-
+            token.ThrowIfCancellationRequested();
             if (projectileAbilityData.isSpreadShotOnStart)
             {
-                await T_ShootSpreadProjectiles();
+                await T_ShootSpreadProjectiles(token);
             }
             else
             {
-                await T_ShootMultipleStraightProjectiles();
+                await T_ShootMultipleStraightProjectiles(token);
             }
-            
         }
 
-        private async UniTask T_ShootSpreadProjectiles()
+        private async UniTask T_ShootSpreadProjectiles(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             PlayRandomSound();
          
             float _angleIncrease = projectileAbilityData.projectileSpread / (m_amountOfShots - 1f);
@@ -80,7 +80,7 @@ namespace Runtime.Abilities
                 Vector3 spreadDirection = m_calculatedRotation * aimDirection;
                 
                 var _projectile = await ObjectPoolController.Instance.T_CreateObject(projectileAbilityData.name, 
-                    projectileAbilityData.projeciltePrefab, currentOwner.spawnerLocation.position);
+                    projectileAbilityData.projeciltePrefab, currentOwner.spawnerLocation.position, token);
                 
                 _projectile.TryGetComponent(out ProjectileEntityBase _projectileEntity);
 
@@ -94,24 +94,24 @@ namespace Runtime.Abilities
             }
         }
         
-        private async UniTask T_ShootMultipleStraightProjectiles()
+        private async UniTask T_ShootMultipleStraightProjectiles(CancellationToken token)
         {
-
+            token.ThrowIfCancellationRequested();
             for (int i = 0; i < m_amountOfShots; i++)
             {
-                await ShootSingleStraightProjectile();
+                await ShootSingleStraightProjectile(token);
                 PlayRandomSound();
-                await UniTask.WaitForSeconds(projectileAbilityData.timeBetweenShots);
+                await UniTask.WaitForSeconds(projectileAbilityData.timeBetweenShots, cancellationToken: token);
             }
-            
         }
 
-        private async UniTask ShootSingleStraightProjectile()
+        private async UniTask ShootSingleStraightProjectile(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             PlayRandomSound();
             
             var _projectile = await ObjectPoolController.Instance.T_CreateObject(projectileAbilityData.name, 
-                projectileAbilityData.projeciltePrefab, currentOwner.spawnerLocation.position);
+                projectileAbilityData.projeciltePrefab, currentOwner.spawnerLocation.position, token);
 
             _projectile.transform.forward = aimDirection;
             
@@ -127,16 +127,16 @@ namespace Runtime.Abilities
             _projectileEntity.Initialize(currentOwner, aimDirection, projectileAbilityData, 
                 currentSpeed, currentDamage, currentKnockback, _calculatedLifetime, currentScale);
         }
-
         
-
         #endregion
        
         #region AbilityBase Inherited Methods
 
-        public override void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart = true)
+        public override async UniTask InitializeAbilityAsync(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart,
+            CancellationToken token)
         {
-            base.InitializeAbility(_owner, _data);
+            token.ThrowIfCancellationRequested();
+            await base.InitializeAbilityAsync(_owner, _data, true, token);
             
             speedAmountMax = projectileAbilityData.projectileShootSpeed;
             lifeTimeMax = projectileAbilityData.projectileMaxLifetime;
@@ -147,32 +147,32 @@ namespace Runtime.Abilities
             ChangeLineRendererColor();
         }
         
-        public override async UniTask PreLoadNecessaryObjects()
+        public override async UniTask PreLoadNecessaryObjectsAsync(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             for (int i = 0; i < projectileAbilityData.projectileAmount; i++)
             {
                 await ObjectPoolController.Instance.T_PreCreateObject(projectileAbilityData.name,
-                    projectileAbilityData.projeciltePrefab);   
+                    projectileAbilityData.projeciltePrefab, token);   
             }
         }
 
-        public override async UniTask DoAbility()
+        public override async UniTask DoAbilityAsync(CancellationToken token)
         {
-            base.DoAbility();
+            token.ThrowIfCancellationRequested();
+            await base.DoAbilityAsync(token);
             
             canUseAbility = false;
-
             
             //Shoot Projectile
             if (m_amountOfShots > 1)
             {   
-                await T_ShootMultipleProjectiles();
+                await T_ShootMultipleProjectiles(token);
             }
             else
             {
-                await ShootSingleStraightProjectile();
+                await ShootSingleStraightProjectile(token);
             }
-            
         }
         
         public override void ShowAttackIndicator(bool _isActive)

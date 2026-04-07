@@ -50,6 +50,9 @@ LineRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -217,14 +220,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e619aefe733f436ca6ac8337bcf02b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_abilityCastRangeIndicator: {fileID: 0}
+  m_wallLayer:
+    serializedVersion: 2
+    m_Bits: 512
   m_abilityUseSFX: []
+  m_changableMR: []
   m_hookIndicator: {fileID: 1125565652709407256}
   m_hookPoint: {fileID: 2478521882185503256}
   m_ropeVisuals: {fileID: 3755387974288288627}
   m_hookReturnPoint: {fileID: 3705768004079970543}
-  m_wallLayer:
-    serializedVersion: 2
-    m_Bits: 512
 --- !u!82 &6310597019882954644
 AudioSource:
   m_ObjectHideFlags: 0
@@ -236,6 +241,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -379,6 +385,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -485,6 +494,9 @@ LineRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

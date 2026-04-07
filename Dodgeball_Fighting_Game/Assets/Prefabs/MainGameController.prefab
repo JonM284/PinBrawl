@@ -648,6 +648,7 @@ MonoBehaviour:
       m_AssetGUID: 5e7ab120e7973124cae1c9af033b4c05
       m_SubObjectName: 
       m_SubObjectType: 
+      m_SubObjectGUID: 
       m_EditorAssetChanged: 0
   canvasByLayers:
   - layer: {fileID: 11400000, guid: 5a51eb2f682ea8e429d15e0d8549b31a, type: 2}
@@ -662,6 +663,7 @@ MonoBehaviour:
     m_AssetGUID: 5a165cadcf8dfd1418394580be378f1c
     m_SubObjectName: 
     m_SubObjectType: 
+    m_SubObjectGUID: 
     m_EditorAssetChanged: 0
 --- !u!1 &3143325741773410383
 GameObject:
@@ -1233,7 +1235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b47781a6ff32460f9d1808fa4453f493, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_testGameMode: {fileID: 11400000, guid: 767bd25ff952af547b6a605cc770b0fb, type: 2}
+  m_testGameMode: {fileID: 11400000, guid: 5495b8ece9f8c8e468d5aad2c3004adf, type: 2}
   m_testCharacterID: 0
   m_amountOfCharacters: 2
   m_roundResetTimer: 4
@@ -1289,6 +1291,24 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 10d7a000c99d6a94186727afccedfc14, type: 2}
   - {fileID: 11400000, guid: 240fa3aa7bf5829479f9ef5d3dea6eab, type: 2}
   - {fileID: 11400000, guid: e35322937f8085c46af807ee09e28d04, type: 2}
+  allUpgrades:
+  - {fileID: 11400000, guid: 8ef2f20fb0ab3b4438f02255a2fa3dae, type: 2}
+  - {fileID: 11400000, guid: c690432109614344cbb3ffb47562c9b6, type: 2}
+  - {fileID: 11400000, guid: 5cfcead4a377b5749b8fd5ed7da16cd0, type: 2}
+  - {fileID: 11400000, guid: 3d4fe3f1af66b504aa6685f1b86ff040, type: 2}
+  - {fileID: 11400000, guid: fd5bd52ea2fd1f841bfceac9293f0d90, type: 2}
+  - {fileID: 11400000, guid: 53c067d2e58f79e4a97c550a030ddb50, type: 2}
+  - {fileID: 11400000, guid: a9e03916c25adb44dab58075ef8433d8, type: 2}
+  - {fileID: 11400000, guid: 0ab542a462b534549b3502268c87ea40, type: 2}
+  - {fileID: 11400000, guid: 3588e2feeb3f6de439568e371222488c, type: 2}
+  - {fileID: 11400000, guid: 41851b3bc7eff7c4eaba780989a16049, type: 2}
+  - {fileID: 11400000, guid: 54e9c3c7fbbb6034d92686f2c2b82884, type: 2}
+  - {fileID: 11400000, guid: 3d9de479b6c8e9749b975759b3c3407f, type: 2}
+  - {fileID: 11400000, guid: 7d186805e87644c41a14e7defedff4e1, type: 2}
+  - {fileID: 11400000, guid: 31e0771267b429543b648c600adac49a, type: 2}
+  - {fileID: 11400000, guid: b4c696f998c5d19448a1bea38de2caeb, type: 2}
+  - {fileID: 11400000, guid: 8ecc64b87c47c09449006c5caadd36af, type: 2}
+  - {fileID: 11400000, guid: ed8668f1bd5f8f14ea20bfed247fb31c, type: 2}
   m_pointsNeededToWin: 3
   m_isShowTutorial: 1
 --- !u!1 &8805505436093219786

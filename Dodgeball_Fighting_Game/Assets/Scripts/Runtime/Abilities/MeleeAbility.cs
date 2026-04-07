@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
 using Runtime.Character;
@@ -149,7 +150,7 @@ namespace Runtime.Abilities
             if (!_ball.IsNull())
             {
                 _ball.HitBall(aimDirection * m_meleeAbilityData.knockbackDirectionMod, 
-                    m_meleeAbilityData.ballHitStrength, currentOwner);
+                    m_meleeAbilityData.ballHitStrengthType, currentOwner);
             }
 
             _collider.TryGetComponent(out IDamagable _damagable);
@@ -166,9 +167,10 @@ namespace Runtime.Abilities
 
         #region IAbility Inherited Methods
 
-        public override async UniTask DoAbility()
+        public override async UniTask DoAbilityAsync(CancellationToken token)
         {
-            base.DoAbility();
+            token.ThrowIfCancellationRequested();
+            await base.DoAbilityAsync(token);
 
             PlayRandomSound();
             
@@ -229,10 +231,11 @@ namespace Runtime.Abilities
             m_lineMeleeIndicator.gameObject.SetActive(_isActive);
         }
 
-        public override void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart = true)
+        public override async UniTask InitializeAbilityAsync(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart, 
+            CancellationToken token)
         {
-            base.InitializeAbility(_owner, _data);
-
+            token.ThrowIfCancellationRequested();
+            await base.InitializeAbilityAsync(_owner, _data, true ,token);
             ChangeLineRendererColor();
         }
 

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
@@ -47,15 +49,17 @@ namespace Runtime.Abilities
 
         #region Private Fields
 
-        private float cooldownModifier = 1f;
+        protected float cooldownModifier = 1f;
         //hit = damage and Knockback modifier
-        private float hitModifier = 1f;
-        private float lifeTimeModifier = 1f;
-        private float speedModifier = 1f;
-        private float rangeModifier = 1f;
-        private float knockbackAmountMax;
-        private float damageAmountMax;
+        protected float hitModifier = 1f;
+        protected float lifeTimeModifier = 1f;
+        protected float speedModifier = 1f;
+        protected float rangeModifier = 1f;
+        protected float knockbackAmountMax;
+        protected float damageAmountMax;
 
+        protected CancellationTokenSource cts = new CancellationTokenSource();
+        
         #endregion
         
         #region IAbility Inherited Methods
@@ -66,8 +70,7 @@ namespace Runtime.Abilities
 
         public Vector3 aimDirection { get; set; }
         public BaseCharacter currentOwner { get; set; }
-
-
+        
         #region Accessors
 
         public AbilityData abilityData { get; private set; }
@@ -92,8 +95,10 @@ namespace Runtime.Abilities
         /// </summary>
         /// <param name="_owner">Owner Player</param>
         /// <param name="_data">Actual Data</param>
-        public virtual void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart = true)
+        public virtual async UniTask InitializeAbilityAsync(BaseCharacter _owner, AbilityData _data,
+            bool _canUseOnStart, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             if (_owner.IsNull())
             {
                 return;
@@ -109,24 +114,19 @@ namespace Runtime.Abilities
             currentScale = abilityData.abilityScale;
             canUseAbility = _canUseOnStart;
             SetCategoryGUIDs();
-            PreLoadNecessaryObjects();
-            ChangeMRColor();
+            await PreLoadNecessaryObjectsAsync(token);
+            ChangeMrColor();
         }
 
-        private void ChangeMRColor()
+        private void ChangeMrColor()
         {
             if (m_changableMR.Count == 0)
             {
                 return;
             }
 
-            foreach (var _mr in m_changableMR)
+            foreach (var _mr in m_changableMR.Where(_mr => !_mr.IsNull()))
             {
-                if (_mr.IsNull())
-                {
-                    continue;
-                }
-                
                 _mr.materials[0].SetColor("_Tint", currentOwner.playerColor);
                 _mr.materials[0].SetColor("_Color", currentOwner.playerColor);
             }
@@ -145,9 +145,10 @@ namespace Runtime.Abilities
             }
         }
         
-        public virtual async UniTask PreLoadNecessaryObjects()
+        public virtual async UniTask PreLoadNecessaryObjectsAsync(CancellationToken token)
         {
-            
+            token.ThrowIfCancellationRequested();
+            await UniTask.CompletedTask;
         }
 
         public virtual void ShowAttackIndicator(bool _isActive)
@@ -155,8 +156,9 @@ namespace Runtime.Abilities
             aimDirection = currentOwner.m_playerAimVector.normalized;
         }
 
-        public virtual async UniTask DoAbility()
+        public virtual async UniTask DoAbilityAsync(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             aimDirection = currentOwner.m_playerAimVector.normalized;
         }
 

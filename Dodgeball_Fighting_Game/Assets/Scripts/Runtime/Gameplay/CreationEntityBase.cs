@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
@@ -63,6 +64,7 @@ namespace Runtime.Gameplay
 
         protected Collider[] m_hitColliders = new Collider[6];
         protected int m_hitAmount;
+        protected CancellationTokenSource cts = new CancellationTokenSource();
 
         #endregion
         
@@ -270,7 +272,7 @@ namespace Runtime.Gameplay
                         _hitDirection = m_savedAimDirection * m_creationAbilityData.knockbackDirectionMod;
                     }
                 
-                    _ball.HitBall(_hitDirection, m_creationAbilityData.ballHitStrength, m_owner);
+                    _ball.HitBall(_hitDirection, m_creationAbilityData.ballHitStrengthType, m_owner);
                 }
                 else if(m_creationAbilityData.isWall)
                 {
@@ -340,6 +342,11 @@ namespace Runtime.Gameplay
             {
                 return;
             }
+
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
             
             foreach (var _statusData in m_creationAbilityData.applicableStatusesOnHit)
             {
@@ -347,7 +354,7 @@ namespace Runtime.Gameplay
                     continue;   
                 }
 
-                _character.ApplyStatus(_statusData);
+                _character.ApplyStatus(_statusData, cts.Token).Forget();
             }
         }
         

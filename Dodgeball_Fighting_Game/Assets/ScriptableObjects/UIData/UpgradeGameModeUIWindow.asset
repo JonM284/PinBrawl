@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc60cdd3380d8014fb481d935ad468fe, type: 3}
+  m_Name: UpgradeGameModeUIWindow
+  m_EditorClassIdentifier: 
+  layerData: {fileID: 11400000, guid: ab9897b86dc1ddd4fb9e0a5c9f986b69, type: 2}
+  uiWindowAssetReference: {fileID: 6762178512874981851, guid: da251ffc833a9694c99bf31d1f1e9e21, type: 3}

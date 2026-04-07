@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
@@ -44,15 +45,17 @@ namespace Runtime.Abilities
             return m_hitWallsAmount > 0;
         }
         
-        public override async UniTask PreLoadNecessaryObjects()
+        public override async UniTask PreLoadNecessaryObjectsAsync(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             await ObjectPoolController.Instance.T_PreCreateObject(m_creationAbilityData.name,
-                m_creationAbilityData.creationPrefab);
+                m_creationAbilityData.creationPrefab, token);
         }
 
-        public override void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart = true)
+        public override async UniTask InitializeAbilityAsync(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart,
+            CancellationToken token)
         {
-            base.InitializeAbility(_owner, _data);
+            await base.InitializeAbilityAsync(_owner, _data, _canUseOnStart, token);
 
             lifeTimeMax = m_creationAbilityData.maxTimeAlive;
             
@@ -60,16 +63,17 @@ namespace Runtime.Abilities
             m_abilityCastRangeIndicator.transform.parent = _owner.GetIndicatorParent();
         }
 
-        public override async UniTask DoAbility()
+        public override async UniTask DoAbilityAsync(CancellationToken token)
         {
-            base.DoAbility();
+            token.ThrowIfCancellationRequested();
+            await base.DoAbilityAsync(token);
             
             m_previouslyHitColliders.Clear();
             
             canUseAbility = false;
             
             var _instantiatedObj =  await ObjectPoolController.Instance.T_CreateObject(m_creationAbilityData.name, 
-                m_creationAbilityData.creationPrefab, m_endPosition);
+                m_creationAbilityData.creationPrefab, m_endPosition, token);
 
             _instantiatedObj.transform.forward = currentOwner.m_playerAimVector.normalized;
 

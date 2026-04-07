@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
 using Runtime.Character;
@@ -111,9 +112,10 @@ namespace Runtime.Abilities
 
         #region IAbility Inherited Methods
 
-        public override async UniTask DoAbility()
+        public override async UniTask DoAbilityAsync(CancellationToken token)
         {
-            base.DoAbility();
+            token.ThrowIfCancellationRequested();
+            await base.DoAbilityAsync(token);
             
             currentOwner.HaltCharacterMovement();
 

@@ -193,7 +193,7 @@ namespace Runtime.LevelManagers
 
         public void EndGame()
         {
-            MatchGameController.Instance.EndGame();
+            MatchGameController.Instance.EndGame().Forget();
         }
         
       

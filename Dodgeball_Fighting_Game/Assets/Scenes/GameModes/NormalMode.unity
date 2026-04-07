@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -38,13 +38,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -67,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -377,7 +373,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -416,15 +413,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -577,7 +576,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -616,15 +616,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -687,10 +689,10 @@ RectTransform:
   - {fileID: 212454336}
   m_Father: {fileID: 36751220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 500, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 500, y: -524.8374}
+  m_SizeDelta: {x: 210, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &48150811
 MonoBehaviour:
@@ -783,6 +785,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterIcon: {fileID: 1379815666}
+  m_characterIconBackground: {fileID: 0}
+  m_blockBackground: {fileID: 0}
   m_pointImageParents:
   - {fileID: 727454010}
   - {fileID: 1186404172}
@@ -1442,10 +1446,10 @@ RectTransform:
   - {fileID: 1061459048}
   m_Father: {fileID: 48150810}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 399, y: 0}
-  m_SizeDelta: {x: 0, y: 100}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 190, y: -95}
+  m_SizeDelta: {x: 418, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &212454337
 MonoBehaviour:
@@ -1763,6 +1767,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c959baa39db426e9bf3858e2c829898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_currentSelectingCharacterImage: {fileID: 0}
+  m_currentSelectingPlayerBackgroundImage: {fileID: 0}
+  m_selectingCharacterName: {fileID: 0}
+  m_abilityHolders: []
   m_perkUISlots:
   - {fileID: 2057841970}
   - {fileID: 1537789352}
@@ -1771,6 +1779,8 @@ MonoBehaviour:
   - {fileID: 685866843}
   m_axisThreshold: 0.15
   m_amountOfPerks: 5
+  m_controllerVibrationAmount: 0.5
+  m_controllerVibrationDuration: 0.15
 --- !u!1 &368631800
 GameObject:
   m_ObjectHideFlags: 0
@@ -2014,7 +2024,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce9aba5019d9c594b8ec7b0c589cc29a, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -2053,15 +2064,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -2615,7 +2628,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce9aba5019d9c594b8ec7b0c589cc29a, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -2654,15 +2668,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -2725,10 +2741,10 @@ RectTransform:
   - {fileID: 1234683247}
   m_Father: {fileID: 36751220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 500, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 500, y: -534.8374}
+  m_SizeDelta: {x: 210, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &602332912
 MonoBehaviour:
@@ -2821,6 +2837,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterIcon: {fileID: 1987232834}
+  m_characterIconBackground: {fileID: 0}
+  m_blockBackground: {fileID: 0}
   m_pointImageParents:
   - {fileID: 1336053320}
   - {fileID: 1434089779}
@@ -3112,17 +3130,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_perkName: {fileID: 1247234116}
   m_perkDescription: {fileID: 41040730}
+  m_perkType: {fileID: 0}
   m_perkIcon: {fileID: 1270838153}
-  m_perkForeground: {fileID: 466570734}
-  m_perkBackground: {fileID: 394851617}
-  allGraphics:
-  - {fileID: 1270838153}
-  - {fileID: 466570734}
-  - {fileID: 1247234116}
-  - {fileID: 41040730}
-  - {fileID: 394851617}
-  m_activeColor: {r: 1, g: 1, b: 1, a: 1}
-  m_inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_perkTypeIcon: {fileID: 0}
+  m_perkImageBackground: {fileID: 0}
+  m_inactiveImage: {fileID: 0}
+  m_allColors: []
   m_hoverAnimation: {fileID: 1394629939}
 --- !u!1 &689196612
 GameObject:
@@ -3161,10 +3174,10 @@ RectTransform:
   - {fileID: 1938691194}
   m_Father: {fileID: 36751220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 500, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 500, y: -554.8374}
+  m_SizeDelta: {x: 210, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &689196614
 MonoBehaviour:
@@ -3257,6 +3270,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterIcon: {fileID: 965216205}
+  m_characterIconBackground: {fileID: 0}
+  m_blockBackground: {fileID: 0}
   m_pointImageParents:
   - {fileID: 1783288656}
   - {fileID: 749121399}
@@ -4353,7 +4368,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce9aba5019d9c594b8ec7b0c589cc29a, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -4392,15 +4408,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -4714,7 +4732,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -4753,15 +4772,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -5064,10 +5085,10 @@ RectTransform:
   - {fileID: 832457714}
   m_Father: {fileID: 602332911}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 399, y: 0}
-  m_SizeDelta: {x: 0, y: 100}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 190, y: -95}
+  m_SizeDelta: {x: 418, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1234683248
 MonoBehaviour:
@@ -5225,9 +5246,9 @@ RectTransform:
   - {fileID: 2182289}
   m_Father: {fileID: 1943473205}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 399, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 190, y: -95}
   m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1240312856
@@ -5331,7 +5352,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce9aba5019d9c594b8ec7b0c589cc29a, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -5370,15 +5392,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -5540,7 +5564,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -5579,15 +5604,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -6509,17 +6536,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_perkName: {fileID: 389552313}
   m_perkDescription: {fileID: 1601232852}
+  m_perkType: {fileID: 0}
   m_perkIcon: {fileID: 1431656984}
-  m_perkForeground: {fileID: 639753928}
-  m_perkBackground: {fileID: 260022037}
-  allGraphics:
-  - {fileID: 1431656984}
-  - {fileID: 639753928}
-  - {fileID: 389552313}
-  - {fileID: 1601232852}
-  - {fileID: 260022037}
-  m_activeColor: {r: 1, g: 1, b: 1, a: 1}
-  m_inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_perkTypeIcon: {fileID: 0}
+  m_perkImageBackground: {fileID: 0}
+  m_inactiveImage: {fileID: 0}
+  m_allColors: []
   m_hoverAnimation: {fileID: 1758149756}
 --- !u!1 &1601232850
 GameObject:
@@ -6582,7 +6604,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -6621,15 +6644,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -7716,17 +7741,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_perkName: {fileID: 599575112}
   m_perkDescription: {fileID: 8681146}
+  m_perkType: {fileID: 0}
   m_perkIcon: {fileID: 143392471}
-  m_perkForeground: {fileID: 1835930980}
-  m_perkBackground: {fileID: 2041808510}
-  allGraphics:
-  - {fileID: 143392471}
-  - {fileID: 1835930980}
-  - {fileID: 599575112}
-  - {fileID: 8681146}
-  - {fileID: 2041808510}
-  m_activeColor: {r: 1, g: 1, b: 1, a: 1}
-  m_inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_perkTypeIcon: {fileID: 0}
+  m_perkImageBackground: {fileID: 0}
+  m_inactiveImage: {fileID: 0}
+  m_allColors: []
   m_hoverAnimation: {fileID: 1235285894}
 --- !u!1 &1863879653
 GameObject:
@@ -7789,7 +7809,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce9aba5019d9c594b8ec7b0c589cc29a, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2100000, guid: 528fd0b51d436b44ab64212fd9bfc79c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -7828,15 +7849,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -7988,7 +8011,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31e868d3efe640ed82c49312a39f204e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_gameModeCanvas: {fileID: 94373382}
+  m_selfUIWindow: {fileID: 0}
+  m_isSetBased: 0
   m_pointsUI: {fileID: 553902238}
   m_augmentationsUI: {fileID: 767236636}
   m_amountOfPerksPerPlayer: 2
@@ -8265,10 +8289,10 @@ RectTransform:
   - {fileID: 1285179111}
   m_Father: {fileID: 689196613}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 399, y: 0}
-  m_SizeDelta: {x: 0, y: 100}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 190, y: -95}
+  m_SizeDelta: {x: 418, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1938691195
 MonoBehaviour:
@@ -8347,10 +8371,10 @@ RectTransform:
   - {fileID: 1240312855}
   m_Father: {fileID: 36751220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 500, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 500, y: -544.8374}
+  m_SizeDelta: {x: 210, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1943473206
 MonoBehaviour:
@@ -8443,6 +8467,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterIcon: {fileID: 900484080}
+  m_characterIconBackground: {fileID: 0}
+  m_blockBackground: {fileID: 0}
   m_pointImageParents:
   - {fileID: 417459576}
   - {fileID: 1718019965}
@@ -9098,17 +9124,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_perkName: {fileID: 1863879655}
   m_perkDescription: {fileID: 1276279529}
+  m_perkType: {fileID: 0}
   m_perkIcon: {fileID: 1152514651}
-  m_perkForeground: {fileID: 866750798}
-  m_perkBackground: {fileID: 1760971009}
-  allGraphics:
-  - {fileID: 1152514651}
-  - {fileID: 866750798}
-  - {fileID: 1863879655}
-  - {fileID: 1276279529}
-  - {fileID: 1760971009}
-  m_activeColor: {r: 1, g: 1, b: 1, a: 1}
-  m_inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_perkTypeIcon: {fileID: 0}
+  m_perkImageBackground: {fileID: 0}
+  m_inactiveImage: {fileID: 0}
+  m_allColors: []
   m_hoverAnimation: {fileID: 2055564847}
 --- !u!1 &2060236664
 GameObject:
@@ -9414,17 +9435,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_perkName: {fileID: 972603773}
   m_perkDescription: {fileID: 1157591586}
+  m_perkType: {fileID: 0}
   m_perkIcon: {fileID: 1065030927}
-  m_perkForeground: {fileID: 521215334}
-  m_perkBackground: {fileID: 608211276}
-  allGraphics:
-  - {fileID: 1065030927}
-  - {fileID: 521215334}
-  - {fileID: 972603773}
-  - {fileID: 1157591586}
-  - {fileID: 608211276}
-  m_activeColor: {r: 1, g: 1, b: 1, a: 1}
-  m_inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_perkTypeIcon: {fileID: 0}
+  m_perkImageBackground: {fileID: 0}
+  m_inactiveImage: {fileID: 0}
+  m_allColors: []
   m_hoverAnimation: {fileID: 1936368806}
 --- !u!1 &2145887600
 GameObject:

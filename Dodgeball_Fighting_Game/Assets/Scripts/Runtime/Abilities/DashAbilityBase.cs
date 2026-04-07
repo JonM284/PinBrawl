@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
 using Runtime.Character;
@@ -63,6 +64,9 @@ namespace Runtime.Abilities
                 case MovementType.REACTIVATE:
                     BeamAttack();
                     break;
+                case MovementType.ALONG_PATH:
+                case MovementType.TELEPORT:
+                case MovementType.JUMP:
                 default:
                     PointMelee();
                     break;
@@ -179,7 +183,7 @@ namespace Runtime.Abilities
             if (!_ball.IsNull())
             {
                 _ball.HitBall(m_knockbackDir * m_dashAbilityData.knockbackDirectionMod, 
-                    m_dashAbilityData.ballHitStrength, currentOwner);
+                    m_dashAbilityData.ballHitStrengthType, currentOwner);
                 return;
             }
             
@@ -218,6 +222,11 @@ namespace Runtime.Abilities
             {
                 return;
             }
+
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
             
             foreach (var _statusData in m_dashAbilityData.applicableStatusesOnHit)
             {
@@ -225,7 +234,7 @@ namespace Runtime.Abilities
                     continue;   
                 }
 
-                _character.ApplyStatus(_statusData);
+                _character.ApplyStatus(_statusData, cts.Token).Forget();
             }
         }
 
@@ -278,13 +287,14 @@ namespace Runtime.Abilities
             DoReactivateTeleport();
             currentOwner.AddAbilityCooldown(this);
         }
-
-        protected async UniTask SetupReactivateTeleport()
+        
+        protected async UniTask SetupReactivateTeleport(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             Debug.Log("Setup Location");
 
             var _dashPointObject = await ObjectPoolController.Instance.T_CreateObject(m_dashAbilityData.name, 
-                m_dashAbilityData.previousLeftPoint.gameObject, currentOwner.transform.position);
+                m_dashAbilityData.previousLeftPoint.gameObject, currentOwner.transform.position, token);
 
             _dashPointObject.TryGetComponent(out DashReturnPointEntity _dashPointEntity);
             
@@ -295,8 +305,9 @@ namespace Runtime.Abilities
             m_hasUsedAbility = true;
         }
 
-        protected async UniTask DoPathMovement()
+        protected async UniTask DoPathMovement(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             canUseAbility = false;
 
             PlayRandomSound();
@@ -311,7 +322,6 @@ namespace Runtime.Abilities
                 {
                     m_testLocation = currentOwner.transform.position + (aimDirection.normalized * (currentRange - 0.01f));
                 }
-                
             }
             
             currentOwner.EnableCharacterController(false);
@@ -321,11 +331,12 @@ namespace Runtime.Abilities
                 JuiceGameController.Instance.CreateRangeIndicator(currentOwner.transform.position, m_endPosition, currentScale);
             }
             
-            await T_PathMovement();
+            await T_PathMovement(token);
         }
 
-        protected async UniTask T_PathMovement()
+        protected async UniTask T_PathMovement(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             m_currentPercentage = 0;
             m_currentTravelTime = 0;
             m_startPosition = currentOwner.transform.position;
@@ -396,9 +407,11 @@ namespace Runtime.Abilities
         
         #region IAbility Inherited Methods
         
-        public override void InitializeAbility(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart = true)
+        public override async UniTask InitializeAbilityAsync(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart,
+            CancellationToken token)
         {
-            base.InitializeAbility(_owner, _data);
+            token.ThrowIfCancellationRequested();
+            await base.InitializeAbilityAsync(_owner, _data, _canUseOnStart, token);
             
             speedAmountMax = m_dashAbilityData.dashSpeed;
 
@@ -532,15 +545,16 @@ namespace Runtime.Abilities
             }
         }
         
-        public override async UniTask PreLoadNecessaryObjects()
+        public override async UniTask PreLoadNecessaryObjectsAsync(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             if (m_dashAbilityData.previousLeftPoint.IsNull())
             {
                 return;
             }
             
             await ObjectPoolController.Instance.T_PreCreateObject(m_dashAbilityData.name,
-                m_dashAbilityData.previousLeftPoint.gameObject);
+                m_dashAbilityData.previousLeftPoint.gameObject, token);
         }
 
         public override void ResetAbilityUse()
@@ -550,10 +564,9 @@ namespace Runtime.Abilities
             m_hasUsedAbility = false;
         }
 
-        public override async UniTask DoAbility()
+        public override async UniTask DoAbilityAsync(CancellationToken token)
         {
-            base.DoAbility();
-            
+            await base.DoAbilityAsync(token);
 
             switch (m_dashAbilityData.movementType)
             {
@@ -561,7 +574,7 @@ namespace Runtime.Abilities
                     DoInstantDash();
                     break;
                 case MovementType.ALONG_PATH: case MovementType.JUMP:
-                    await DoPathMovement();
+                    await DoPathMovement(token);
                     break;
                 case MovementType.REACTIVATE:
                     if (m_hasUsedAbility)
@@ -570,7 +583,7 @@ namespace Runtime.Abilities
                     }
                     else
                     {
-                        await SetupReactivateTeleport();
+                        await SetupReactivateTeleport(token);
                     }
                     break;
             }

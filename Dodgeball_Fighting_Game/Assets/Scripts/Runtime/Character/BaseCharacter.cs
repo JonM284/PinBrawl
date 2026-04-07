@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data;
 using Data.AbilityDatas;
@@ -192,6 +193,8 @@ namespace Runtime.Character
 
         private int m_abilityUseCharges = 0;
 
+        private CancellationTokenSource cts = new CancellationTokenSource();
+
         #endregion
 
         #region Accessors
@@ -376,8 +379,9 @@ namespace Runtime.Character
             m_isInitialized = true;
         }
 
-        public async UniTask InitializeAssignedAbilities()
+        public async UniTask InitializeAssignedAbilities(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             if (characterData.IsNull() || characterData.allCharacterAbilities.Count == 0)
             {
                 return;
@@ -397,7 +401,7 @@ namespace Runtime.Character
                 }
                 
                 m_assignedAbilities.Add(_ability);
-                _ability.InitializeAbility(this, _abilityData);
+                await _ability.InitializeAbilityAsync(this, _abilityData, true, token);
             }
             
             
@@ -412,13 +416,14 @@ namespace Runtime.Character
             }
 
             m_buntAbility = _buntAbilityScript;
-            m_buntAbility.InitializeAbility(this, m_buntAbilityData);
+            await m_buntAbility.InitializeAbilityAsync(this, m_buntAbilityData, false, token);
             
             OnAbilitiesAssigned?.Invoke();
         }
 
-        public async UniTask T_AssignLargeAbility()
+        public async UniTask T_AssignLargeAbility(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             if (characterData.IsNull() || characterData.allCharacterAbilities.Count == 0)
             {
                 return;
@@ -434,13 +439,14 @@ namespace Runtime.Character
             }
             
             m_assignedAbilities.Add(_ability);
-            _ability.InitializeAbility(this, characterData.largeAbility, false);
+            await _ability.InitializeAbilityAsync(this, characterData.largeAbility, false, token);
             
             OnAbilitiesAssigned?.Invoke();
         }
 
-        public async UniTask AssignSpecificNewAbility(AbilityData _newAbility)
+        public async UniTask AssignSpecificNewAbility(AbilityData _newAbility, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             if (_newAbility.IsNull() || m_assignedAbilities.Count >= 3)
             {
                 //Don't add more that max 3 abilties [NOT including shield, wack, and bunt]
@@ -458,7 +464,7 @@ namespace Runtime.Character
             }
                 
             m_assignedAbilities.Add(_ability);
-            _ability.InitializeAbility(this, _newAbility);
+            await _ability.InitializeAbilityAsync(this, _newAbility, true, token);
             //TBD
             OnSingleAbilityAssigned?.Invoke();
         }
@@ -804,7 +810,12 @@ namespace Runtime.Character
                 return;
             }
 
-            m_buntAbility.DoAbility();
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
+            
+            m_buntAbility.DoAbilityAsync(cts.Token).Forget();
             
             //ToDo: pause player for animation
             
@@ -1054,7 +1065,7 @@ namespace Runtime.Character
                 }
                 else
                 {
-                    _ball.HitBall(m_playerAimVector, HitStrength.LIGHT ,this);
+                    _ball.HitBall(m_playerAimVector, HitStrengthType.LIGHT ,this);
                     EarlyEndTimer(ballHitTimerIdentifier);
                 }
             }
@@ -1108,7 +1119,7 @@ namespace Runtime.Character
             
             _ball.SetBuildUp(false, this);
             
-            _ball.HitBall(m_playerAimVector, HitStrength.MEDIUM,this);
+            _ball.HitBall(m_playerAimVector, HitStrengthType.MEDIUM,this);
 
             ResetCharacterMovementSpeed();
         }
@@ -1263,8 +1274,13 @@ namespace Runtime.Character
             m_assignedAbilities[_abilityID].ShowAttackIndicator(false);
             
             CancelWackCharge();
+
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
             
-            m_assignedAbilities[_abilityID].DoAbility();
+            m_assignedAbilities[_abilityID].DoAbilityAsync(cts.Token).Forget();
 
             if (m_assignedAbilities[_abilityID].canUseAbility)
             {
@@ -1326,15 +1342,16 @@ namespace Runtime.Character
 
         #region Perk Related -------------
 
-        public async UniTask AddPerk(PerkDataBase _perkData)
+        public async UniTask AddPerk(PerkDataBase _perkData, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             if (_perkData.IsNull())
             {
                 return;
             }
             
             var _currentPerkPrefab = await ObjectPoolController.Instance.T_CreateParentedObject(_perkData.name,
-                _perkData.perkGameObject, m_statusHolder);
+                _perkData.perkGameObject, m_statusHolder, token);
             
             _currentPerkPrefab.TryGetComponent(out PerkEntityBase _perkEntity);
 
@@ -1354,15 +1371,16 @@ namespace Runtime.Character
 
         #region Status Related --------------
 
-        public async UniTask ApplyStatus(StatusData _statusData)
+        public async UniTask ApplyStatus(StatusData _statusData, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             if (_statusData.IsNull())
             {
                 return;
             }
             
             var _currentStatusPrefab = await ObjectPoolController.Instance.T_CreateParentedObject(_statusData.name,
-                _statusData.statusGameObject, m_statusHolder);
+                _statusData.statusGameObject, m_statusHolder, token);
 
             VFXController.Instance.PlayBuffDebuff(_statusData.isBuff, transform.position, Quaternion.identity);
             
