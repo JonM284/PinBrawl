@@ -20,13 +20,13 @@ namespace Runtime.UI.Items
         #region Actions
 
         //int (playerID)
-        private Action<BaseCharacter> OnSelectPressed;
+        private Action<Player> OnSelectPressed;
         //int (playerID)
-        private Action<BaseCharacter> OnCancelPressed;
+        private Action<Player> OnCancelPressed;
         //int (playerID), int (right/left)
-        private Action<BaseCharacter, bool> OnHorizontalAxisChanged;
+        private Action<Player, bool> OnHorizontalAxisChanged;
         //int (playerID), int (up/down)
-        private Action<BaseCharacter, bool> OnVerticalAxisChanged;
+        private Action<Player, bool> OnVerticalAxisChanged;
 
         #endregion
 
@@ -58,8 +58,8 @@ namespace Runtime.UI.Items
         #region Class Implementation
 
         public void InitializeItem(Player _newPlayer, BaseCharacter _assignedCharacter, 
-            Action<BaseCharacter> _onSelectCallback, Action<BaseCharacter> _onCancelCallback,
-            Action<BaseCharacter, bool> _onHorizontalChangeCallback, Action<BaseCharacter, bool> _onVerticalChangeCallback)
+            Action<Player> _onSelectCallback, Action<Player> _onCancelCallback,
+            Action<Player, bool> _onHorizontalChangeCallback, Action<Player, bool> _onVerticalChangeCallback)
         {
             assignedPlayer = _newPlayer;
             assignedCharacter = _assignedCharacter;
@@ -73,6 +73,10 @@ namespace Runtime.UI.Items
 
         public void ResetItem()
         {
+            OnSelectPressed = null;
+            OnCancelPressed = null;
+            OnHorizontalAxisChanged = null;
+            OnVerticalAxisChanged = null;
             isInitialized = false;
             assignedPlayer = null;
             assignedCharacter = null;
@@ -102,18 +106,18 @@ namespace Runtime.UI.Items
 
             if (assignedPlayer.GetButtonDown(confirmButton))
             {
-                OnSelectPressed?.Invoke(assignedCharacter);
+                OnSelectPressed?.Invoke(assignedPlayer);
             }
             
             if (assignedPlayer.GetButtonDown(cancelButton))
             {
-                OnCancelPressed?.Invoke(assignedCharacter);
+                OnCancelPressed?.Invoke(assignedPlayer);
             }
         }
         
         private void ChangeHorizontalSelected(bool _isRight)
         {
-            OnHorizontalAxisChanged?.Invoke(assignedCharacter, _isRight);
+            OnHorizontalAxisChanged?.Invoke(assignedPlayer, _isRight);
             canMoveSelection = false;
             Debug.Log($"Update Horizontal, isRight?:{_isRight}");
         }
@@ -121,7 +125,7 @@ namespace Runtime.UI.Items
         private void ChangeVerticalSelected(bool _isUp)
         {
             canMoveSelection = false;
-            OnVerticalAxisChanged?.Invoke(assignedCharacter, _isUp);
+            OnVerticalAxisChanged?.Invoke(assignedPlayer, _isUp);
             Debug.Log($"Update Vertical, isUp?:{_isUp}");
         }
         

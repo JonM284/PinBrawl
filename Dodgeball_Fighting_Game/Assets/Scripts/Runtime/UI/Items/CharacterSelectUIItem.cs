@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Data;
+using Data.AbilityDatas;
 using Project.Scripts.Utils;
 using Rewired;
 using Rewired.ControllerExtensions;
@@ -34,6 +36,19 @@ namespace Runtime.UI.Items
 
         #endregion
 
+        #region Enum
+
+        public enum CharacterSelectionState
+        {
+            None,
+            Disconnected,
+            SelectingCharacter,
+            SelectingAbility,
+            Ready,
+        }
+
+        #endregion
+
         #region Serialized Fields
         
         [SerializeField] private Image m_characterIcon;
@@ -43,25 +58,26 @@ namespace Runtime.UI.Items
         [SerializeField] private GameObject m_selectingVisual;
         [SerializeField] private GameObject m_characterVisuals;
         [SerializeField] private GameObject m_readyVisuals;
-
+        
         [SerializeField] private TMP_Text m_characterName;
 
         [SerializeField] private TMP_Text m_shieldAmountText;
 
         [SerializeField] private TMP_Text m_firstAbilityDescription;
         [SerializeField] private Image m_firstAbilityIcon;
-        [SerializeField] private List<AbilityTypeVisuals> m_firstAbilityTypeTags = new List<AbilityTypeVisuals>();
-            
+
+        [SerializeField] private GameObject m_secondAbilityHolder;
         [SerializeField] private TMP_Text m_secondAbilityDescription;
         [SerializeField] private Image m_secondAbilityIcon;
-        [SerializeField] private List<AbilityTypeVisuals> m_secondAbilityTypeTags = new List<AbilityTypeVisuals>();
+        
+        [SerializeField] private PlayerUIInputReader inputReader;
         
         #endregion
 
         #region Private Fields
 
 
-        private bool m_isActive, m_canMoveSelection, m_isInitialized;
+        private bool m_canMoveSelection, m_isInitialized;
 
         private int m_characterIndexCurrent, m_characterMaxAmount;
 
@@ -69,7 +85,7 @@ namespace Runtime.UI.Items
 
         private float m_threshold = 0.2f;
 
-        private CharacterSelectDataModel m_manager;
+        private CharacterSelectDataModel manager;
 
         private Color m_playerColor;
 
@@ -79,25 +95,19 @@ namespace Runtime.UI.Items
 
         public CharacterData currentCharacter { get; private set; }
 
-        public bool isReady { get; private set; }
+        public AbilityData currentAbilityData { get; private set; }
+
+        public CharacterSelectionState currentSelectionState { get; private set; }
 
         public Player assignedPlayer { get; private set; }
 
-        #endregion
+        public Color assignedColor => m_playerColor;
 
-        #region Unity Events
+        public int playerIndex { get; private set; }
 
-        private void Update()
-        {
-            if (!m_isInitialized)
-            {
-                return;
-            }
+        public PlayerUIInputReader InputReader => inputReader;
 
-            ReadSelectionInputs();
-            ReadJoinInputs();
-            ReadOtherInputs();
-        }
+        public bool isReady => currentSelectionState == CharacterSelectionState.Ready;
 
         #endregion
         
@@ -105,17 +115,42 @@ namespace Runtime.UI.Items
 
         public void Initialize(int _playerIndex, CharacterSelectDataModel _characterSelectDataModel)
         {
-            assignedPlayer = ReInput.players.GetPlayer(_playerIndex);
+            playerIndex = _playerIndex;
+            assignedPlayer = ReInput.players.GetPlayer(playerIndex);
             m_characterMaxAmount = MatchGameController.Instance.GetCharacterAmount();
-            m_playerColor = SettingsController.Instance.GetColorByPlayerIndex(_playerIndex);
+            m_playerColor = SettingsController.Instance.GetColorByPlayerIndex(playerIndex);
             m_background.color = m_playerColor;
+            currentSelectionState = CharacterSelectionState.Disconnected;
+            
+            inputReader.InitializeItem(assignedPlayer, null, OnSelectCallback, OnCancelCallback, 
+                OnHorizontalChangeCallback, OnVerticalChangeCallback);
 
             CheckController(assignedPlayer);
             
-            m_manager = _characterSelectDataModel;
+            manager = _characterSelectDataModel;
             
             DisconnectPlayer();
             m_isInitialized = true;
+        }
+
+        private void OnSelectCallback(Player controller)
+        {
+            manager.OnSelectPressed(controller);
+        }
+
+        private void OnCancelCallback(Player controller)
+        {
+            manager.OnCancelPressed(controller);
+        }
+
+        private void OnHorizontalChangeCallback(Player controller, bool isRight)
+        {
+            manager.OnHorizontalUpdated(controller, isRight);
+        }
+
+        private void OnVerticalChangeCallback(Player controller, bool isUp)
+        {
+            manager.OnVerticalUpdated(controller, isUp);
         }
         
         void CheckController(Player player)
@@ -131,6 +166,11 @@ namespace Runtime.UI.Items
                 ds4.SetLightColor(m_playerColor);
             }
         }
+        
+        private void UpdateReadyVisuals()
+        {
+            m_readyVisuals.SetActive(currentSelectionState == CharacterSelectionState.Ready);
+        }
 
         public void DisconnectPlayer()
         {
@@ -138,124 +178,65 @@ namespace Runtime.UI.Items
             m_selectingVisual.SetActive(false);
             m_readyVisuals.SetActive(false);
             m_joinVisual.SetActive(true);
-
-            isReady = false;
-            m_isActive = false;
+            currentSelectionState = CharacterSelectionState.Disconnected;
         }
 
-        private void ReadJoinInputs()
-        {
-            if (m_isActive)
-            {
-                return;
-            }
-            
-            if (assignedPlayer.GetButtonDown(confirmButton))
-            {
-                PlayerJoin();
-            }
-        }
+        /// <summary>
+        /// Disconnected -> Character Selection -> Ability Selection -> Ready
+        /// </summary>
 
-        private void ReadOtherInputs()
-        {
-            if (assignedPlayer.GetButtonDown(cancelButton))
-            {
-                if (isReady)
-                {
-                    CancelSelection();
-                }
-                else
-                {
-                    DisconnectPlayer();
-                }
-            }
-
-            if (assignedPlayer.GetButtonDown(startAction) && isReady)
-            {
-                m_manager.StartGame();
-            }
-        }
-        
-        private void ReadSelectionInputs()
-        {
-            if (!m_isActive)
-            {
-                return;
-            }
-            
-            if (isReady)
-            {
-                return;
-            }
-            
-            m_horizontalInput = assignedPlayer.GetAxisRaw("Move_Horizontal");
-
-            if (m_horizontalInput >= m_threshold && m_canMoveSelection)
-            {
-                ChangeSelection(true);
-            }else if (m_horizontalInput <= -m_threshold && m_canMoveSelection)
-            {
-                ChangeSelection(false);
-            }else if (Mathf.Abs(m_horizontalInput) < m_threshold && !m_canMoveSelection)
-            {
-                m_canMoveSelection = true;
-            }
-
-            if (assignedPlayer.GetButtonDown(confirmButton))
-            {
-                SelectCharacter();
-            }
-        }
-
-        private void CancelSelection()
-        {
-            isReady = false;
-            UpdateReadyVisuals();
-            m_manager.UpdateReadyPlayers();
-        }
-
-        private void SelectCharacter()
-        {
-            isReady = true;
-            UpdateReadyVisuals();
-            m_manager.UpdateReadyPlayers();
-        }
-
-        private void UpdateReadyVisuals()
-        {
-            m_readyVisuals.SetActive(isReady);
-        }
-
-        private void PlayerJoin()
+        public void OnSelect_Disconnected(CharacterData characterData)
         {
             m_characterVisuals.SetActive(true);
             m_selectingVisual.SetActive(true);
             m_readyVisuals.SetActive(false);
             m_joinVisual.SetActive(false);
-
+            currentCharacter = characterData;
+            currentAbilityData = null;
             m_characterIndexCurrent = 0;
-            currentCharacter = MatchGameController.Instance.GetCharacterDataAtIndex(m_characterIndexCurrent);
             UpdateCharacterInfo();
-            
-            m_isActive = true;
+            currentSelectionState = CharacterSelectionState.SelectingCharacter;
+        }
+        
+        public void OnSelect_Character()
+        {
+            currentSelectionState = CharacterSelectionState.SelectingAbility;
+        }
+        
+        public void OnSelect_Ability()
+        {
+            currentSelectionState = CharacterSelectionState.Ready;
+            UpdateReadyVisuals();
+            manager.UpdateReadyPlayers();
+        }
+        
+        public void OnCancel_CharacterSelect()
+        {
+            currentSelectionState = CharacterSelectionState.Disconnected;
+            DisconnectPlayer();
+        }
+        
+        public void OnCancel_AbilitySelect()
+        {
+            currentSelectionState = CharacterSelectionState.SelectingCharacter;
+            currentAbilityData = null;
+            UpdateAbilitySelectVisuals(false);
         }
 
-        private void ChangeSelection(bool _isRight)
+        public void OnCancel_Ready()
         {
-            int _nextIndex = _isRight ? m_characterIndexCurrent + 1 : m_characterIndexCurrent - 1;
+            currentSelectionState = CharacterSelectionState.SelectingAbility;
+        }
 
-            if (_nextIndex > m_characterMaxAmount - 1)
+        public void ChangeSelectedCharacter(CharacterData characterData)
+        {
+            if (characterData.IsNull())
             {
-                _nextIndex = 0;
-            }else if (_nextIndex < 0)
-            {
-                _nextIndex = m_characterMaxAmount - 1;
+                return;
             }
 
-            m_characterIndexCurrent = _nextIndex;
-
-            currentCharacter = MatchGameController.Instance.GetCharacterDataAtIndex(m_characterIndexCurrent);
-
+            currentCharacter = characterData;
+            
             UpdateCharacterInfo();
             
             m_canMoveSelection = false;
@@ -268,43 +249,42 @@ namespace Runtime.UI.Items
                 return;
             }
             
-            m_firstAbilityTypeTags.ForEach(atv => atv.tagBackground.SetActive(false));
-            m_secondAbilityTypeTags.ForEach(atv => atv.tagBackground.SetActive(false));
-            
             m_characterIcon.sprite = currentCharacter.characterIconRef;
             m_characterName.text = currentCharacter.characterName;
             m_shieldAmountText.text = currentCharacter.characterArmorAmount.ToString();
             
+            //First ability is ultimate
             m_firstAbilityDescription.text = currentCharacter.allCharacterAbilities[0].abilityDescription;
             m_firstAbilityIcon.sprite = currentCharacter.allCharacterAbilities[0].abilityIconRef;
-            for (int i = 0; i < m_firstAbilityTypeTags.Count; i++)
-            {
-                m_firstAbilityTypeTags[i].tagBackground.SetActive(i < currentCharacter.allCharacterAbilities[0].abilityCategories.Count);
-                
-                if (i >= currentCharacter.allCharacterAbilities[0].abilityCategories.Count)
-                {
-                    continue;
-                }
-                
-                m_firstAbilityTypeTags[i].typeText.text = currentCharacter.allCharacterAbilities[0].abilityCategories[i].abilityCategoryName;
-            }
-            
-            m_secondAbilityDescription.text = currentCharacter.allCharacterAbilities[1].abilityDescription;
-            m_secondAbilityIcon.sprite = currentCharacter.allCharacterAbilities[1].abilityIconRef;
-            
-            for (int i = 0; i < m_secondAbilityTypeTags.Count; i++)
-            {
-                m_secondAbilityTypeTags[i].tagBackground.SetActive(i < currentCharacter.allCharacterAbilities[1].abilityCategories.Count);
-                
-                if (i >= currentCharacter.allCharacterAbilities[1].abilityCategories.Count)
-                {
-                    continue;
-                }
-                
-                m_secondAbilityTypeTags[i].typeText.text = currentCharacter.allCharacterAbilities[1].abilityCategories[i].abilityCategoryName;
-            }
         }
 
+        public void ChangeSelectedAbility(AbilityData abilityData)
+        {
+            if (abilityData.IsNull())
+            {
+                return;
+            }
+
+            currentAbilityData = abilityData;
+            UpdateAbilitySelectVisuals(true);
+        }
+
+        private void UpdateAbilitySelectVisuals(bool isShow)
+        {
+            m_secondAbilityHolder.SetActive(isShow);
+            
+            if (currentAbilityData.IsNull())
+            {
+                m_secondAbilityDescription.text = string.Empty;
+                m_secondAbilityIcon.sprite = null;
+                return;
+            }
+            
+            m_secondAbilityDescription.text = currentAbilityData.abilityDescription;
+            m_secondAbilityIcon.sprite = currentAbilityData.abilityIconRef;
+        }
+        
+        
         #endregion
         
         

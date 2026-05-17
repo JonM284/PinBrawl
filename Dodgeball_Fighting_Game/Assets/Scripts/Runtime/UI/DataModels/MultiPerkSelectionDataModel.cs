@@ -6,6 +6,7 @@ using DG.Tweening;
 using Project.Scripts.Utils;
 using Rewired;
 using Runtime.Character;
+using Runtime.Gameplay;
 using Runtime.UI.Items;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,14 +25,14 @@ namespace Runtime.UI.DataModels
         
         #region Nested Classes
 
-        private class PlayerPositionInfo
+        private class UpgradeSelectPlayerPositionInfo
         {
             public int xPos = 0, yPos = 0;
             public UpgradeUIItem currentItem;
             public bool hasFinishedSelecting = false;
             public PerkSelectionUIItem assignedUpgradeSelectionUIItem;
 
-            public PlayerPositionInfo(PerkSelectionUIItem upgradeSelector)
+            public UpgradeSelectPlayerPositionInfo(PerkSelectionUIItem upgradeSelector)
             {
                 assignedUpgradeSelectionUIItem = upgradeSelector;
                 hasFinishedSelecting = false;
@@ -55,10 +56,11 @@ namespace Runtime.UI.DataModels
         
         private CancellationTokenSource cts = new CancellationTokenSource();
 
-        private Dictionary<BaseCharacter, PlayerPositionInfo> posInfoByCharacter = new();
+        private Dictionary<Player, UpgradeSelectPlayerPositionInfo> posInfoByController = new();
 
         private int maxSelectedUpgrades = 2;
 
+        private int amountOfPlayers;
         
         #endregion
         
@@ -69,9 +71,7 @@ namespace Runtime.UI.DataModels
         public bool allPlayersHaveSelected { get; private set; }
 
         public List<Player> currentPlayerControllers { get; private set;}
-
-        public List<BaseCharacter> currentPlayers { get; private set; }
-
+        
         #endregion
 
         #region Class Implementation
@@ -79,6 +79,12 @@ namespace Runtime.UI.DataModels
         private void SetActiveState(bool _isActive)
         {
             isSelecting = _isActive;
+        }
+
+        public async UniTask FadeBlackScreen(bool isFadeIn, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            await shadeImage.DOFade(isFadeIn ? 1f : 0f, 0.5f).ToUniTask(cancellationToken: token);
         }
 
         public async UniTask PreSetupScreen(BaseCharacter winningCharacter, CancellationToken token)
@@ -94,48 +100,68 @@ namespace Runtime.UI.DataModels
             token.ThrowIfCancellationRequested();
 
             //ToDo: animation        
+            await FadeBlackScreen(false, token);
 
-            await shadeImage.DOFade(0f, 0.5f).ToUniTask(cancellationToken: token);
+            await RemoveWinnerAnimationAsync(token);
             
             await UniTask.Yield();
         }
 
-        public async UniTask SetupSelectionScreenPlayers(List<BaseCharacter> selectingCharacters, BaseCharacter winningPlayer, CancellationToken token)
+        public async UniTask RemoveWinnerAnimationAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            if (selectingCharacters.IsNull() || selectingCharacters.Count == 0)
+
+            var roundWinner = playerUpgradeSelectors.FirstOrDefault(psui => psui.IsWinningPlayer);
+
+            if (roundWinner.IsNull())
+            {
+                return;
+            }
+
+            await roundWinner.WinningPlayerAnimationAsync(token);
+
+            await UniTask.Yield();
+
+            roundWinner.PositionProxy.SetActive(false);
+        }
+
+        public async UniTask SetupSelectionScreenPlayers(List<PlayerMatchStats> allPlayerStats, PlayerMatchStats winningPlayerStats, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            if (allPlayerStats.IsNull() || allPlayerStats.Count == 0)
             {
                 Debug.Log("Base Character Null");
                 return;
             }
             
-            currentPlayers = new List<BaseCharacter>();
-            currentPlayerControllers = new List<Player>();
-            posInfoByCharacter.Clear();
-            
-            currentPlayers = selectingCharacters.ToList();
-
-            for (var i = 0; i < currentPlayers.Count; i++)
+            foreach (var item in upgradeHolderItems)
             {
-                var isWinningPlayer = currentPlayers[i] == winningPlayer;
-                await playerUpgradeSelectors[i].Initialize(currentPlayers[i], this, isWinningPlayer, token);
+                await item.InitializeUpgrades();
+            }
+            
+            currentPlayerControllers = new List<Player>();
+            posInfoByController.Clear();
+            amountOfPlayers = allPlayerStats.Count;
+            
+            playerUpgradeSelectors.ForEach(psui => psui.PositionProxy.gameObject.SetActive(false));
+
+            for (var i = 0; i < allPlayerStats.Count; i++)
+            {
+                playerUpgradeSelectors[i].PositionProxy.gameObject.SetActive(true);
+                var isWinningPlayer = allPlayerStats[i] == winningPlayerStats;
+                await playerUpgradeSelectors[i].Initialize(allPlayerStats[i], this, isWinningPlayer, token);
 
                 if (isWinningPlayer)
                 {
                     continue;   
                 }
                 
-                var playerController = currentPlayers[i].GetPlayerController();
+                var playerController = allPlayerStats[i].playerCharacter.GetPlayerController();
                 currentPlayerControllers.Add(playerController);
-                var newPosInfo = new PlayerPositionInfo(playerUpgradeSelectors[i]);
+                var newPosInfo = new UpgradeSelectPlayerPositionInfo(playerUpgradeSelectors[i]);
                 newPosInfo.currentItem = GetUIAtCoordinate(newPosInfo.xPos, newPosInfo.yPos);
-                newPosInfo.currentItem.AddHoveringPlayer(currentPlayers[i]);
-                posInfoByCharacter.Add(currentPlayers[i], newPosInfo);
-            }
-
-            foreach (var item in upgradeHolderItems)
-            {
-                await item.InitializeUpgrades();
+                newPosInfo.currentItem.AddHoveringPlayer(allPlayerStats[i].playerCharacter);
+                posInfoByController.Add(playerController, newPosInfo);
             }
         }
 
@@ -161,14 +187,14 @@ namespace Runtime.UI.DataModels
             SetActiveState(false);
         }
 
-        public void UpdateHorizontalPosition(BaseCharacter baseCharacter, bool isRight)
+        public void UpdateHorizontalPosition(Player controller, bool isRight)
         {
-            if (baseCharacter.IsNull() || !posInfoByCharacter.ContainsKey(baseCharacter))
+            if (controller.IsNull() || !posInfoByController.ContainsKey(controller))
             {
                 return;
             }
 
-            var foundPlayerPositionInfo = posInfoByCharacter[baseCharacter];
+            var foundPlayerPositionInfo = posInfoByController[controller];
             
             if (foundPlayerPositionInfo.hasFinishedSelecting)
             {
@@ -177,10 +203,11 @@ namespace Runtime.UI.DataModels
             
             var currentXPos = foundPlayerPositionInfo.xPos;
             var currentYPos = foundPlayerPositionInfo.yPos;
+            var character = foundPlayerPositionInfo.assignedUpgradeSelectionUIItem.assignedCharacter;
             
             if (!foundPlayerPositionInfo.currentItem.IsNull())
             {
-                foundPlayerPositionInfo.currentItem.RemoveHoveringPlayer(baseCharacter);
+                foundPlayerPositionInfo.currentItem.RemoveHoveringPlayer(character);
             }
             
             var nextXIndex = WrapIndex(isRight ? currentXPos + 1 : currentXPos - 1, 
@@ -188,17 +215,17 @@ namespace Runtime.UI.DataModels
 
             foundPlayerPositionInfo.currentItem = GetUIAtCoordinate(nextXIndex, currentYPos);
             foundPlayerPositionInfo.xPos = nextXIndex;
-            foundPlayerPositionInfo.currentItem.AddHoveringPlayer(baseCharacter);
+            foundPlayerPositionInfo.currentItem.AddHoveringPlayer(character);
         }
 
-        public void UpdateVerticalPosition(BaseCharacter baseCharacter, bool isUp)
+        public void UpdateVerticalPosition(Player controller, bool isUp)
         {
-            if (baseCharacter.IsNull() || !posInfoByCharacter.ContainsKey(baseCharacter))
+            if (controller.IsNull() || !posInfoByController.ContainsKey(controller))
             {
                 return;
             }
             
-            var foundPlayerPositionInfo = posInfoByCharacter[baseCharacter];
+            var foundPlayerPositionInfo = posInfoByController[controller];
             
             if (foundPlayerPositionInfo.hasFinishedSelecting)
             {
@@ -207,10 +234,11 @@ namespace Runtime.UI.DataModels
             
             var currentXPos = foundPlayerPositionInfo.xPos;
             var currentYPos = foundPlayerPositionInfo.yPos;
+            var character = foundPlayerPositionInfo.assignedUpgradeSelectionUIItem.assignedCharacter;
             
             if (!foundPlayerPositionInfo.currentItem.IsNull())
             {
-                foundPlayerPositionInfo.currentItem.RemoveHoveringPlayer(baseCharacter);
+                foundPlayerPositionInfo.currentItem.RemoveHoveringPlayer(character);
             }
             
             //Note: has to be reversed because index 0 is at the top and last index is on the bottom.
@@ -223,17 +251,17 @@ namespace Runtime.UI.DataModels
             foundPlayerPositionInfo.currentItem = GetUIAtCoordinate(nextXIndex, nextYIndex);
             foundPlayerPositionInfo.xPos = nextXIndex;
             foundPlayerPositionInfo.yPos = nextYIndex;
-            foundPlayerPositionInfo.currentItem.AddHoveringPlayer(baseCharacter);
+            foundPlayerPositionInfo.currentItem.AddHoveringPlayer(character);
         }
 
-        public void OnSelectPressed(BaseCharacter baseCharacter)
+        public void OnSelectPressed(Player controller)
         {
-            if (baseCharacter.IsNull() || !posInfoByCharacter.ContainsKey(baseCharacter))
+            if (controller.IsNull() || !posInfoByController.ContainsKey(controller))
             {
                 return;
             }
             
-            var foundPlayerPositionInfo = posInfoByCharacter[baseCharacter];
+            var foundPlayerPositionInfo = posInfoByController[controller];
 
             if (foundPlayerPositionInfo.hasFinishedSelecting)
             {
@@ -256,7 +284,7 @@ namespace Runtime.UI.DataModels
 
             if (!playerHasReachedMax) return;
             
-            foundPlayerPositionInfo.currentItem.RemoveHoveringPlayer(baseCharacter);
+            foundPlayerPositionInfo.currentItem.RemoveHoveringPlayer(foundPlayerPositionInfo.assignedUpgradeSelectionUIItem.assignedCharacter);
             foundPlayerPositionInfo.currentItem = null;
 
             CheckAllPlayersFinished();
@@ -264,18 +292,18 @@ namespace Runtime.UI.DataModels
 
         private void CheckAllPlayersFinished()
         {
-            allPlayersHaveSelected = posInfoByCharacter.Values.Count(ppi => ppi.hasFinishedSelecting) >=
-                                     currentPlayers.Count - 1;
+            allPlayersHaveSelected = posInfoByController.Values.Count(ppi => ppi.hasFinishedSelecting) >=
+                                     amountOfPlayers - 1;
         }
         
-        public void OnCancelPressed(BaseCharacter baseCharacter)
+        public void OnCancelPressed(Player controller)
         {
-            if (baseCharacter.IsNull() || !posInfoByCharacter.ContainsKey(baseCharacter))
+            if (controller.IsNull() || !posInfoByController.ContainsKey(controller))
             {
                 return;
             }
 
-            var foundPlayerPositionInfo = posInfoByCharacter[baseCharacter];
+            var foundPlayerPositionInfo = posInfoByController[controller];
             foundPlayerPositionInfo.assignedUpgradeSelectionUIItem.UnAssignUpgradeData();
 
             if (!foundPlayerPositionInfo.hasFinishedSelecting) return;
@@ -284,7 +312,7 @@ namespace Runtime.UI.DataModels
             foundPlayerPositionInfo.xPos = 0;
             foundPlayerPositionInfo.yPos = 0;
             foundPlayerPositionInfo.currentItem = GetUIAtCoordinate(0, 0);
-            foundPlayerPositionInfo.currentItem.AddHoveringPlayer(baseCharacter);
+            foundPlayerPositionInfo.currentItem.AddHoveringPlayer(foundPlayerPositionInfo.assignedUpgradeSelectionUIItem.assignedCharacter);
         }
         
         private UpgradeUIItem GetUIAtCoordinate(int xIndex, int yIndex)
@@ -306,12 +334,12 @@ namespace Runtime.UI.DataModels
         {
             token.ThrowIfCancellationRequested();
             
-            foreach (var kvp in posInfoByCharacter)
+            foreach (var kvp in posInfoByController)
             {
                 foreach (var upgradeDatas in kvp.Value.assignedUpgradeSelectionUIItem.assignedUpgrades)
                 {
                     //Add to character
-                    await kvp.Key.AddPerk(upgradeDatas, token);
+                    await kvp.Value.assignedUpgradeSelectionUIItem.assignedCharacter.AddPerk(upgradeDatas, token);
                     await UniTask.Yield(PlayerLoopTiming.Update, token);
                 }
             }
@@ -323,9 +351,9 @@ namespace Runtime.UI.DataModels
 
         private async UniTask CleanUp()
         {
-            currentPlayers.Clear();
+            playerUpgradeSelectors.ForEach(uhui => uhui.InputReader.ResetItem());
             currentPlayerControllers.Clear();
-            posInfoByCharacter.Clear();
+            posInfoByController.Clear();
             await UniTask.CompletedTask;
         }
         

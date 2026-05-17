@@ -183,6 +183,7 @@ namespace Runtime.Character
         private List<AbilityBase> m_cooldownRemovableAbilities = new List<AbilityBase>();
 
         private AbilityBase m_buntAbility;
+        private AbilityData m_selectedAbility;
 
         //status
         private List<StatusEntityBase> m_currentStatuses = new List<StatusEntityBase>();
@@ -323,8 +324,8 @@ namespace Runtime.Character
             m_canReadPlayerInput = true;
         }
 
-        public virtual async UniTask InitializeCharacter(CharacterData _characterData, int _index, Player _player,
-            LayerMask _groundMask, LayerMask _wallMask)
+        public virtual async UniTask InitializeCharacter(CharacterData _characterData, AbilityData chosenAbility, int _index, Player _player,
+            LayerMask _groundMask, LayerMask _wallMask, CancellationToken token)
         {
             if (_characterData.IsNull())
             {
@@ -341,6 +342,7 @@ namespace Runtime.Character
             m_player = _player;
 
             characterData = _characterData;
+            m_selectedAbility = chosenAbility;
 
             m_currentDamagedAmount = 0;
             m_damagePercentage = 0;
@@ -372,11 +374,25 @@ namespace Runtime.Character
 
             m_healthbarLoc.position = transform.position + characterData.healthBarOffset;
             
-            //await InitializeAssignedAbilities();
+            //await InitializeAssignedAbilities(token);
 
             wackTimer = new CustomTimer(ballCooldownTimerIdentifier, characterData.ballMeleeCooldownTimer, false , ResetBallInput);
 
             m_isInitialized = true;
+        }
+
+        private async UniTask InitializeChosenAbility(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            var chosenAbilityPrefab = Instantiate(m_selectedAbility.abilityGameObject, m_aimIndicator);
+
+            if (chosenAbilityPrefab.TryGetComponent(out AbilityBase _chosenAbility).IsNull())
+            {
+                return;
+            }
+                
+            m_assignedAbilities.Add(_chosenAbility);
+            await _chosenAbility.InitializeAbilityAsync(this, m_selectedAbility, true, token);
         }
 
         public async UniTask InitializeAssignedAbilities(CancellationToken token)
@@ -386,16 +402,16 @@ namespace Runtime.Character
             {
                 return;
             }
+
+            await InitializeChosenAbility(token);
             
             //ToDo: PRELOAD all necessary abilities spawnables AND vfx
             foreach (var _abilityData in characterData.allCharacterAbilities)
             {
                 var _currentAbilityPrefab = Instantiate(_abilityData.abilityGameObject,
                     m_aimIndicator);
-
-                _currentAbilityPrefab.TryGetComponent(out AbilityBase _ability);
-
-                if (_ability.IsNull())
+                
+                if (_currentAbilityPrefab.TryGetComponent(out AbilityBase _ability).IsNull())
                 {
                     continue;
                 }
@@ -407,11 +423,10 @@ namespace Runtime.Character
             
             var _buntAbilityPrefab = Instantiate(m_buntAbilityData.abilityGameObject,
                 transform);
-
-            _buntAbilityPrefab.TryGetComponent(out AbilityBase _buntAbilityScript);
-
-            if (_buntAbilityScript.IsNull())
+            
+            if (_buntAbilityPrefab.TryGetComponent(out AbilityBase _buntAbilityScript).IsNull())
             {
+                OnAbilitiesAssigned?.Invoke();
                 return;
             }
 

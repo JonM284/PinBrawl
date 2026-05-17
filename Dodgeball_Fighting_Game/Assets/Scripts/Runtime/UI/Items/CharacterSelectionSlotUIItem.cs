@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Data.PerkDatas;
+using Data;
 using DG.Tweening;
-using NUnit.Framework;
 using Project.Scripts.Utils;
+using Rewired;
 using Runtime.Character;
 using Runtime.UI.Icons;
 using TMPro;
@@ -14,35 +13,43 @@ using UnityEngine.UI;
 
 namespace Runtime.UI.Items
 {
-    public class UpgradeUIItem: MonoBehaviour
+    public class CharacterSelectionSlotUIItem: MonoBehaviour
     {
-        [SerializeField] private IconBase upgradeIcon;
+        [SerializeField] private float upscaleAmount = 1.3f;
+        [SerializeField] private IconBase characterIcon;
         [SerializeField] private Image selectionObject;
         [SerializeField] private List<PlayerMarkers> playerMarkers = new List<PlayerMarkers>();
-        [SerializeField] private CanvasGroup descriptionCanvasGroup;
-        [SerializeField] private RectTransform descriptionRectTransform;
-        [SerializeField] private TMP_Text descriptionText;
 
-        private List<BaseCharacter> currentHoveredCharacters = new ();
+        private List<CharacterSelectUIItem> currentHoveredCharacters = new ();
         private bool hasGrown;
         private SemaphoreSlim changeSizeSemaphoreSlim = new SemaphoreSlim(1, 1);
 
-        public PerkDataBase assignedUpgradeData { get; private set; }
+        #region Accessors
 
-        public async UniTask InitializeItem(PerkDataBase upgrade)
+        public int xIndex { get; private set; }
+        public int yIndex { get; private set; }
+
+        public CharacterData assignedCharacterData { get; private set; }
+        
+        #endregion
+
+        #region Class Implementation
+
+        
+        public async UniTask InitializeItem(CharacterData characterData, int _xIndex, int _yIndex)
         {
-            if (upgrade.IsNull())
+            if (characterData.IsNull())
             {
                 return;
             }
             
-            assignedUpgradeData = upgrade;
-            descriptionText.text = upgrade.perkDescription;
-            LayoutRebuilder.MarkLayoutForRebuild(descriptionRectTransform);
-            await upgradeIcon.GetIcon(upgrade.perkIconRef);
+            assignedCharacterData = characterData;
+            xIndex = _xIndex;
+            yIndex = _yIndex;
+            await characterIcon.GetIcon(characterData.characterIconRef);
         }
 
-        public void AddHoveringPlayer(BaseCharacter hoveringPlayer)
+        public void AddHoveringPlayer(CharacterSelectUIItem hoveringPlayer)
         {
             if (currentHoveredCharacters.IsNull() || currentHoveredCharacters.Contains(hoveringPlayer))
             {
@@ -53,7 +60,7 @@ namespace Runtime.UI.Items
             UpdateItem();
         }
 
-        public void RemoveHoveringPlayer(BaseCharacter unhoveringPlayer)
+        public void RemoveHoveringPlayer(CharacterSelectUIItem unhoveringPlayer)
         {
             if (currentHoveredCharacters.IsNull() || currentHoveredCharacters.Count == 0 || !currentHoveredCharacters.Contains(unhoveringPlayer))
             {
@@ -67,8 +74,8 @@ namespace Runtime.UI.Items
         private void UpdateItem()
         {
             SetColor(currentHoveredCharacters.Count > 0 && !currentHoveredCharacters[0].IsNull() 
-                ? currentHoveredCharacters[0].playerColor : Color.white);
-            HideShowSelected(currentHoveredCharacters.Count > 0);
+                ? currentHoveredCharacters[0].assignedColor : Color.white);
+            //HideShowSelected(currentHoveredCharacters.Count > 0);
             UpdatePlayerMarkers();
 
             if ((currentHoveredCharacters.Count > 0 && !hasGrown) || (currentHoveredCharacters.Count == 0 && hasGrown))
@@ -93,9 +100,9 @@ namespace Runtime.UI.Items
             for (var i = 0; i < currentHoveredCharacters.Count; i++)
             {
                 var currentMarker = playerMarkers[i];
-                currentMarker.markerImage.color = currentHoveredCharacters[i].playerColor;
+                currentMarker.markerImage.color = currentHoveredCharacters[i].assignedColor;
                 currentMarker.markerImage.enabled = true;
-                currentMarker.markerText.text = $"P{currentHoveredCharacters[i].GetPlayerIndex() + 1}";
+                currentMarker.markerText.text = $"P{currentHoveredCharacters[i].playerIndex + 1}";
             }
         }
         
@@ -107,7 +114,6 @@ namespace Runtime.UI.Items
         private void HideShowSelected(bool isShow)
         {
             selectionObject.gameObject.SetActive(isShow);
-            descriptionCanvasGroup.alpha = isShow ? 1f : 0f;
         }
 
         private async UniTask AdjustSize()
@@ -115,7 +121,7 @@ namespace Runtime.UI.Items
             await changeSizeSemaphoreSlim.WaitAsync();
             try
             {
-                var newScale = hasGrown ? 1f : 1.5f;
+                var newScale = hasGrown ? 1f : upscaleAmount;
                 await transform.DOScale(newScale, 0.1f);
             }
             finally
@@ -124,6 +130,10 @@ namespace Runtime.UI.Items
                 changeSizeSemaphoreSlim.Release();
             }
         }
+        
+        #endregion
+
+        
         
     }
 }

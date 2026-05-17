@@ -136,6 +136,7 @@ namespace Runtime.GameModes
         {
             token.ThrowIfCancellationRequested();
             //If a player wins enough rounds, show Sets won score
+            await multiPerkSelectionDataModel.FadeBlackScreen(true , token);
             await UpdateGameModeUIDisplay(true, token);
             
             //For each losing player, allow them to select augments
@@ -144,9 +145,9 @@ namespace Runtime.GameModes
 
             await multiPerkSelectionDataModel.PreSetupScreen(m_roundWinnerStats.playerCharacter, token);
 
-            var playersByOrderOfPoints = m_playerStats.OrderBy(s => s.roundPoints).Select(s => s.playerCharacter).ToList();
+            var playerStatsByPointOrder = m_playerStats.OrderBy(s => s.roundPoints).ToList();
             
-            await multiPerkSelectionDataModel.SetupSelectionScreenPlayers(playersByOrderOfPoints, m_roundWinnerStats.playerCharacter, token);
+            await multiPerkSelectionDataModel.SetupSelectionScreenPlayers(playerStatsByPointOrder, m_roundWinnerStats, token);
 
             //ToDo: Start Animation
             await multiPerkSelectionDataModel.PlayOpeningAnimation(token);

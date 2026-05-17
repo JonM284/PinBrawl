@@ -339,6 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerName: {fileID: 8185296533018108423}
+  pointsText: {fileID: 3484182949130351944}
   playerBackgrounds:
   - {fileID: 7851404524359361531}
   - {fileID: 5029712028480066564}

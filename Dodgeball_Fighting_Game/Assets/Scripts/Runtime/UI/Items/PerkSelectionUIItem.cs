@@ -5,8 +5,10 @@ using Cysharp.Threading.Tasks;
 using Data.PerkDatas;
 using DG.Tweening;
 using Project.Scripts.Utils;
+using Rewired;
 using Runtime.Character;
 using Runtime.GameControllers;
+using Runtime.Gameplay;
 using Runtime.UI.DataModels;
 using Runtime.UI.Icons;
 using TMPro;
@@ -18,12 +20,12 @@ namespace Runtime.UI.Items
     public class PerkSelectionUIItem: MonoBehaviour
     {
 
-        [SerializeField] private TMP_Text playerName;
+        [SerializeField] private TMP_Text playerName, pointsText;
         [SerializeField] private List<Image> playerBackgrounds;
         [SerializeField] private Image playerCharacterImage;
         [SerializeField] private List<IconBase> selectedPerkImages = new();
         [SerializeField] private PlayerUIInputReader inputReader;
-        [SerializeField] private GameObject mask;
+        [SerializeField] private GameObject mask, positionProxy;
         
         private int maxAmountOfUpgrades = 2;
         
@@ -39,61 +41,76 @@ namespace Runtime.UI.Items
 
         public bool hasFinishedSelection => selectedUpgrades.Count >= maxAmountOfUpgrades;
 
+        public bool IsWinningPlayer { get; private set; }
+
         public bool IsInitialized { get; private set; }
+
+        public GameObject PositionProxy => positionProxy;
+
+        public BaseCharacter assignedCharacter { get; private set; }
 
         #region Class Implementation
 
 
-        public async UniTask Initialize(BaseCharacter character, MultiPerkSelectionDataModel multiPerkSelectionDataModel, bool isWinningPlayer, CancellationToken token)
+        public async UniTask Initialize(PlayerMatchStats playerStats, MultiPerkSelectionDataModel multiPerkSelectionDataModel, bool isWinningPlayer, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            if (character.IsNull())
+            if (playerStats.IsNull())
             {
                 return;
             }
 
-            playerName.text = character.characterData.characterName;
-            playerBackgrounds.ForEach(img => img.color = character.playerColor);
-            playerCharacterImage.sprite = character.characterData.characterIconRef;
+            mask.SetActive(false);
+            transform.localPosition = Vector3.zero;
+            assignedCharacter = playerStats.playerCharacter;
+            playerName.text = assignedCharacter.characterData.characterName;
+            pointsText.text = playerStats.roundPoints.ToString();
+            playerBackgrounds.ForEach(img => img.color = assignedCharacter.playerColor);
+            playerCharacterImage.sprite = assignedCharacter.characterData.characterIconRef;
             selectedUpgrades.Clear();
             selectedPerkImages.ForEach(icon => icon.RemoveIcon());
-            
-            mask.SetActive(isWinningPlayer);
-            var localScale = isWinningPlayer ? disabledSize * Vector3.one : Vector3.one;
+            IsWinningPlayer = isWinningPlayer;
             
             //Winning Player doesn't upgrade
             if (isWinningPlayer)
             {
-                await transform.DOScale(localScale, 0.5f).WithCancellation(token);
                 return;
             }
-            
-            transform.localScale = localScale;
+
+            transform.localScale = Vector3.one;
             mpsDataModel = multiPerkSelectionDataModel;
-            inputReader.InitializeItem(character.GetPlayerController(), character, OnSelectCallback, OnCancelCallback, 
+            inputReader.InitializeItem(assignedCharacter.GetPlayerController(), assignedCharacter, OnSelectCallback, OnCancelCallback, 
                 OnHorizontalChangeCallback, OnVerticalChangeCallback);
             IsInitialized = true;
             await UniTask.Yield(cancellationToken: token);
         }
 
-        private void OnVerticalChangeCallback(BaseCharacter character, bool isUp)
+        public async UniTask WinningPlayerAnimationAsync(CancellationToken token)
         {
-            mpsDataModel.UpdateVerticalPosition(character, isUp);
+            token.ThrowIfCancellationRequested();
+            mask.SetActive(true);
+            await transform.DOScale(disabledSize, 0.5f).SetEase(Ease.InOutElastic).WithCancellation(token);
+            await transform.DOLocalMoveX(500f, 1f).SetEase(Ease.InOutElastic).WithCancellation(token);
         }
 
-        private void OnHorizontalChangeCallback(BaseCharacter character, bool isRight)
+        private void OnVerticalChangeCallback(Player controller, bool isUp)
         {
-            mpsDataModel.UpdateHorizontalPosition(character, isRight);
+            mpsDataModel.UpdateVerticalPosition(controller, isUp);
         }
 
-        private void OnCancelCallback(BaseCharacter character)
+        private void OnHorizontalChangeCallback(Player controller, bool isRight)
         {
-            mpsDataModel.OnCancelPressed(character);
+            mpsDataModel.UpdateHorizontalPosition(controller, isRight);
         }
 
-        private void OnSelectCallback(BaseCharacter character)
+        private void OnCancelCallback(Player controller)
         {
-            mpsDataModel.OnSelectPressed(character);
+            mpsDataModel.OnCancelPressed(controller);
+        }
+
+        private void OnSelectCallback(Player controller)
+        {
+            mpsDataModel.OnSelectPressed(controller);
         }
 
         public void AssignUpgradeData(PerkDataBase newPerk)

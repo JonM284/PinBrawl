@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data;
+using Data.AbilityDatas;
 using Data.PerkDatas;
+using NUnit.Framework;
 using Project.Scripts.Utils;
 using Rewired;
 using Runtime.Character;
@@ -36,11 +38,13 @@ namespace Runtime.GameControllers
         {
             public CharacterData characterData;
             public Player assignedPlayer;
+            public AbilityData chosenAbilityData;
 
-            public SelectedCharactersByPlayer(CharacterData _data, Player _player)
+            public SelectedCharactersByPlayer(CharacterData _data, Player _player, AbilityData _chosenAbilityData)
             {
                 characterData = _data;
                 assignedPlayer = _player;
+                chosenAbilityData = _chosenAbilityData;
             }
         }
 
@@ -96,6 +100,8 @@ namespace Runtime.GameControllers
         [SerializeField] private List<PerkDataBase> m_allPerks = new List<PerkDataBase>();
         
         [SerializeField] private List<PerkDataBase> allUpgrades = new List<PerkDataBase>();
+
+        [SerializeField] private List<AbilityData> allAssignableAbilities = new();
 
         [SerializeField] private int m_pointsNeededToWin = 3;
 
@@ -265,7 +271,7 @@ namespace Runtime.GameControllers
             SetInitialAvailablePerks();
             
             //Create Characters -> Create Health bars
-            await CreateCharacters();
+            await CreateCharacters(token);
 
             if (!m_isShowTutorial)
             {
@@ -287,7 +293,7 @@ namespace Runtime.GameControllers
             
             if (m_isShowTutorial)
             {
-                await StartTutorial();
+                await StartTutorial(token);
             }
             
             await UniTask.WaitForSeconds(1.25f, cancellationToken: token);
@@ -501,7 +507,7 @@ namespace Runtime.GameControllers
             {
                 for (int i = 0; i < m_amountOfCharacters; i++)
                 {
-                    m_selectedCharacters.Add(new SelectedCharactersByPlayer(m_allCharacters[m_testCharacterID], ReInput.players.GetPlayer(i)));
+                    m_selectedCharacters.Add(new SelectedCharactersByPlayer(m_allCharacters[m_testCharacterID], ReInput.players.GetPlayer(i), GetFirstAbilityData()));
                 }
             }
             
@@ -521,21 +527,15 @@ namespace Runtime.GameControllers
             m_currentLevelManager = null;
         }
 
-        public void AssignSelectedCharacter(CharacterData _selectedCharacter, Player _assigningPlayer)
+        public void AssignSelectedCharacter(CharacterData _selectedCharacter, Player _assigningPlayer, AbilityData _chosenAbilityData)
         {
-            m_selectedCharacters.Add(new SelectedCharactersByPlayer(_selectedCharacter, _assigningPlayer));
+            m_selectedCharacters.Add(new SelectedCharactersByPlayer(_selectedCharacter, _assigningPlayer, _chosenAbilityData));
         }
 
-        public void AssignSelectedCharacters(List<CharacterData> _selectedCharacters)
+        private async UniTask CreateCharacters(CancellationToken token)
         {
-            for (int i = 0; i < _selectedCharacters.Count; i++)
-            {
-                AssignSelectedCharacter(_selectedCharacters[i], ReInput.players.GetPlayer(i));
-            }
-        }
+            token.ThrowIfCancellationRequested();
 
-        private async UniTask CreateCharacters()
-        {
             if (m_selectedCharacters.IsNull() || m_selectedCharacters.Count == 0)
             {
                 Debug.Log("Selected Characters = NULL");
@@ -554,8 +554,8 @@ namespace Runtime.GameControllers
 
                 var _healthBar = Instantiate(m_playerHealthDataModel, m_currentLevelManager.GetCanvasTransform());
                 
-                await _newlyCreatedBaseCharacter.InitializeCharacter(m_selectedCharacters[i].characterData, 
-                    i, m_selectedCharacters[i].assignedPlayer, m_groundMask, m_wallMask);
+                await _newlyCreatedBaseCharacter.InitializeCharacter(m_selectedCharacters[i].characterData, m_selectedCharacters[i].chosenAbilityData,
+                    i, m_selectedCharacters[i].assignedPlayer, m_groundMask, m_wallMask, token);
                 
                 _healthBar.Initialize(_newlyCreatedBaseCharacter, m_selectedCharacters[i].characterData.characterArmorAmount,
                     100f, m_currentLevelManager.GetStaticHealthParent());
@@ -659,6 +659,21 @@ namespace Runtime.GameControllers
         public CharacterData GetCharacterDataAtIndex(int _index)
         {
             return m_allCharacters[_index];
+        }
+
+        public List<CharacterData> GetAllCharacterData()
+        {
+            return m_allCharacters.ToList();
+        }
+
+        public List<AbilityData> GetAllAbilities()
+        {
+            return allAssignableAbilities.ToList();
+        }
+
+        public AbilityData GetFirstAbilityData()
+        {
+            return allAssignableAbilities.FirstOrDefault();
         }
 
         #region Perks ------------------------
@@ -805,17 +820,17 @@ namespace Runtime.GameControllers
             return allUpgrades.ToList();
         }
         
-        private async UniTask StartTutorial()
+        private async UniTask StartTutorial(CancellationToken token)
         {
-
+            token.ThrowIfCancellationRequested();
             m_tutorialDummies.Clear();
             
             for(int i = 0; i < m_selectedCharacters.Count; i++)
             {
                 var _newDummyCharacter = GetTutorialDummy(i);
                 
-                await _newDummyCharacter.InitializeCharacter(m_dummyCharacterData, 
-                    -1, null, m_groundMask, m_wallMask);
+                await _newDummyCharacter.InitializeCharacter(m_dummyCharacterData, null,
+                    -1, null, m_groundMask, m_wallMask, token);
                 
                 m_tutorialDummies.Add(_newDummyCharacter);
                 

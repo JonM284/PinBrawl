@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24b71266b26c480f8ae55ca28cfe58cb, type: 3}
   m_Name: FrogKing@CharacterData
   m_EditorClassIdentifier: 
-  characterName: FrogKing
+  characterName: Frog King
   characterArmorAmount: 500
   characterIdentifierGUID: 250994ac-7592-4a21-9f56-baa42b319f6b
   characterNaturalKnockbackResistance: 0.15
@@ -29,5 +29,4 @@ MonoBehaviour:
   characterIconRef: {fileID: 21300000, guid: 8608591fe2a28364b9c600504912e54a, type: 3}
   allCharacterAbilities:
   - {fileID: 11400000, guid: caba48e6466213648b5e99428975137d, type: 2}
-  - {fileID: 11400000, guid: e7a5891e2b61e3940b6ad54d78d3e79b, type: 2}
   largeAbility: {fileID: 0}

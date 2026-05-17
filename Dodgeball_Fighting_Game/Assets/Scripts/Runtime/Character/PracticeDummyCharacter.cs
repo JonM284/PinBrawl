@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data;
+using Data.AbilityDatas;
 using DG.Tweening;
 using GameControllers;
 using Project.Scripts.Utils;
@@ -48,9 +50,10 @@ namespace Runtime.Character
         
         #region Class Implementation
         
-        public override async UniTask InitializeCharacter(CharacterData _characterData, int _index, Player _player,
-            LayerMask _groundMask, LayerMask _wallMask)
+        public override async UniTask InitializeCharacter(CharacterData _characterData, AbilityData _chosenAbility, int _index, Player _player,
+            LayerMask _groundMask, LayerMask _wallMask, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             if (_characterData.IsNull())
             {
                 return;

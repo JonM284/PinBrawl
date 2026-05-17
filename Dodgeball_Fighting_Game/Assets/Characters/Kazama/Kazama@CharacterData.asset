@@ -29,5 +29,4 @@ MonoBehaviour:
   characterIconRef: {fileID: 21300000, guid: eb371791c729d444bbfaf29522a846a3, type: 3}
   allCharacterAbilities:
   - {fileID: 11400000, guid: 3b36f61fff99106498ee16679b1867eb, type: 2}
-  - {fileID: 11400000, guid: 154ece2d4a0bcb749b588ede7bf9b6ac, type: 2}
   largeAbility: {fileID: 0}

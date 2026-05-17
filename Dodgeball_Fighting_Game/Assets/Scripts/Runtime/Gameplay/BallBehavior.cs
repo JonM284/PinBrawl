@@ -181,7 +181,7 @@ namespace Runtime.Gameplay
 
         private void Awake()
         {
-            playerDetectionSensor.SetColliderRadius(playerCheckRadius);
+            playerDetectionSensor.SetColliderRadius(playerCheckRadius * m_currentScale);
         }
 
         private void OnEnable()
@@ -336,6 +336,7 @@ namespace Runtime.Gameplay
             
             m_currentScale = Mathf.Clamp(m_currentScale + m_ballScaleModRate, 1, m_ballScaleMaxSize);
             m_ballVisualsParent.transform.localScale = Vector3.one * m_currentScale;
+            playerDetectionSensor.SetColliderRadius(playerCheckRadius * m_currentScale);
             cc.radius = m_charConOriginalSize * m_currentScale;
             m_trail.startWidth = m_currentScale/2;
         }

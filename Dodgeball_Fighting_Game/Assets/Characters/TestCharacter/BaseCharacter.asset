@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24b71266b26c480f8ae55ca28cfe58cb, type: 3}
   m_Name: BaseCharacter
   m_EditorClassIdentifier: 
-  characterName: BaseCharacter
+  characterName: Test Character
   characterArmorAmount: 400
   characterIdentifierGUID: cb5171e9-124a-47e6-bc90-925f40e57d50
   characterNaturalKnockbackResistance: 0.2
@@ -29,5 +29,4 @@ MonoBehaviour:
   characterIconRef: {fileID: 21300000, guid: ad8d6699221bff847954254d45768840, type: 3}
   allCharacterAbilities:
   - {fileID: 11400000, guid: 188c40c3b7eee00429ea815745ef0644, type: 2}
-  - {fileID: 11400000, guid: 61dc09c53d7bc144c85dcc775bd1acf6, type: 2}
   largeAbility: {fileID: 0}

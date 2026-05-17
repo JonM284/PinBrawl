@@ -1309,6 +1309,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b4c696f998c5d19448a1bea38de2caeb, type: 2}
   - {fileID: 11400000, guid: 8ecc64b87c47c09449006c5caadd36af, type: 2}
   - {fileID: 11400000, guid: ed8668f1bd5f8f14ea20bfed247fb31c, type: 2}
+  allAssignableAbilities:
+  - {fileID: 11400000, guid: f1e2a916947ec134387dbcef18f06702, type: 2}
+  - {fileID: 11400000, guid: 618a87c8e95942b44af620eeffb6d668, type: 2}
+  - {fileID: 11400000, guid: e7a5891e2b61e3940b6ad54d78d3e79b, type: 2}
+  - {fileID: 11400000, guid: b9d41b8978a462d47b3f62bb1b56f931, type: 2}
+  - {fileID: 11400000, guid: 188c40c3b7eee00429ea815745ef0644, type: 2}
+  - {fileID: 11400000, guid: 649653f049f034442a44c09e87d78f90, type: 2}
+  - {fileID: 11400000, guid: 7fb40e3e4d8a7e34396b9d1b0f79e34f, type: 2}
+  - {fileID: 11400000, guid: b7409e2cda4c4f646ba387c5d9a011f5, type: 2}
   m_pointsNeededToWin: 3
   m_isShowTutorial: 1
 --- !u!1 &8805505436093219786
