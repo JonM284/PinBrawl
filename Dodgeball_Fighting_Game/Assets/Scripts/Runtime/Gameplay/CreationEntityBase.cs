@@ -265,11 +265,11 @@ namespace Runtime.Gameplay
                 if (m_creationAbilityData.isHitBall)
                 {
                     var _hitDirection = (_ball.transform.position - transform.position) *
-                                        m_creationAbilityData.knockbackDirectionMod;
+                                        (m_creationAbilityData.isForwardKnockBack ? 1f : -1f);
 
                     if (m_creationAbilityData.isSavePointedDirection)
                     {
-                        _hitDirection = m_savedAimDirection * m_creationAbilityData.knockbackDirectionMod;
+                        _hitDirection = m_savedAimDirection * (m_creationAbilityData.isForwardKnockBack ? 1f : -1f);
                     }
                 
                     _ball.HitBall(_hitDirection, m_creationAbilityData.ballHitStrengthType, m_owner);
@@ -288,7 +288,7 @@ namespace Runtime.Gameplay
                 _collider.TryGetComponent(out IKnockbackable _knockbackable);
                 _knockbackable?.ApplyKnockback(transform, m_owner , m_knockbackAmount, 
                     m_creationAbilityData.isSavePointedDirection ? 
-                        m_savedAimDirection * m_creationAbilityData.knockbackDirectionMod : Vector3.zero);    
+                        m_savedAimDirection * (m_creationAbilityData.isForwardKnockBack ? 1f : -1f) : Vector3.zero);    
             }
             
             if (m_damageAmount > 0)

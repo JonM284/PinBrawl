@@ -58,6 +58,10 @@ namespace Runtime.Abilities
         protected float knockbackAmountMax;
         protected float damageAmountMax;
 
+        protected float chargeTimeCurrent, chargeTimeMax;
+
+        protected float chargePercentage;
+
         protected CancellationTokenSource cts = new CancellationTokenSource();
         
         #endregion
@@ -65,6 +69,7 @@ namespace Runtime.Abilities
         #region IAbility Inherited Methods
 
         public bool canUseAbility { get; set; }
+        
         public float abilityCooldownCurrent { get; set; }
         public float abilityCooldownMax { get; set; }
 
@@ -84,7 +89,11 @@ namespace Runtime.Abilities
 
         public float cooldownReductionModifier => cooldownModifier;
 
+        public float knockbackDir => abilityData.IsNull() ? 1f : abilityData.isForwardKnockBack ? 1f : -1f;
+
         public float currentScale { get; set; }
+
+        public bool isCharging { get; protected set;  }
 
         public AudioSource aSource => CommonUtils.GetRequiredComponent(ref m_audioSource,  GetComponent<AudioSource>);
 
@@ -112,12 +121,36 @@ namespace Runtime.Abilities
             knockbackAmountMax = abilityData.abilityKnockbackAmount;
             rangeAmountMax = abilityData.abilityRange;
             currentScale = abilityData.abilityScale;
+            chargeTimeMax = abilityData.abilityActivationWaitTimeMax;
             canUseAbility = _canUseOnStart;
+            
             SetCategoryGUIDs();
             await PreLoadNecessaryObjectsAsync(token);
             ChangeMrColor();
         }
 
+        /// <summary>
+        /// Percentage will change how effective this ability is, ie: more damage bigger range.
+        /// ONLY if the ability is able to be charged. Otherwise the ability will always be max effective.
+        /// </summary>
+        protected void SetChargePercentage()
+        {
+            switch (abilityData.activationType)
+            {
+                case ActivationType.OnHold:
+                case ActivationType.OnAutoCharge:
+                case ActivationType.CountdownAfterPress:
+                    chargePercentage = 0f;
+                    break;
+                default:
+                    chargePercentage = 1f;
+                    break;
+            }
+        }
+        
+        /// <summary>
+        /// Change colors to the owner player.
+        /// </summary>
         private void ChangeMrColor()
         {
             if (m_changableMR.Count == 0)
@@ -132,6 +165,9 @@ namespace Runtime.Abilities
             }
         }
 
+        /// <summary>
+        /// Category GUIDs used for descriptions.
+        /// </summary>
         public void SetCategoryGUIDs()
         {
             if (abilityData.abilityCategories.Count == 0)
@@ -145,26 +181,156 @@ namespace Runtime.Abilities
             }
         }
         
+        /// <summary>
+        /// Preload vfx and projectiles
+        /// </summary>
+        /// <param name="token"></param>
         public virtual async UniTask PreLoadNecessaryObjectsAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             await UniTask.CompletedTask;
         }
 
-        public virtual void ShowAttackIndicator(bool _isActive)
+        /// <summary>
+        /// When the ability button is pressed down
+        /// </summary>
+        public void OnAbilityButtonPressed()
+        {
+            switch (abilityData.activationType)
+            {
+                case ActivationType.OnRelease:
+                    return;
+                case ActivationType.OnAutoCharge when isCharging:
+                    ReleaseAbilityCharge();
+                    return;
+                case ActivationType.OnAutoCharge when !isCharging:
+                    ChargeAbilityAutoAsync(destroyCancellationToken).Forget();
+                    break;
+                case ActivationType.OnPress:
+                    DoAbilityAsync(destroyCancellationToken).Forget();
+                    break;
+                case ActivationType.OnHold:
+                    isCharging = true;
+                    break;
+            }
+        }
+
+        public void OnAbilityButtonHeld()
+        {
+            switch (abilityData.activationType)
+            {
+                case ActivationType.OnAutoCharge:
+                case ActivationType.OnPress:
+                    return;
+                case ActivationType.OnRelease:
+                    ShowAttackIndicator(true);
+                    return;
+                case ActivationType.OnHold:
+                    HoldAbilityCharge();
+                    break;
+            }
+        }
+
+        public void OnAbilityButtonReleased()
+        {
+            switch (abilityData.activationType)
+            {
+                case ActivationType.OnAutoCharge:
+                case ActivationType.OnPress:
+                    return;
+                case ActivationType.OnRelease:
+                    DoAbilityAsync(destroyCancellationToken).Forget();
+                    return;
+                case ActivationType.OnHold:
+                    ReleaseAbilityCharge();
+                    DoAbilityAsync(destroyCancellationToken).Forget();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// When the ability use button is pressed. (Charge activation type only)
+        /// </summary>
+        protected void HoldAbilityCharge()
+        {
+            if (!isCharging || abilityData.IsNull() || abilityData.activationType != ActivationType.OnHold)
+            {
+                return;
+            }
+            
+            chargeTimeCurrent += Time.deltaTime;
+            chargePercentage = Mathf.Clamp01(chargeTimeCurrent / chargeTimeMax);
+            ShowAttackIndicator(isCharging);
+        }
+        
+        /// <summary>
+        /// When the ability use button is released. (Charge activation type only)
+        /// </summary>
+        protected void ReleaseAbilityCharge()
+        {
+            isCharging = false;
+            ShowAttackIndicator(false);
+        }
+
+        /// <summary>
+        /// Activate Ability charge.
+        /// When fully charged or re-activated, the ability will perform it's action. (re-activate and countdown ability types)
+        /// </summary>
+        /// <param name="token"></param>
+        protected async UniTask ChargeAbilityAutoAsync(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            isCharging = true;
+            chargeTimeCurrent = 0f;
+            
+            while (isCharging && chargeTimeCurrent < chargeTimeMax)
+            {
+                chargeTimeCurrent += Time.deltaTime;
+                chargePercentage = Mathf.Clamp01(chargeTimeCurrent / chargeTimeMax);
+                ShowAttackIndicator(isCharging);
+                await UniTask.Yield(PlayerLoopTiming.LastUpdate, token);
+                if (isCharging && !(chargeTimeCurrent >= chargeTimeMax)) continue;
+                
+                isCharging = false;
+                chargeTimeCurrent = chargeTimeMax;
+                break;
+            }
+            
+            DoAbilityAsync(token).Forget();
+        }
+        
+        /// <summary>
+        /// Display Attack Indicator (usually used when attack is on release)
+        /// </summary>
+        protected virtual void ShowAttackIndicator(bool _isActive)
         {
             aimDirection = currentOwner.m_playerAimVector.normalized;
         }
-
-        public virtual async UniTask DoAbilityAsync(CancellationToken token)
+        
+        /// <summary>
+        /// Perform actual ability
+        /// </summary>
+        /// <param name="token"></param>
+        protected virtual async UniTask DoAbilityAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             aimDirection = currentOwner.m_playerAimVector.normalized;
+
+            if (abilityData.isUltimateAbility)
+            {
+                //ToDo: add "Cinematic" Intro
+                
+            }
+            
         }
 
         //Example: object[] arg = {Cooldown, Hit [damage and Knockback], Scale};
         //Projectile -> MaxLifetime, Speed
         //Dash -> Offset
+        /// <summary>
+        /// Change Ability Parameters during runtime
+        /// </summary>
         public virtual void UpdateAbility(params object[] _arguments)
         {
             cooldownModifier += (float)_arguments[0];
@@ -176,6 +342,9 @@ namespace Runtime.Abilities
         }
         
 
+        /// <summary>
+        /// Set ability to be ready to use again
+        /// </summary>
         public virtual void ResetAbilityUse()
         {
             //Reset Variables
@@ -184,11 +353,17 @@ namespace Runtime.Abilities
             m_previouslyHitColliders.Clear();
         }
 
+        /// <summary>
+        /// Returns whether or not the category is for this ability.
+        /// </summary>
         public bool ContainsCategory(AbilityCategories _checkCategory)
         {
             return m_categoryGUIDs.Count != 0 && m_categoryGUIDs.Contains(_checkCategory.abilityCategoryGUID);
         }
 
+        /// <summary>
+        /// SFX for this ability.
+        /// </summary>
         protected void PlayRandomSound()
         {
             if (m_abilityUseSFX.Count == 0)
@@ -200,6 +375,10 @@ namespace Runtime.Abilities
             aSource.PlayOneShot(m_abilityUseSFX[Random.Range(0, m_abilityUseSFX.Count)]);
         }
         
+        /// <summary>
+        /// Sets the end position of this ability.
+        /// Used for dashes and teleports so the player doesn't go out of bounds.
+        /// </summary>
         protected virtual void GetEndPosition()
         {
             m_hitWallsAmount = Physics.RaycastNonAlloc(currentOwner.transform.position, aimDirection, 

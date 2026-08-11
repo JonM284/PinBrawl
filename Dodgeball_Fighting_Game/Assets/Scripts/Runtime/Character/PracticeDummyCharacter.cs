@@ -73,11 +73,6 @@ namespace Runtime.Character
             m_originalSpeed = characterData.characterWalkSpeed;
             m_currentSpeed = m_originalSpeed;
             
-            m_currentEnergy = m_energyMax / 4f;
-
-            m_playerKillEnergyAddAmount = m_dummyKillAmount;
-            m_pvpDamageEnergyAddAmount = m_dummyDamageAmount;
-
             m_startLocation = transform.position;
             
             m_isInitialized = true;
@@ -118,11 +113,6 @@ namespace Runtime.Character
 
             var _damageIntakeAmount = Mathf.CeilToInt(_damageAmount * m_damageIntakeMod);
             m_currentDamagedAmount += _damageIntakeAmount;
-
-            if (!_attackingCharacter.IsNull())
-            {
-                _attackingCharacter.AddEnergy(m_pvpDamageEnergyAddAmount);
-            }
             
             JuiceGameController.Instance.CreateDamageText(_damageIntakeAmount, transform.position);
             UpdateDamagePercentage();

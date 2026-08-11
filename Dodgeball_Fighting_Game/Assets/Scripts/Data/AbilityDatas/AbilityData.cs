@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Data.StatusDatas;
+using Runtime.Abilities;
 using Runtime.Gameplay;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -20,20 +21,19 @@ namespace Data.AbilityDatas
         public float abilityRange = 0;
         public float abilityScale = 1;
 
-        [Tooltip("Amount of time before character goes back to running animation")]
-        public float abilityAnimationTime = 0.15f;
-
+        public bool isUltimateAbility;
+        
         [Tooltip("Stop Character Movement while performing?")]
-        public bool isHaultMovement = true;
+        public bool isHaltMovement = true;
 
-        [Tooltip("Can hit enemy player only 1 time or multiple times. IE: dash attack")]
-        public bool isHitOnce;
+        public ActivationType activationType = ActivationType.OnRelease;
 
-        public bool isReactivatable;
+        [Tooltip("Full amount of time required to charge or wait until ability deals max stats")]
+        public float abilityActivationWaitTimeMax = 1f;
 
         public float reactivationTime = 1f;
 
-        public float knockbackDirectionMod = 1f;
+        public bool isForwardKnockBack = true;
 
         [FormerlySerializedAs("ballHitStrength")] public HitStrengthType ballHitStrengthType;
 

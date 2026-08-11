@@ -1310,14 +1310,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ecc64b87c47c09449006c5caadd36af, type: 2}
   - {fileID: 11400000, guid: ed8668f1bd5f8f14ea20bfed247fb31c, type: 2}
   allAssignableAbilities:
-  - {fileID: 11400000, guid: f1e2a916947ec134387dbcef18f06702, type: 2}
-  - {fileID: 11400000, guid: 618a87c8e95942b44af620eeffb6d668, type: 2}
-  - {fileID: 11400000, guid: e7a5891e2b61e3940b6ad54d78d3e79b, type: 2}
-  - {fileID: 11400000, guid: b9d41b8978a462d47b3f62bb1b56f931, type: 2}
-  - {fileID: 11400000, guid: 188c40c3b7eee00429ea815745ef0644, type: 2}
-  - {fileID: 11400000, guid: 649653f049f034442a44c09e87d78f90, type: 2}
-  - {fileID: 11400000, guid: 7fb40e3e4d8a7e34396b9d1b0f79e34f, type: 2}
-  - {fileID: 11400000, guid: b7409e2cda4c4f646ba387c5d9a011f5, type: 2}
+  - {fileID: 11400000, guid: 765d4f5910c0dd146b532217ff028812, type: 2}
+  - {fileID: 11400000, guid: 5dfd91e5e199352438eca5bb9d9767eb, type: 2}
+  - {fileID: 11400000, guid: 579cdd3510acf904d84fc5c096bd7c2e, type: 2}
+  - {fileID: 11400000, guid: 61f955f145f712e4bbbbb7c2a7779b8d, type: 2}
+  - {fileID: 11400000, guid: f5e34111ad888374bbdaa3c4426ca409, type: 2}
   m_pointsNeededToWin: 3
   m_isShowTutorial: 1
 --- !u!1 &8805505436093219786
@@ -1368,7 +1365,6 @@ MonoBehaviour:
   m_stageY: 0.1
   m_damageTextPrefab: {fileID: 1862784113860278606, guid: 0108c5afbc7c26642a04d58fd9bcc1a1, type: 3}
   m_rangeAttackPrefab: {fileID: 7773850815471342035, guid: 4007311f91b2a074491a6991e6d9a8db, type: 3}
-  m_playerDeathFeedback: {fileID: 7801815681030030769}
 --- !u!1 &9145069647049232470
 GameObject:
   m_ObjectHideFlags: 0
@@ -1378,8 +1374,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1992142801506576192}
-  - component: {fileID: 7801815681030030769}
-  - component: {fileID: 4864603813032776501}
   m_Layer: 0
   m_Name: PlayerDeathEffect
   m_TagString: Untagged
@@ -1402,130 +1396,3 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3411763797863990506}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7801815681030030769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9145069647049232470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 841b72de2996c5c40bfb394f3d0e0a98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Feedbacks:
-  - {fileID: 4864603813032776501}
-  InitializationMode: 2
-  AutoInitialization: 1
-  SafeMode: 3
-  Direction: 0
-  AutoChangeDirectionOnEnd: 0
-  AutoPlayOnStart: 0
-  AutoPlayOnEnable: 0
-  ForceTimescaleMode: 0
-  ForcedTimescaleMode: 1
-  DurationMultiplier: 1
-  RandomizeDuration: 0
-  RandomDurationMultiplier: {x: 0.5, y: 1.5}
-  DisplayFullDurationDetails: 0
-  PlayerTimescaleMode: 1
-  OnlyPlayIfWithinRange: 0
-  RangeCenter: {fileID: 0}
-  RangeDistance: 5
-  UseRangeFalloff: 0
-  RangeFalloff:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  RemapRangeFalloff: {x: 0, y: 1}
-  IgnoreRangeEvents: 0
-  CooldownDuration: 0
-  InitialDelay: 0
-  CanPlay: 1
-  CanPlayWhileAlreadyPlaying: 1
-  ChanceToPlay: 100
-  FeedbacksIntensity: 1
-  Events:
-    TriggerMMFeedbacksEvents: 0
-    TriggerUnityEvents: 1
-    OnPlay:
-      m_PersistentCalls:
-        m_Calls: []
-    OnPause:
-      m_PersistentCalls:
-        m_Calls: []
-    OnResume:
-      m_PersistentCalls:
-        m_Calls: []
-    OnRevert:
-      m_PersistentCalls:
-        m_Calls: []
-    OnComplete:
-      m_PersistentCalls:
-        m_Calls: []
-    OnRestoreInitialValues:
-      m_PersistentCalls:
-        m_Calls: []
-    OnSkipToTheEnd:
-      m_PersistentCalls:
-        m_Calls: []
-  DebugActive: 0
---- !u!114 &4864603813032776501
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9145069647049232470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86fec89a17b5b2347a82ae1c77aced3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Active: 1
-  Label: Freeze Frame
-  Chance: 100
-  Timing:
-    TimescaleMode: 0
-    ExcludeFromHoldingPauses: 0
-    ContributeToTotalDuration: 1
-    InitialDelay: 0
-    CooldownDuration: 0
-    InterruptsOnStop: 1
-    NumberOfRepeats: 0
-    RepeatForever: 0
-    DelayBetweenRepeats: 1
-    MMFeedbacksDirectionCondition: 0
-    PlayDirection: 0
-    ConstantIntensity: 0
-    UseIntensityInterval: 0
-    IntensityIntervalMin: 0
-    IntensityIntervalMax: 0
-    Sequence: {fileID: 0}
-    TrackID: 0
-    Quantized: 0
-    TargetBPM: 120
-  DebugActive: 0
-  FreezeFrameDuration: 1
-  MinimumTimescaleThreshold: 0.1

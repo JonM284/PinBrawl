@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10cccc6dace840d696cbb3cf24bdd3f3, type: 3}
+  m_Name: WACKSILENCE@Status
+  m_EditorClassIdentifier: 
+  statusName: Wack Silence
+  statusDescription: Disables character's Wack for x amount of time
+  statusIconRef: {fileID: -1182276646, guid: a10cb3573e0dca140b847908d070e55c, type: 3}
+  isBuff: 0
+  statusIdentifierGUID: a4df09f3-1f4e-4fd1-ad01-56fcb3453320
+  timeMax: 3
+  shieldChangeOverTick: 0
+  statusGameObject: {fileID: 2709609490780426897, guid: 0801ab73108c6ba4fb14bf0862e1d685, type: 3}

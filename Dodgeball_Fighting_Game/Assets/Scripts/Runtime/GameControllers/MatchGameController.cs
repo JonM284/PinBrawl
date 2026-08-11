@@ -31,6 +31,12 @@ namespace Runtime.GameControllers
 
         #endregion
 
+        #region Static Common Settings
+
+        public readonly string defaultProjectilePoolNameFormat = "{0}_player_{1}_{2}_projectile";
+
+        #endregion
+
         #region Nested Classes
 
         [Serializable]
@@ -392,6 +398,7 @@ namespace Runtime.GameControllers
             foreach (var _character in m_currentlyAliveCharacters)
             {
                 _character.Pause_UnPause_Character(false);
+                _character.StartAllAbilityCooldowns();
             }
             
             //Let Characters Move, take down invisible walls => Maybe?

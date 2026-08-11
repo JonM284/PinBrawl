@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b924cc7a371148f79f2119ad8f88d686, type: 3}
+  m_Name: VulnerableProjectile@PassiveAbility
+  m_EditorClassIdentifier: 
+  abilityName: Vulnerable
+  abilityDescription: Applies vulnerable to targets on contact
+  abilityIconRef: {fileID: -374902398, guid: a10cb3573e0dca140b847908d070e55c, type: 3}
+  abilityCooldownTimeMax: 3
+  abilityKnockbackAmount: 0
+  abilityDamageAmount: 0
+  abilityRange: 50
+  abilityScale: 1
+  isUltimateAbility: 0
+  isHaltMovement: 1
+  activationType: 0
+  abilityActivationWaitTimeMax: 1
+  reactivationTime: 1
+  isForwardKnockBack: 1
+  ballHitStrengthType: 3
+  collisionDetectionLayers:
+    serializedVersion: 2
+    m_Bits: 192
+  abilityCategories: []
+  applicableStatusesOnHit:
+  - {fileID: 11400000, guid: 586271b055d6e4a489f0788ad4372655, type: 2}
+  abilityGameObject: {fileID: 4351572726978402741, guid: 0299e847645882f4eb2eb636e309e116, type: 3}
+  projectileMaxLifetime: 30
+  projectileShootSpeed: 14
+  projectileDetectionRange: 1
+  projectileExplosionRange: 1
+  projectileEndType: 0
+  isPassThroughObjects: 0
+  isMultiStage: 0
+  isSpreadShotOnStart: 0
+  isGenericCharacterPrefab: 1
+  projectileAmount: 1
+  projectileSpread: 0
+  timeBetweenShots: 0.25
+  amountOfStages: 0
+  isSlowDownOverTime: 0
+  slowDownModifier: 0
+  slowDownType: 0
+  projeciltePrefab: {fileID: 0}
+  endCreatable: {fileID: 0}

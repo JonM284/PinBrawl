@@ -14,6 +14,7 @@ using Rewired;
 using Runtime.Abilities;
 using Runtime.GameControllers;
 using Runtime.Gameplay;
+using Runtime.Gameplay.Sensors;
 using Runtime.GameplayInterfaces;
 using Runtime.Perks;
 using Runtime.Statuses;
@@ -43,12 +44,14 @@ namespace Runtime.Character
         private readonly string actionUseTimerIdentifier = "Using_Action";
         private readonly string shieldPopTimerIdentifier = "SHIELD_POP@Identifier";
         private readonly string evadeUseTimerIdentifier = "EVADE@Identifier";
+        private readonly string parryTimerIdentifier = "PARRY@Identifier";
 
         //Input Actions
         private readonly string ballMeleeActionName = "Ball_Melee";
         private readonly string primaryAbilityActionName = "Primary_Ability";
         private readonly string secondaryAbilityActionName = "Secondary_Ability";
         private readonly string energyShieldActionName = "Energy_Shield";
+        private readonly string dashAbilityActionName = "Select";
         
         #endregion
 
@@ -77,9 +80,7 @@ namespace Runtime.Character
         public static event Action<BaseCharacter, StatusData> OnStatusApplied;
         
         public static event Action<BaseCharacter, StatusData> OnStatusRemoved;
-
-        public static event Action<BaseCharacter, float> OnEnergyAmountChanged;
-
+        
         public static event Action<BaseCharacter> OnEvadeUsed;
 
         #endregion
@@ -96,15 +97,12 @@ namespace Runtime.Character
 
         [SerializeField] private GameObject m_meleeIndicator;
 
-        [SerializeField] private Transform m_energyShieldParent;
-        [SerializeField] private GameObject m_energyShieldIndicator;
-
         [SerializeField] private VFXPlayer m_wackVFX;
         [SerializeField] private VFXPlayer m_wackChargeVFX;
         [SerializeField] private VFXPlayer m_shieldPopVFX;
         [SerializeField] private VFXPlayer m_shieldPopStunVFX;
         [SerializeField] private VFXPlayer m_knockbackVFX;
-
+        
         [SerializeField] private MeshRenderer m_marker;
 
         [SerializeField] private MeshRenderer m_aimMarker;
@@ -113,7 +111,9 @@ namespace Runtime.Character
         
         [SerializeField] private Transform m_statusHolder;
 
-        [SerializeField] private AbilityData m_buntAbilityData;
+        [SerializeField] private AbilityData m_dashAbilityData;
+
+        [SerializeField] private EnergyShieldBehaviour energyShieldBehaviour;
 
         [SerializeField] private List<AudioClip> m_wackSounds = new List<AudioClip>();
 
@@ -129,19 +129,16 @@ namespace Runtime.Character
         protected float m_damagePercentage, m_damagePercentageKnockbackMod;
         protected float m_ballConnectBuildUpTimerCurrent, m_ballConnectBuildUpTimerMax = 1.1f, m_calcMaxBuildUpTimer, 
             m_ballBuildUpPercentage;
-        protected float m_currentEnergy, m_energyMax = 100, m_energyDepleteAmount = 9f, m_energyShieldPopStunDuration = 10f;
-        protected float m_evadeDuration = 2f;
-        protected float m_playerKillEnergyAddAmount, m_pvpDamageEnergyAddAmount; 
-        protected float m_playerHorizontalInput, m_playerVerticalInput;
         protected float m_knockbackForce, m_knockbackTime;
         protected float m_ballMeleeChargeAmount, m_ballMeleeChargeAmountMax = 1f;
         protected float m_damageIntakeMod = 1f;
         protected float m_meleeChargeThreshold = 0.8f;
-        protected float m_hitStunMaxTime = 0.3f, m_hitStunMaxFrequency = 0.8f, m_hitStunKnockbackThreshold = 150f;
+        protected float m_hitStunMaxTime = 0.1f, m_hitStunMaxFrequency = 0.6f, m_hitStunKnockbackThreshold = 150f;
         protected float m_currentHitStunTime, m_currentHitStunFrequency;
         protected float m_armoredKnockbackReductionRate = 15f, m_unarmoredKnockbackReductionRate = 8f;
         protected float m_speedModifier = 1f, m_armorModifier = 1f, m_wackSizeModifier = 1f;
         protected float m_wackRangeCurrent, m_wackTimeMax = 0.15f;
+        protected float m_energyShieldPopStunDuration = 10f;
         
         //bool
         protected bool m_isAlive = true;
@@ -151,6 +148,7 @@ namespace Runtime.Character
         protected bool m_isInAction;
         protected bool m_playerHittingBall, m_canCheckBallInput = true, m_isCharging;
         protected bool m_hasPlayedVFX;
+        protected bool canUseAbilities;
         
         protected int m_playerIndex;
         protected int m_hitStunMaxVirbrato = 25, m_currentVirbrato;
@@ -182,7 +180,7 @@ namespace Runtime.Character
         private List<AbilityBase> m_abilitiesOnCooldown = new List<AbilityBase>();
         private List<AbilityBase> m_cooldownRemovableAbilities = new List<AbilityBase>();
 
-        private AbilityBase m_buntAbility;
+        private AbilityBase m_dashAbility;
         private AbilityData m_selectedAbility;
 
         //status
@@ -195,6 +193,8 @@ namespace Runtime.Character
         private int m_abilityUseCharges = 0;
 
         private CancellationTokenSource cts = new CancellationTokenSource();
+
+        private SemaphoreSlim wackBallSemaphoreSlim = new SemaphoreSlim(1,1);
 
         #endregion
 
@@ -216,7 +216,7 @@ namespace Runtime.Character
 
         public bool m_stopCooldownTimer => m_isStunned || m_isKnockedBack || m_isWaiting;
 
-        protected Camera mainCamera => CommonUtils.GetRequiredComponent(ref m_mainCamera, () =>
+        public Camera mainCamera => CommonUtils.GetRequiredComponent(ref m_mainCamera, () =>
         {
             return CameraUtils.GetMainCamera();
         });
@@ -241,7 +241,11 @@ namespace Runtime.Character
 
         public bool isShielding { get; private set; }
 
+        public bool isParrying { get; private set; }
+
         public bool isEvading { get; private set; }
+
+        public bool isDashing { get; private set; }
 
         public CustomTimer wackTimer { get; protected set; }
 
@@ -260,6 +264,8 @@ namespace Runtime.Character
         {
             MatchGameController.OnRoundStart -= SetPlayerRoundStart;
         }
+
+        
 
         private void OnDrawGizmos()
         {
@@ -281,7 +287,8 @@ namespace Runtime.Character
             
             ReadPlayerInputs();
             CheckLocalTimers();
-            
+
+            CheckAbilityCooldowns();
             CheckStatusCooldown();
 
             CheckCharacterRotation();
@@ -294,11 +301,6 @@ namespace Runtime.Character
             else if(m_isKnockedBack)
             {
                 DoKnockback();
-            }
-            
-            if (m_playerHittingBall)
-            {
-                CheckHitBall();
             }
         }
 
@@ -351,16 +353,9 @@ namespace Runtime.Character
             m_originalSpeed = characterData.characterWalkSpeed;
             m_currentSpeed = m_originalSpeed;
             
-            m_currentEnergy = m_energyMax / 4f;
-            
-            OnEnergyAmountChanged?.Invoke(this, m_currentEnergy);
-
             m_wackRangeCurrent = characterData.ballMeleeColliderRadius;
             m_meleeIndicator.transform.localScale = Vector3.one * (m_wackRangeCurrent * 2);
             m_wackVFX.transform.localScale = m_meleeIndicator.transform.localScale;
-
-            m_playerKillEnergyAddAmount = SettingsController.Instance.GetPlayerKillEnergyAmount();
-            m_pvpDamageEnergyAddAmount = SettingsController.Instance.GetPvpDamageEnergyAmount();
 
             playerColor = SettingsController.Instance.GetColorByPlayerIndex(m_playerIndex);
             playerMidColor = SettingsController.Instance.GetMidColorByPlayerIndex(m_playerIndex);
@@ -374,11 +369,13 @@ namespace Runtime.Character
 
             m_healthbarLoc.position = transform.position + characterData.healthBarOffset;
             
+            energyShieldBehaviour.Initialize(this);
             //await InitializeAssignedAbilities(token);
 
             wackTimer = new CustomTimer(ballCooldownTimerIdentifier, characterData.ballMeleeCooldownTimer, false , ResetBallInput);
-
+            
             m_isInitialized = true;
+            canUseAbilities = true;
         }
 
         private async UniTask InitializeChosenAbility(CancellationToken token)
@@ -388,17 +385,23 @@ namespace Runtime.Character
 
             if (chosenAbilityPrefab.TryGetComponent(out AbilityBase _chosenAbility).IsNull())
             {
+                Debug.LogError($"Ability Initialization Error:[Name:{m_selectedAbility.abilityName}] does not contain component of type AbilityBase");
                 return;
             }
                 
             m_assignedAbilities.Add(_chosenAbility);
-            await _chosenAbility.InitializeAbilityAsync(this, m_selectedAbility, true, token);
+            await _chosenAbility.InitializeAbilityAsync(this, m_selectedAbility, false, token);
         }
 
+        /// <summary>
+        /// Initialize chosen ability to slot 0.
+        /// Initialize pre-assigned Character abilities to other slots.
+        /// </summary>
+        /// <param name="token"></param>
         public async UniTask InitializeAssignedAbilities(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            if (characterData.IsNull() || characterData.allCharacterAbilities.Count == 0)
+            if (characterData.IsNull())
             {
                 return;
             }
@@ -417,25 +420,35 @@ namespace Runtime.Character
                 }
                 
                 m_assignedAbilities.Add(_ability);
-                await _ability.InitializeAbilityAsync(this, _abilityData, true, token);
-            }
-            
-            
-            var _buntAbilityPrefab = Instantiate(m_buntAbilityData.abilityGameObject,
-                transform);
-            
-            if (_buntAbilityPrefab.TryGetComponent(out AbilityBase _buntAbilityScript).IsNull())
-            {
-                OnAbilitiesAssigned?.Invoke();
-                return;
+                await _ability.InitializeAbilityAsync(this, _abilityData, false, token);
             }
 
-            m_buntAbility = _buntAbilityScript;
-            await m_buntAbility.InitializeAbilityAsync(this, m_buntAbilityData, false, token);
+            await AssignDashAbilityAsync(token);
             
             OnAbilitiesAssigned?.Invoke();
         }
 
+        /// <summary>
+        /// Initialize Dash ability
+        /// </summary>
+        private async UniTask AssignDashAbilityAsync(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            var _dashAbilityPrefab = Instantiate(m_dashAbilityData.abilityGameObject,
+                transform);
+            
+            if (_dashAbilityPrefab.TryGetComponent(out AbilityBase _dashAbilityComp).IsNull())
+            {
+                return;
+            }
+
+            m_dashAbility = _dashAbilityComp;
+            await m_dashAbility.InitializeAbilityAsync(this, m_dashAbilityData, false, token);
+        }
+        
+        /// <summary>
+        /// Initialize Ultimate Ability
+        /// </summary>
         public async UniTask T_AssignLargeAbility(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -574,7 +587,7 @@ namespace Runtime.Character
 
         protected bool ContainsTimer(string _identifier)
         {
-            return !m_currentTimers.FirstOrDefault(ct => ct.timerIdentifier == _identifier).IsNull();
+            return m_currentTimers.Count != 0 && m_currentTimers.TrueForAll(ct => ct.timerIdentifier != _identifier);
         }
 
         protected void DecreaseTimerMaxTime(string _identifier, float m_decreaseAmount)
@@ -601,6 +614,11 @@ namespace Runtime.Character
             if (m_currentTimers.Count == 0)
             {
                 //No Active Timers
+                return;
+            }
+
+            if (!ContainsTimer(_identifier))
+            {
                 return;
             }
 
@@ -646,30 +664,50 @@ namespace Runtime.Character
 
             if (m_player.GetButtonDown(energyShieldActionName))
             {
-                UseEnergy();
+                OnStartEnergyShield();
+            }else if(m_player.GetButton(energyShieldActionName))
+            {
+                OnUseEnergyShield();
+            }else if (m_player.GetButtonUp(energyShieldActionName))
+            {
+                OnEndEnergyShield();
             }
-                
+
+            if (m_player.GetButtonDown(dashAbilityActionName))
+            {
+                UseDashAbility();
+            }
+
+
+            if (m_player.GetButtonDown(primaryAbilityActionName) && !m_player.GetButtonDown(secondaryAbilityActionName))
+            {
+                OnAbilityButtonDown(0);
+            } else if (!m_player.GetButtonDown(primaryAbilityActionName) && m_player.GetButtonDown(secondaryAbilityActionName))
+            {
+                OnAbilityButtonDown(1);
+            }
+            
             if (m_player.GetButton(primaryAbilityActionName) && !m_player.GetButton(secondaryAbilityActionName))
             {
-                ShowAbilityIndicator(0);
+                OnAbilityButtonHeld(0);
             } else if (!m_player.GetButton(primaryAbilityActionName) && m_player.GetButton(secondaryAbilityActionName))
             {
-                ShowAbilityIndicator(1);
+                OnAbilityButtonHeld(1);
             }else if (m_player.GetButton(primaryAbilityActionName) && m_player.GetButton(secondaryAbilityActionName))
             {
-                ShowAbilityIndicator(2);
+                OnAbilityButtonHeld(2);
             }
                 
             if (m_player.GetButtonUp(primaryAbilityActionName) && m_currentHeldAbility == 0)
             {
-                UseAbility(0);
+                OnAbilityButtonReleased(0);
             } else if (m_player.GetButtonUp(secondaryAbilityActionName) && m_currentHeldAbility == 1)
             {
-                UseAbility(1);
+                OnAbilityButtonReleased(1);
             }else if (!m_player.GetButton(primaryAbilityActionName) 
                       && !m_player.GetButton(secondaryAbilityActionName) && m_currentHeldAbility == 2)
             {
-                UseAbility(2);
+                OnAbilityButtonReleased(2);
             }
             
         }
@@ -772,168 +810,17 @@ namespace Runtime.Character
         }
 
         #endregion
-        
-        #region Energy Shield --------------
 
-        private void UseEnergy()
+        #region Dash Ability
+
+        private void UseDashAbility()
         {
-            if (m_isInAction || m_isShieldPopStunned || m_currentEnergy <= 0 || m_isKnockedBack || m_isStunned)
-            {
-                return;
-            }
-
-            if (isEvading)
-            {
-                return;
-            }
-
-            if (m_currentEnergy < m_energyMax)
-            {
-                UseEvade();
-            }
-            else
-            {
-                UseBunt();
-            }
-        }
-
-        private void UseEvade()
-        {
-            if (m_currentEnergy < m_energyMax/4)
+            if (m_dashAbility.IsNull() || m_abilitiesOnCooldown.Contains(m_dashAbility))
             {
                 return;
             }
             
-            isEvading = true;
-
-            RemoveEnergy(m_energyMax/4);
-            
-            OnEvadeUsed?.Invoke(this);
-
-            m_currentTimers.Add(new CustomTimer(evadeUseTimerIdentifier, m_evadeDuration, false, EndEvade));
-        }
-
-        private void EndEvade()
-        {
-            isEvading = false;
-        }
-
-        private void UseBunt()
-        {
-            if (m_currentEnergy < m_energyMax)
-            {
-                return;
-            }
-
-            if (cts.IsNull())
-            {
-                cts = new CancellationTokenSource();
-            }
-            
-            m_buntAbility.DoAbilityAsync(cts.Token).Forget();
-            
-            //ToDo: pause player for animation
-            
-            m_currentEnergy = m_energyMax / 4f;
-            OnEnergyAmountChanged?.Invoke(this, m_currentEnergy);
-            UpdateShieldScale();
-        }
-
-        public void AddEnergy(float _amountToAdd)
-        {
-            m_currentEnergy = Mathf.Clamp(m_currentEnergy + _amountToAdd, 0, m_energyMax);
-            OnEnergyAmountChanged?.Invoke(this, m_currentEnergy);
-            
-            UpdateShieldScale();
-        }
-
-        private void RemoveEnergy(float _amountToRemove)
-        {
-            m_currentEnergy = Mathf.Clamp(m_currentEnergy - _amountToRemove, 0, m_energyMax);
-            OnEnergyAmountChanged?.Invoke(this, m_currentEnergy);
-            
-            UpdateShieldScale();
-        }
-
-        private void UpdateShieldScale()
-        {
-            m_energyShieldIndicator.transform.localScale = Vector3.one * ((m_currentEnergy / m_energyMax) + 0.2f);
-        }
-
-        protected void DisplayEnergyShield(bool _isActive)
-        {
-            if (m_energyShieldIndicator.IsNull())
-            {
-                return;
-            }
-            
-            if (_isActive)
-            {
-                m_energyShieldParent.LookAt(mainCamera.transform);
-            }
-            
-            m_energyShieldIndicator.SetActive(_isActive);
-        }
-        
-        protected void UseEnergyShield()
-        {
-            if (m_isInAction || m_isShieldPopStunned || m_currentEnergy <= 0 || m_isKnockedBack || m_isStunned)
-            {
-                return;
-            }
-
-            isShielding = true;
-            
-            if (!m_energyShieldIndicator.activeSelf)
-            {
-                DisplayEnergyShield(true);
-            }
-            
-            if (m_currentEnergy <= 0)
-            {
-                if (!m_isShieldPopStunned)
-                {
-                    PopEnergyShield();
-                }
-                return;
-            }
-
-            RemoveEnergy(Time.deltaTime * m_energyDepleteAmount);
-        }
-
-        protected void EndEnergyShield()
-        {
-            isShielding = false;
-            DisplayEnergyShield(false);
-        }
-
-        protected void PopEnergyShield()
-        {
-            m_isShieldPopStunned = true;
-
-            m_shieldPopVFX.Play();
-            m_shieldPopStunVFX.Play();
-            
-            EndEnergyShield();
-            m_currentTimers.Add(new CustomTimer(shieldPopTimerIdentifier, m_energyShieldPopStunDuration, false, EndShieldPopStun));
-        }
-
-        protected void EndShieldPopStun()
-        {
-            if (m_shieldPopStunVFX.is_playing)
-            {
-                m_shieldPopStunVFX.Stop();
-            }
-            
-            m_isShieldPopStunned = false;
-            HalfRegenShieldEnergy();
-        }
-
-        protected void HalfRegenShieldEnergy()
-        {
-            m_currentEnergy = m_energyMax / 2f;
-            UpdateShieldScale();
-            OnEnergyAmountChanged?.Invoke(this, m_currentEnergy);
+            OnAbilityButtonDown(m_dashAbility);
         }
 
         #endregion
@@ -942,7 +829,7 @@ namespace Runtime.Character
 
         protected void MoveCharacter()
         {
-            if (characterController.IsNull())
+            if (characterController.IsNull() || !characterController.enabled)
             {
                 return;
             }
@@ -1014,7 +901,7 @@ namespace Runtime.Character
         
         protected void PerformBallMelee()
         {
-            if (!m_canCheckBallInput || m_isKnockedBack || m_isStunned || isShielding || isEvading)
+            if (!m_canCheckBallInput || m_isKnockedBack || m_isStunned || isShielding || isEvading || m_playerHittingBall)
             {
                 return;
             }
@@ -1037,6 +924,8 @@ namespace Runtime.Character
             OnWackUsed?.Invoke(this);
             m_currentTimers.Add(new CustomTimer(ballHitTimerIdentifier, m_wackTimeMax, false, StopCheckingBall));
             m_currentTimers.Add(wackTimer);
+            
+            CheckHitBallAsync().Forget();
         }
 
         protected void PlayRandomWackSound()
@@ -1050,44 +939,79 @@ namespace Runtime.Character
             aSource.PlayOneShot(m_wackSounds[Random.Range(0,m_wackSounds.Count)]);
         }
 
-        protected void CheckHitBall()
+        private async UniTask CheckHitBallAsync()
         {
             if (m_isKnockedBack || m_isStunned)
             {
                 return;
             }
+
+            Debug.Log($"Check WACK");
+
+            m_hitAmount = 0;
             
-            m_hitAmount = Physics.OverlapSphereNonAlloc(m_sphereCheckLocation.position, m_wackRangeCurrent, 
-                m_hitColliders, characterData.ballMeleeLayerMask);
+            await wackBallSemaphoreSlim.WaitAsync();
             
-            if (m_hitAmount == 0)
+            try
             {
-                return;
-            }
 
-            for (int i = 0; i < m_hitAmount; i++)
-            {
-                m_hitColliders[i].TryGetComponent(out BallBehavior _ball);
-
-                if (_ball.IsNull())
+                while (m_playerHittingBall)
                 {
-                    continue;
+                    m_hitAmount = Physics.OverlapSphereNonAlloc(m_sphereCheckLocation.position, m_wackRangeCurrent,
+                        m_hitColliders, characterData.ballMeleeLayerMask);
+
+                    Debug.Log($"Check In While loop");
+                    
+                    if (m_hitAmount > 0)
+                    {
+                        break;
+                    }
+                    
+                    await UniTask.Yield(PlayerLoopTiming.Update);
                 }
+                
+                Debug.Log($"Check Hit Ball Amount:{m_hitAmount}");
 
-                if (m_ballMeleeChargeAmount / m_ballMeleeChargeAmountMax >= m_meleeChargeThreshold)
+                bool hasHitBall = false;
+
+                for (int i = 0; i < m_hitAmount; i++)
                 {
-                    OnHitBallConnect(_ball);
-                }
-                else
-                {
-                    _ball.HitBall(m_playerAimVector, HitStrengthType.LIGHT ,this);
+                    Debug.Log("--- FOR LOOP START");
+                    if (hasHitBall)
+                    {
+                        continue;
+                    }
+
+                    m_hitColliders[i].TryGetComponent(out BallBehavior _ball);
+
+                    if (_ball.IsNull())
+                    {
+                        continue;
+                    }
+
+                    if (m_ballMeleeChargeAmount / m_ballMeleeChargeAmountMax >= m_meleeChargeThreshold)
+                    {
+                        OnHitBallConnect(_ball).Forget();
+                    }
+                    else
+                    {
+                        _ball.HitBall(m_playerAimVector, HitStrengthType.LIGHT, this);
+                    }
+
                     EarlyEndTimer(ballHitTimerIdentifier);
+                    hasHitBall = true;
+                    Debug.Log("FOR LOOP END ---");
                 }
+            }
+            finally
+            {
+                wackBallSemaphoreSlim.Release();
             }
         }
 
         protected async UniTask OnHitBallConnect(BallBehavior _ball)
         {
+
             HaltCharacterMovement();
             EarlyEndTimer(ballHitTimerIdentifier);
             
@@ -1123,9 +1047,7 @@ namespace Runtime.Character
                 
                 _ball.UpdateBallCharge(m_ballBuildUpPercentage, m_playerAimVector);
                 
-                Debug.Log("Building UP");
-
-                await UniTask.Yield();
+                await UniTask.Yield(PlayerLoopTiming.Update);
             }
             
             //ToDo: Ball Hit VFX when going fast?
@@ -1151,6 +1073,16 @@ namespace Runtime.Character
         protected void ResetBallInput()
         {
             m_canCheckBallInput = true;
+        }
+
+        public void SilenceWack(bool canUseWack)
+        {
+            if (ContainsTimer(wackTimer.timerIdentifier))
+            {
+                EarlyEndTimer(wackTimer.timerIdentifier);
+            }
+            
+            m_canCheckBallInput = canUseWack;
         }
 
         #endregion
@@ -1227,7 +1159,7 @@ namespace Runtime.Character
 
         protected void CheckAbilityCooldowns()
         {
-            if (m_abilitiesOnCooldown.Count <= 0)
+            if (m_abilitiesOnCooldown.Count == 0)
             {
                 return;
             }
@@ -1263,7 +1195,16 @@ namespace Runtime.Character
         //Might Not be Needed
         protected abstract void PokeAbility();
 
-        protected void UseAbility(int _abilityID)
+        public void StartAllAbilityCooldowns()
+        {
+            foreach (var ability in m_assignedAbilities)
+            {
+                ability.canUseAbility = false;
+                AddAbilityCooldown(ability);
+            }
+        }
+        
+        protected void OnAbilityButtonDown(int _abilityID)
         {
             if (m_assignedAbilities.Count == 0)
             {
@@ -1280,13 +1221,26 @@ namespace Runtime.Character
                 return;
             }
 
-            if (isShielding || isEvading)
+            if (isShielding || isEvading || !canUseAbilities)
+            {
+                return;
+            }
+            
+            m_currentHeldAbility = _abilityID;
+            OnAbilityButtonDown(m_assignedAbilities[_abilityID]);
+        }
+        
+        protected void OnAbilityButtonDown(AbilityBase abilityBase)
+        {
+            if (m_assignedAbilities.Count == 0 || abilityBase.IsNull())
             {
                 return;
             }
 
-            m_currentHeldAbility = m_heldResetNum;
-            m_assignedAbilities[_abilityID].ShowAttackIndicator(false);
+            if (isShielding || isEvading)
+            {
+                return;
+            }
             
             CancelWackCharge();
 
@@ -1295,28 +1249,22 @@ namespace Runtime.Character
                 cts = new CancellationTokenSource();
             }
             
-            m_assignedAbilities[_abilityID].DoAbilityAsync(cts.Token).Forget();
+            abilityBase.OnAbilityButtonPressed();
 
-            if (m_assignedAbilities[_abilityID].canUseAbility)
+            if (abilityBase.abilityData == null || abilityBase.abilityData.activationType != ActivationType.OnPress)
             {
                 return;
             }
             
-            OnAbilityUsed?.Invoke(this, m_assignedAbilities[_abilityID]);
-            m_abilitiesOnCooldown.Add(m_assignedAbilities[_abilityID]);
+            OnAbilityUsed?.Invoke(this, abilityBase);
+            AddAbilityCooldown(abilityBase);
         }
 
-        private void ShowAbilityIndicator(int _abilityID)
+        protected void OnAbilityButtonHeld(int _abilityID)
         {
             if (m_assignedAbilities.Count == 0)
             {
                 return;
-            }
-            
-            if (m_currentHeldAbility > m_heldResetNum && m_currentHeldAbility != _abilityID)
-            {
-                //player starts holding a different ability
-                m_assignedAbilities[m_currentHeldAbility].ShowAttackIndicator(false);
             }
 
             if (_abilityID >= m_assignedAbilities.Count || m_assignedAbilities[_abilityID].IsNull())
@@ -1329,13 +1277,96 @@ namespace Runtime.Character
                 return;
             }
 
-            if (isShielding || isEvading)
+            if (isShielding || isEvading || !canUseAbilities)
             {
                 return;
             }
             
             m_currentHeldAbility = _abilityID;
-            m_assignedAbilities[_abilityID].ShowAttackIndicator(true);
+            OnAbilityButtonHeld(m_assignedAbilities[_abilityID]);
+        }
+        
+        protected void OnAbilityButtonHeld(AbilityBase abilityBase)
+        {
+            if (m_assignedAbilities.Count == 0 || abilityBase.IsNull())
+            {
+                return;
+            }
+
+            if (isShielding || isEvading)
+            {
+                return;
+            }
+            
+            CancelWackCharge();
+
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
+            
+            abilityBase.OnAbilityButtonHeld();
+        }
+
+        protected void OnAbilityButtonReleased(int _abilityID)
+        {
+            if (m_assignedAbilities.Count == 0)
+            {
+                return;
+            }
+
+            if (_abilityID >= m_assignedAbilities.Count || m_assignedAbilities[_abilityID].IsNull())
+            {
+                return;
+            }
+
+            if (!m_assignedAbilities[_abilityID].canUseAbility)
+            {
+                return;
+            }
+
+            if (isShielding || isEvading || !canUseAbilities)
+            {
+                return;
+            }
+            
+            m_currentHeldAbility = _abilityID;
+            OnAbilityButtonReleased(m_assignedAbilities[_abilityID]);
+        }
+        
+        protected void OnAbilityButtonReleased(AbilityBase abilityBase)
+        {
+            if (m_assignedAbilities.Count == 0 || abilityBase.IsNull())
+            {
+                return;
+            }
+
+            if (isShielding || isEvading)
+            {
+                return;
+            }
+            
+            CancelWackCharge();
+
+            if (cts.IsNull())
+            {
+                cts = new CancellationTokenSource();
+            }
+            
+            abilityBase.OnAbilityButtonReleased();
+            
+            if (abilityBase.abilityData == null || abilityBase.abilityData.activationType != ActivationType.OnRelease)
+            {
+                return;
+            }
+            
+            OnAbilityUsed?.Invoke(this, abilityBase);
+            AddAbilityCooldown(abilityBase);
+        }
+
+        public void SetSilenceStatus(bool _canUseAbilities)
+        {
+            canUseAbilities = _canUseAbilities;
         }
 
         public void AddAbilityCooldown(AbilityBase _ability)
@@ -1346,6 +1377,7 @@ namespace Runtime.Character
 
             if (_matchingAbility.IsNull())
             {
+                Debug.LogError($"[Ability Error] AddAbilityCooldown: {_ability.abilityData.abilityName} Not Added");
                 return;
             }
             
@@ -1384,6 +1416,70 @@ namespace Runtime.Character
 
         #endregion
 
+        #region Energy Shield
+
+        private void OnStartEnergyShield()
+        {
+            if (m_isInAction || m_isShieldPopStunned || energyShieldBehaviour.CurrentEnergy <= 0 || m_isKnockedBack || m_isStunned)
+            {
+                return;
+            }
+
+            isShielding = true;
+            isParrying = true;
+            energyShieldBehaviour.EnableShield(true);
+            energyShieldBehaviour.SetParrying(true);
+            CreateLocalTimer(parryTimerIdentifier, SettingsController.Instance.GetParryTiming(), OnParryEnd);
+        }
+
+        private void OnUseEnergyShield()
+        {
+            if (m_isInAction || m_isShieldPopStunned || m_isKnockedBack || m_isStunned)
+            {
+                return;
+            }
+            
+            energyShieldBehaviour.UseEnergyShield();
+        }
+
+        private void OnEndEnergyShield()
+        {
+            isShielding = false;
+            energyShieldBehaviour.EnableShield(false);
+            energyShieldBehaviour.EndEnergyShield();
+            EarlyEndTimer(parryTimerIdentifier);
+        }
+
+        private void OnParryEnd()
+        {
+            isParrying = false;
+            energyShieldBehaviour.SetParrying(false);
+        }
+
+        public void OnPopEnergyShield()
+        {
+            m_isShieldPopStunned = true;
+
+            m_shieldPopVFX.Play();
+            m_shieldPopStunVFX.Play();
+            
+            OnEndEnergyShield();
+            m_currentTimers.Add(new CustomTimer(shieldPopTimerIdentifier, m_energyShieldPopStunDuration, false, EndShieldPopStun));
+        }
+
+        protected void EndShieldPopStun()
+        {
+            if (m_shieldPopStunVFX.is_playing)
+            {
+                m_shieldPopStunVFX.Stop();
+            }
+            
+            m_isShieldPopStunned = false;
+            energyShieldBehaviour.HalfRegenShieldEnergy();
+        }
+        
+        #endregion
+        
         #region Status Related --------------
 
         public async UniTask ApplyStatus(StatusData _statusData, CancellationToken token)
@@ -1528,23 +1624,14 @@ namespace Runtime.Character
 
             _damageAmount = Mathf.CeilToInt(_damageAmount);
 
-            /*if (isShielding)
+            if (isShielding)
             {
-                //** Formula => AmountReduction = (_damageAmount / characterMaxArmor) * maxShieldEnergy
-                //--- This will reduce the energyAmount by an amount equal to damage the player would have taken 
-                
-                RemoveEnergy((_damageAmount / m_currentMaxArmor) * m_energyMax);
+                energyShieldBehaviour.RemoveEnergy(_damageAmount);
                 return;
-            }*/
+            }
 
             var _damageIntakeAmount = Mathf.CeilToInt(_damageAmount * m_damageIntakeMod);
             m_currentDamagedAmount += _damageIntakeAmount;
-
-            //ToDo: check if needed
-            if (!_attackingCharacter.IsNull())
-            {
-                _attackingCharacter.AddEnergy(m_pvpDamageEnergyAddAmount);
-            }
             
             JuiceGameController.Instance.CreateDamageText(_damageIntakeAmount, transform.position);
             
@@ -1556,13 +1643,17 @@ namespace Runtime.Character
             OnPlayerPreDeath?.Invoke(this);
 
             RemoveAllStatuses();
+
+            if (isShielding)
+            {
+                OnEndEnergyShield();
+            }
             
             m_canReadPlayerInput = false;
             m_characterMoveVector = Vector3.zero;
             m_isKnockedBack = false;
             m_knockbackForce = 0;
             m_knockbackTime = 0;
-            m_lastAttackingPlayer.AddEnergy(m_playerKillEnergyAddAmount);
             
             m_player.SetVibration(0, 0.6f, 0.25f);
             
@@ -1577,11 +1668,9 @@ namespace Runtime.Character
         {
             Debug.Log($"Current Hit Stun Settings: Time= {m_currentHitStunTime} Frequency= {m_hitStunV3FrequencyCurrent}, Vibrato= {m_currentVirbrato}");
             
-            m_characterModelHolder.DOShakePosition( m_currentHitStunTime, m_hitStunV3FrequencyCurrent , m_currentVirbrato,
+            await m_characterModelHolder.DOShakePosition( m_currentHitStunTime, m_hitStunV3FrequencyCurrent , m_currentVirbrato,
                 0);
-
-            await UniTask.WaitForSeconds(m_currentHitStunTime);
-
+            
             m_characterModelHolder.localPosition = Vector3.zero;
             
             StartKnockBack();
@@ -1590,17 +1679,21 @@ namespace Runtime.Character
         public virtual void ApplyKnockback(Transform _attackerTransform, BaseCharacter _lastAttacker, 
             float _baseKnockbackAmount, Vector3 _forcedDirection, bool _isBallHit = false)
         {
-            if (_baseKnockbackAmount <= 0 || isShielding || isEvading)
+            if (_baseKnockbackAmount <= 0 || (isShielding && _isBallHit) || isEvading)
             {
                 return;
             }
 
+            Debug.Log($"[Knockback debug] IsShielding:{isShielding} -> IsBallHit:{_isBallHit}");
             m_canReadPlayerInput = false;
-
             
             PlayDamageSFX();
             
-            m_knockbackForce = _baseKnockbackAmount * (m_damagePercentageKnockbackMod) *
+            Debug.Log($"[Knockback debug] _baseKnockbackAmount:{_baseKnockbackAmount} ... m_damagePercentageKnockbackMod: {m_damagePercentageKnockbackMod} " +
+                      $"... characterData.characterNaturalKnockbackResistance:{characterData.characterNaturalKnockbackResistance}");
+
+            var knockbackMod = Mathf.Max(0.01f, m_damagePercentageKnockbackMod);
+            m_knockbackForce = _baseKnockbackAmount * (knockbackMod) *
                                (1 - characterData.characterNaturalKnockbackResistance);
             
             m_knockbackMoveVector = _forcedDirection == Vector3.zero ? transform.position - _attackerTransform.position : _forcedDirection.FlattenVector3Y();
@@ -1621,8 +1714,6 @@ namespace Runtime.Character
 
             VFXController.Instance.PlayDamageVFX(transform.position, Quaternion.identity);
             
-            
-
             if (!m_knockbackVFX.IsNull())
             {
                 m_knockbackVFX.transform.forward = -m_knockbackMoveVector.normalized;
@@ -1632,7 +1723,7 @@ namespace Runtime.Character
             
             //ToDo: Controller Vibration
             //m_player.SetVibration(0, 0.1f, 0.1f);
-            T_OnKnockback();
+            T_OnKnockback().Forget();
         }
 
         #endregion

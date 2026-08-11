@@ -5,5 +5,6 @@
         LIGHT,
         MEDIUM,
         HEAVY,
+        NULLIFY,
     }
 }

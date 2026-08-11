@@ -63,7 +63,7 @@ namespace Runtime.Abilities
             m_abilityCastRangeIndicator.transform.parent = _owner.GetIndicatorParent();
         }
 
-        public override async UniTask DoAbilityAsync(CancellationToken token)
+        protected override async UniTask DoAbilityAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             await base.DoAbilityAsync(token);
@@ -94,7 +94,7 @@ namespace Runtime.Abilities
             
         }
         
-        public override void ShowAttackIndicator(bool _isActive)
+        protected override void ShowAttackIndicator(bool _isActive)
         {
             
             if (Mathf.Abs(currentOwner.playerRStickInput.magnitude) > m_axisThreshold && m_aimingRightStick == false)

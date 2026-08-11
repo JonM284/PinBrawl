@@ -4,6 +4,7 @@ using Project.Scripts.Utils;
 using Runtime.Character;
 using Runtime.GameControllers;
 using Runtime.Gameplay.Sensors;
+using Runtime.GameplayInterfaces;
 using Runtime.VFX;
 using Unity.Mathematics;
 using UnityEngine;
@@ -18,6 +19,17 @@ namespace Runtime.Gameplay
     public class BallBehavior: MonoBehaviour
     {
 
+        #region Enum
+
+        public enum BallState
+        {
+            NORMAL,
+            BUNTED,
+            NULLIFIED,
+        }
+
+        #endregion
+        
         #region Nested-Classes
 
         [Serializable]
@@ -63,8 +75,8 @@ namespace Runtime.Gameplay
         [SerializeField] private List<AudioClip> m_wallHitSFX = new List<AudioClip>();
 
         [SerializeField] private float m_ballSpeedReduceRate = 1f;
-        
-        [SerializeField] private PlayerDetectionSensor playerDetectionSensor;
+
+        [SerializeField] private DamageableDetectionSensor damageableDetectionSensor;
         
         [Header("Ball Variables")]
         [Header("Speed")]
@@ -102,8 +114,10 @@ namespace Runtime.Gameplay
         [SerializeField] private TrailRenderer m_trail;
 
         [SerializeField] private Color m_neutralColor;
+        [SerializeField] private Gradient m_neutralGradient;
 
         [SerializeField] private Color m_buntedColor;
+        [SerializeField] private Gradient m_buntGradient;
         
         [SerializeField] private VFXPlayer m_heavyWackVFX;
 
@@ -143,7 +157,7 @@ namespace Runtime.Gameplay
 
         private float m_ballHitEnergyAddAmount = 5f;
 
-        private bool m_isBunted, m_isBuildingUp;
+        private bool m_isBuildingUp;
 
         private Vector3 m_stageMinPosition, m_stageMaxPosition;
 
@@ -151,6 +165,8 @@ namespace Runtime.Gameplay
 
         private Collider[] m_hitColliders = new Collider[6];
         private int m_amountHit;
+
+        private BallState m_currentBallState, m_previousState;
         
         #endregion
 
@@ -170,6 +186,10 @@ namespace Runtime.Gameplay
 
         public bool isSemiFastBall => m_trackedSpeed >= m_ballMediumHit;
 
+        public BallState CurrentBallState => m_currentBallState;
+
+        public float CurrentBallDamage => Mathf.RoundToInt(m_ballDamageAmount * (m_currentSpeed / m_ballMaxSpeed));
+        
         #endregion
 
         #region Unity Events
@@ -181,17 +201,17 @@ namespace Runtime.Gameplay
 
         private void Awake()
         {
-            playerDetectionSensor.SetColliderRadius(playerCheckRadius * m_currentScale);
+            damageableDetectionSensor.SetColliderRadius(playerCheckRadius * m_currentScale);
         }
 
         private void OnEnable()
         {
-            playerDetectionSensor.OnCharacterEnter += OnHitPlayer;
+            damageableDetectionSensor.OnDamageableEnter += OnHitDamageable;
         }
 
         private void OnDisable()
         {
-            playerDetectionSensor.OnCharacterEnter -= OnHitPlayer;
+            damageableDetectionSensor.OnDamageableEnter -= OnHitDamageable;
         }
 
         private void Update()
@@ -210,6 +230,7 @@ namespace Runtime.Gameplay
             cc.Move(m_ballMoveDirection);
 
             CheckBallPosition();
+            CheckBuntCooldown();
         }
 
         private void LateUpdate()
@@ -239,10 +260,43 @@ namespace Runtime.Gameplay
             transform.position = m_currentBallBouncePosition;
             ReflectBall();
         }
+
+        public void ChangeState(BallState newState, BaseCharacter changingCharacter)
+        {
+            m_previousState = m_currentBallState;
+            m_currentBallState = newState;
+            
+            //State Change has not occured
+            if (m_previousState == m_currentBallState)
+            {
+               return; 
+            }
+            
+            //Upon Entering new state
+            switch (m_currentBallState)
+            {
+                case BallState.NULLIFIED:
+                    InstantSlowBall();
+                    ChangeColor(m_neutralColor);
+                    ChangeGradient(m_neutralGradient);
+                    break;
+                case BallState.BUNTED:
+                    InstantSlowBall();
+                    BuntBall(changingCharacter);
+                    ChangeGradient(m_buntGradient);
+                    break;
+                case BallState.NORMAL:
+                    if (m_currentSpeed != m_trackedSpeed)
+                    {
+                        m_currentSpeed = m_trackedSpeed;
+                    }
+                    break;
+            }
+        }
         
         private void CheckBuntCooldown()
         {
-            if (!m_isBunted)
+            if (m_currentBallState != BallState.BUNTED)
             {
                 return;
             }
@@ -264,7 +318,8 @@ namespace Runtime.Gameplay
 
         public void ResetBall()
         {
-            m_isBunted = false;
+            m_currentBallState = BallState.NORMAL;
+            m_previousState = BallState.NORMAL;
             StopBall();
             m_ballVisuals.materials[0].SetColor(outlineColorName, m_neutralColor);
             m_lastWackCharacter = null;
@@ -297,6 +352,18 @@ namespace Runtime.Gameplay
             m_currentSpeed -= Time.deltaTime * m_ballSpeedReduceRate;
         }
 
+        private void InstantReduceSpeedByPercentage(float percent)
+        {
+            if (m_currentSpeed <= m_ballMinSpeed)
+            {
+                return;
+            }
+
+            percent = Mathf.Clamp01(percent);
+            var amountProxy = Mathf.Max(m_currentSpeed * percent, m_ballMinSpeed);
+            m_currentSpeed = amountProxy;
+        }
+        
         public void InstantSlowBall()
         {
             m_currentSpeed = m_ballMinSpeed;
@@ -306,8 +373,12 @@ namespace Runtime.Gameplay
         {
             PlayWallHitSFX();
             
-            m_ballMoveDirection = Vector3.Reflect(m_ballMoveDirection, m_currentWallBounceNormal);
-            FindNextWallHitPoint(m_ballMoveDirection);
+            ChangeBallDirection(Vector3.Reflect(m_ballMoveDirection, m_currentWallBounceNormal));
+
+            if (m_currentBallState == BallState.BUNTED)
+            {
+                ChangeState(BallState.NORMAL, m_buntingCharacter);
+            }
         }
 
         public void SetBuildUp(bool _isBuildingUp, BaseCharacter _baseCharacter)
@@ -333,48 +404,52 @@ namespace Runtime.Gameplay
             {
                 return;
             }
-            
+            Debug.Log("Changing Size");
             m_currentScale = Mathf.Clamp(m_currentScale + m_ballScaleModRate, 1, m_ballScaleMaxSize);
             m_ballVisualsParent.transform.localScale = Vector3.one * m_currentScale;
-            playerDetectionSensor.SetColliderRadius(playerCheckRadius * m_currentScale);
+            damageableDetectionSensor.SetColliderRadius(playerCheckRadius * m_currentScale);
             cc.radius = m_charConOriginalSize * m_currentScale;
             m_trail.startWidth = m_currentScale/2;
         }
 
         public void HitBall(Vector3 direction, HitStrengthType _hitLevel, BaseCharacter _currentHittingCharacter)
         {
-            //ToDo: speed (x2 or so) if charged hit
-            //ToDo: on charged hit, pause wacking player and ball for a second or so, [build up to new speed] then release. 
-            //During that time, player can change direction
-            //ToDo: Ball Increases size on charged hit
-            //ToDO: basic hit -> just redirect ball 
-            //ALWAYS: change ball color
-            
             if (m_isBuildingUp && _currentHittingCharacter != m_chargedWackPlayer)
             {
                 return;
             }
-            
-            if (_hitLevel == HitStrengthType.LIGHT)
+
+            if (_hitLevel == HitStrengthType.NULLIFY)
             {
-                m_trackedSpeed += 1f;
+                ChangeBallDirection(direction);
+                ChangeState(BallState.NULLIFIED, _currentHittingCharacter);
+                return;
             }
-            else
+
+            if (m_currentBallState == BallState.BUNTED && _currentHittingCharacter != m_buntingCharacter)
             {
-                m_trackedSpeed *= m_chargedHitSpeedMod;
+                return;
             }
             
+            switch (_hitLevel)
+            {
+                case HitStrengthType.LIGHT:
+                    m_trackedSpeed += 0.05f;
+                    break;
+                default:
+                    m_trackedSpeed *= m_chargedHitSpeedMod;
+                    break;
+            }
+
             m_trackedSpeed = Mathf.Clamp(m_trackedSpeed, m_ballMinSpeed, m_ballMaxSpeed);
 
             m_currentSpeed = m_trackedSpeed;
             
             PlayHitBallSFX();
-            
-            m_ballMoveDirection = direction.FlattenVector3Y();
-            FindNextWallHitPoint(m_ballMoveDirection);
-            
-            _currentHittingCharacter.AddEnergy(m_ballHitEnergyAddAmount);
 
+            ChangeBallDirection(direction);
+            ChangeState(BallState.NORMAL, _currentHittingCharacter);
+            
             if (m_lastWackCharacter == _currentHittingCharacter)
             {
                 return;
@@ -382,7 +457,13 @@ namespace Runtime.Gameplay
             
             m_lastWackCharacter = _currentHittingCharacter;
             OnBallSwap?.Invoke(m_lastWackCharacter);
-            ChangeColors();
+            ChangeColor(m_lastWackCharacter);
+        }
+
+        private void ChangeBallDirection(Vector3 direction)
+        {
+            m_ballMoveDirection = direction.FlattenVector3Y();
+            FindNextWallHitPoint(m_ballMoveDirection);
         }
 
         private void PlayHitBallSFX()
@@ -408,40 +489,44 @@ namespace Runtime.Gameplay
         }
         
         
-        public void BuntBall(BaseCharacter _currentBuntingCharacter)
+        private void BuntBall(BaseCharacter _currentBuntingCharacter)
         {
-            if (m_isBunted)
-            {
-                return;
-            }
-
             m_currentBuntTimer = m_buntTimerMax;
             m_buntingCharacter = _currentBuntingCharacter;
-            StopBall();
-            m_ballVisuals.materials[0].SetColor(outlineColorName, m_buntedColor);
+            ChangeBallDirection(transform.position - _currentBuntingCharacter.transform.position);
+            ChangeColor(m_buntedColor);
             m_lastWackCharacter = null;
-            m_isBunted = true;
         }
 
         private void EndBunt()
         {
-            m_isBunted = false;
+            ChangeState(BallState.NORMAL, m_buntingCharacter);
             m_ballVisuals.materials[0].SetColor(outlineColorName, m_neutralColor);
         }
 
-        private void ChangeColors()
+        private void ChangeColor(BaseCharacter character)
         {
-            m_ballVisuals.materials[0].SetColor(outlineColorName, SettingsController.Instance.GetColorByPlayerIndex(m_lastWackCharacter.GetPlayerIndex()));
-            m_trail.colorGradient =  SettingsController.Instance.GetGradientByPlayerIndex(m_lastWackCharacter.GetPlayerIndex());
+            m_ballVisuals.materials[0].SetColor(outlineColorName, SettingsController.Instance.GetColorByPlayerIndex(character.GetPlayerIndex()));
+            ChangeGradient(SettingsController.Instance.GetGradientByPlayerIndex(character.GetPlayerIndex()));
         }
 
-        public void ForceChangeColorTo(Color _newColor)
+        private void ChangeColor(Color _newColor)
         {
             m_ballVisuals.materials[0].SetColor(outlineColorName, _newColor);
             m_ballAimImg.color = _newColor;
             m_ballChargeImg.color = _newColor;
         }
 
+        private void ChangeGradient(Gradient newGradient)
+        {
+            m_trail.colorGradient =  newGradient;
+        }
+
+        public void ForceChangeColorTo(Color color)
+        {
+            ChangeColor(color);
+        }
+        
         private void FindNextWallHitPoint(Vector3 _direction)
         {
             if (!Physics.Raycast(transform.position, _direction, out RaycastHit _hit, Mathf.Infinity, wallLayers))
@@ -454,16 +539,32 @@ namespace Runtime.Gameplay
             m_currentWallBounceNormal = _hit.normal;
         }
 
-        private void OnHitPlayer(BaseCharacter hitCharacter)
+        private void OnHitDamageable(IDamagable hitDamageable)
         {
+            if (hitDamageable.IsNull()) return;
             if (m_lastWackCharacter.IsNull()) return;
             if (m_currentSpeed <= 0 || m_isBuildingUp) return;
-            if (hitCharacter.IsNull() || hitCharacter == m_lastWackCharacter || m_recentlyHitCharacters.Contains(hitCharacter))
+            if (m_currentBallState == BallState.NULLIFIED) return; //ball is harmless when null
+            if (hitDamageable is BaseCharacter hitCharacter)
             {
+                OnHitPlayer(hitCharacter);
                 return;
             }
-                
-            hitCharacter.OnDealDamage(this.transform, Mathf.RoundToInt(m_ballDamageAmount * (m_currentSpeed / m_ballMaxSpeed)));
+
+            hitDamageable.OnDealDamage(this.transform, CurrentBallDamage);
+        }
+
+        private void OnHitPlayer(BaseCharacter hitCharacter)
+        {
+            if (hitCharacter.IsNull()) return;
+            if (hitCharacter == m_lastWackCharacter || m_recentlyHitCharacters.Contains(hitCharacter)) return;
+            if (hitCharacter.isParrying)
+            {
+                ChangeState(BallState.BUNTED, hitCharacter);
+                return;
+            }
+            
+            hitCharacter.OnDealDamage(this.transform, CurrentBallDamage);
             hitCharacter.ApplyKnockback(this.transform , m_lastWackCharacter ,m_currentSpeed > m_ballLightHit ? 30 : 15, m_ballMoveDirection, true);
             m_recentlyHitCharacters.Add(hitCharacter);
             TickGameController.Instance.CreateNewTimer("Hit_Player", 0.7f, false, RemoveCharacterFromRecentlyHit);

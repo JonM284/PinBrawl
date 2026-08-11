@@ -76,9 +76,16 @@ namespace Runtime.GameModes
             base.DisabledFunctions();
         }
 
+        /// <summary>
+        /// Initialize Match, FIRST START
+        /// </summary>
+        /// <param name="_pointsNeededToWin"></param>
+        /// <param name="token"></param>
         public override async UniTask Initialize(int _pointsNeededToWin, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
+            
+            //Pool Objects
             for (int i = 0; i < m_orbMax; i++)
             {
                 await ObjectPoolController.Instance.T_PreCreateObject(m_orbPoolIdentifier, m_orbPrefab, token);
@@ -90,9 +97,11 @@ namespace Runtime.GameModes
 
             //IMPORTANT: m_playerStats is a reference, DO NOT change anything [READ-ONLY]
             m_playerStats = MatchGameController.Instance.GetStatsList();
-
+            
+            //ToDO: Allow user to change amount of points needed
             m_pointsNeededToWin = _pointsNeededToWin > 0 ? _pointsNeededToWin : m_normalAmountToWin;
             
+            //Assign Ultimate Abilities
             foreach (var baseCharacter in m_playerList)
             {
                 await baseCharacter.T_AssignLargeAbility(token);

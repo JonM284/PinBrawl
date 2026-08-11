@@ -7,6 +7,7 @@ using Project.Scripts.Utils;
 using Runtime.Abilities;
 using Runtime.Character;
 using Runtime.GameControllers;
+using Runtime.Gameplay.Sensors;
 using Runtime.GameplayInterfaces;
 using Runtime.ScriptedAnimations;
 using Runtime.VFX;
@@ -30,6 +31,10 @@ namespace Runtime.Gameplay
 
         [SerializeField] private Transform m_visuals;
 
+        [SerializeField] private PlayerDetectionSensor playerDetectionSensor;
+        [SerializeField] private BallDetectionSensor ballDetectionSensor;
+        [SerializeField] private WallDetectionSensor wallDetectionSensor;
+        
         [SerializeField] private AnimationsBase m_movingAnimation;
 
         [SerializeField] private VFXPlayer m_explosionVisuals;
@@ -48,7 +53,6 @@ namespace Runtime.Gameplay
         private float m_moveSpeed;
         private float m_damageAmount;
         private float m_knockbackAmount;
-        private float m_detectionRange;
         private float m_explosionRange;
 
         private bool m_isInitialized;
@@ -58,6 +62,8 @@ namespace Runtime.Gameplay
         private int m_amountOfStages;
 
         private float m_playerDamagedEnergyAddAmount;
+
+        private string objectPoolNameRef;
         
         private ProjectileEndType m_projectileEndType;
         
@@ -67,7 +73,7 @@ namespace Runtime.Gameplay
 
         private ProjectileAbilityData m_projectileAbilityData;
         
-        protected List<Collider> m_previouslyHitColliders = new List<Collider>();
+        protected List<BaseCharacter> m_previouslyHitCharacter = new List<BaseCharacter>();
 
         protected Collider[] m_hitColliders = new Collider[6];
         protected int m_amountHit;
@@ -80,9 +86,23 @@ namespace Runtime.Gameplay
 
         #region Unity Events
 
+        private void OnEnable()
+        {
+            playerDetectionSensor.OnCharacterEnter += OnCharacterEnter;
+            ballDetectionSensor.OnBallEnter += OnBallEnter;
+            wallDetectionSensor.OnWallHit += OnWallHit;
+        }
+
+        private void OnDisable()
+        {
+            playerDetectionSensor.OnCharacterEnter -= OnCharacterEnter;
+            ballDetectionSensor.OnBallEnter -= OnBallEnter;
+            wallDetectionSensor.OnWallHit -= OnWallHit;
+        }
+
         private void Update()
         {
-            if (m_hasEnded)
+            if (m_hasEnded || !m_isInitialized)
             {
                 return;
             }
@@ -90,13 +110,6 @@ namespace Runtime.Gameplay
             MoveProjectile();
             
             SlowDown();
-            
-            CheckDetectionRange();
-
-            if (!m_isInitialized)
-            {
-                return;
-            }
             
             m_lifeTimeTimer += Time.deltaTime;
 
@@ -128,8 +141,8 @@ namespace Runtime.Gameplay
             m_knockbackAmount = _knockbackAmount;
 
             m_projectileAbilityData = _abilityData;
-
-            m_detectionRange = _scale;
+            
+            playerDetectionSensor.SetColliderRadius(_scale / 2f);
 
             m_explosionRange = _scale;
 
@@ -143,7 +156,7 @@ namespace Runtime.Gameplay
 
             m_playerDamagedEnergyAddAmount = SettingsController.Instance.GetPvpDamageEnergyAmount();
             
-            m_visuals.localScale = Vector3.one * (_scale * 2);
+            m_visuals.localScale = Vector3.one * (_scale);
 
             m_detectableLayers = _abilityData.collisionDetectionLayers;
 
@@ -151,7 +164,13 @@ namespace Runtime.Gameplay
             
             m_lifeTimeTimer = 0;
 
-            m_previouslyHitColliders.Clear();
+            m_previouslyHitCharacter.Clear();
+
+            objectPoolNameRef = _abilityData.isGenericCharacterPrefab
+                ? string.Format(MatchGameController.Instance.defaultProjectilePoolNameFormat,
+                    m_owner.characterData.characterName, m_owner.GetPlayerIndex(),
+                    _abilityData.abilityName)
+                : _abilityData.abilityName;
             
             if (!m_movingAnimation.IsNull())
             {
@@ -168,14 +187,13 @@ namespace Runtime.Gameplay
         
         private void DeleteObject()
         {
-            
             onEnd?.Invoke();
-            ObjectPoolController.Instance.ReturnToPool(m_projectileAbilityData.name, gameObject);
+            ObjectPoolController.Instance.ReturnToPool(objectPoolNameRef, gameObject);
         }
 
         private void SlowDown()
         {
-            if (!m_projectileAbilityData.isSlowDownOverTime)
+            if (m_projectileAbilityData.IsNull() || !m_projectileAbilityData.isSlowDownOverTime)
             {
                 return;
             }
@@ -189,36 +207,56 @@ namespace Runtime.Gameplay
                 m_moveSpeed -= Time.deltaTime * m_projectileAbilityData.slowDownModifier;
             }
         }
-
-        private void CheckDetectionRange()
+        
+        private void OnWallHit()
         {
-            m_amountHit = Physics.OverlapSphereNonAlloc(transform.position, m_detectionRange, m_hitColliders
-                ,m_detectableLayers);
+            if (!m_isPassThroughObjects)
+            {
+                OnProjectileEnd().Forget();
+            }
+        }
+        
+        private void OnBallEnter(BallBehavior ball)
+        {
+            Debug.Log("Ball Enter Range");
+            
+            ball.HitBall(m_moveDir, _mBallHitStrengthType, m_owner);
+            
+            if (!m_isPassThroughObjects)
+            {
+                OnProjectileEnd().Forget();
+            }
+        }
 
-            if (m_amountHit == 0)
+        private void OnCharacterEnter(BaseCharacter character)
+        {
+            if (character == m_owner)
             {
                 return;
             }
 
-            for (int i = 0; i < m_amountHit; i++)
+            if (!m_previouslyHitCharacter.Contains(character))
             {
-                if (m_previouslyHitColliders.Contains(m_hitColliders[i]))
+                ApplyStatus(character);
+            
+                if (m_knockbackAmount > 0)
                 {
-                    continue;
+                    character.ApplyKnockback(transform, m_owner, m_knockbackAmount,
+                        m_projectileEndType == ProjectileEndType.EXPLODE ? Vector3.zero : m_moveDir);
+                }
+            
+                if (m_damageAmount > 0)
+                {
+                    character.OnDealDamage(transform, m_damageAmount, m_owner);
                 }
                 
-                m_hitColliders[i].TryGetComponent(out BaseCharacter _character);
-                
-                if (_character == m_owner)
-                {
-                    continue;
-                }
-
-                ApplyStatus(_character);
-                
-                DoInteraction(m_hitColliders[i]);
+                m_previouslyHitCharacter.Add(character);
             }
             
+            if (!m_isPassThroughObjects)
+            {
+                OnProjectileEnd().Forget();
+            }
         }
 
         private async UniTask OnProjectileEnd()
@@ -290,61 +328,11 @@ namespace Runtime.Gameplay
                 
                 ApplyStatus(_character);
                 
-                DoInteraction(m_explosionHitColliders[i]);
+                //DoInteraction(m_explosionHitColliders[i]);
             }
         }
 
         #region Interaction Related
-
-        protected virtual void DoInteraction(Collider _collider)
-        {
-            if (m_previouslyHitColliders.Count > 0 && m_previouslyHitColliders.Contains(_collider))
-            {
-                return;
-            }
-            
-            //first check if ball -> hit ball
-            _collider.TryGetComponent(out BallBehavior _ball);
-
-            if (!_ball.IsNull())
-            {
-                if (!m_isPassThroughObjects)
-                {
-                    _ball.HitBall(m_projectileEndType == ProjectileEndType.EXPLODE ? 
-                        _collider.transform.position - transform.position :
-                        m_moveDir, _mBallHitStrengthType, m_owner);
-                    
-                    OnProjectileEnd();
-                    return;
-                }
-            }
-
-            HitCollided(_collider);
-                
-            if (!m_isPassThroughObjects)
-            {
-                OnProjectileEnd();
-            }
-        }
-        
-        
-        private void HitCollided(Collider _collider)
-        {
-            if (m_knockbackAmount > 0)
-            {
-                _collider.TryGetComponent(out IKnockbackable _knockbackable);
-                _knockbackable?.ApplyKnockback(transform, m_owner, m_knockbackAmount,
-                    m_projectileEndType == ProjectileEndType.EXPLODE ? Vector3.zero : m_moveDir);
-            }
-            
-            if (m_damageAmount > 0)
-            {
-                _collider.TryGetComponent(out IDamagable _damagable);
-                _damagable?.OnDealDamage(transform, m_damageAmount, m_owner);
-            }
-            
-            m_previouslyHitColliders.Add(_collider);
-        }
 
         private void ApplyStatus(BaseCharacter _character)
         {

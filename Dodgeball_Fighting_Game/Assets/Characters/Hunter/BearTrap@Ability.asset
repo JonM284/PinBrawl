@@ -20,13 +20,13 @@ MonoBehaviour:
   abilityDamageAmount: 100
   abilityRange: 5
   abilityScale: 2.3
-  abilityAnimationTime: 0.15
-  isHaultMovement: 1
-  isHitOnce: 0
-  isReactivatable: 0
+  isUltimateAbility: 1
+  isHaltMovement: 0
+  activationType: 0
+  abilityActivationWaitTimeMax: 1
   reactivationTime: 1
-  knockbackDirectionMod: 1
-  ballHitStrength: 0
+  isForwardKnockBack: 1
+  ballHitStrengthType: 3
   collisionDetectionLayers:
     serializedVersion: 2
     m_Bits: 64

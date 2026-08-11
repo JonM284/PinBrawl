@@ -19,13 +19,15 @@ MonoBehaviour:
   abilityCooldownTimeMax: 1.5
   abilityKnockbackAmount: 10
   abilityDamageAmount: 10
-  abilityAnimationTime: 0.15
-  isHaultMovement: 0
-  isHitOnce: 0
-  isReactivatable: 0
+  abilityRange: 0
+  abilityScale: 1
+  isUltimateAbility: 0
+  isHaltMovement: 1
+  activationType: 0
+  abilityActivationWaitTimeMax: 1
   reactivationTime: 1
-  knockbackDirectionMod: 1
-  ballHitStrength: 0
+  isForwardKnockBack: 1
+  ballHitStrengthType: 0
   collisionDetectionLayers:
     serializedVersion: 2
     m_Bits: 64
@@ -41,6 +43,7 @@ MonoBehaviour:
   isPassThroughObjects: 0
   isMultiStage: 0
   isSpreadShotOnStart: 0
+  isGenericCharacterPrefab: 1
   projectileAmount: 1
   projectileSpread: 0
   timeBetweenShots: 0.25

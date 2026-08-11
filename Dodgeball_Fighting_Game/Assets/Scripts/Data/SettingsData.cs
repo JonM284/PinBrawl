@@ -29,11 +29,15 @@ namespace Data
         
         public List<Gradient> gradientsByPlayerIndex = new List<Gradient>();
 
+        public List<GameObject> projectileByPlayerIndex = new(); 
+
         public float playerKillEnergyAddAmount = 20f;
 
         public float hitBallEnergyAddAmount = 5f;
 
         public float pvpDamageEnergyAddAmount = 5f;
+
+        public float parryWindowTimeMax = 0.2f;
 
     }
 }

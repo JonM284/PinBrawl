@@ -21,6 +21,7 @@ namespace Data.AbilityDatas
         public bool isPassThroughObjects;
         public bool isMultiStage;
         public bool isSpreadShotOnStart;
+        public bool isGenericCharacterPrefab;
         
         [Header("Multi-shot options")]
         [Tooltip("Amount of projectiles to be fired")]

@@ -95,7 +95,9 @@ namespace Runtime.Abilities
 
             if (!_ball.IsNull())
             {
-                _ball.BuntBall(currentOwner);
+                //Removed 5/26/2026
+                //Bunt only happens when character is parrying
+                //_ball.BuntBall(currentOwner);
                 return;
             }
 
@@ -112,7 +114,7 @@ namespace Runtime.Abilities
 
         #region IAbility Inherited Methods
 
-        public override async UniTask DoAbilityAsync(CancellationToken token)
+        protected override async UniTask DoAbilityAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             await base.DoAbilityAsync(token);

@@ -4,7 +4,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using DG.Tweening;
-using MoreMountains.Feedbacks;
 using Project.Scripts.Utils;
 using Runtime.Character;
 using Runtime.Gameplay;
@@ -38,8 +37,6 @@ namespace Runtime.GameControllers
         [SerializeField] private DamageTextUIItem m_damageTextPrefab;
 
         [SerializeField] private RangeIndicatorEntity m_rangeAttackPrefab;
-
-        [SerializeField] private MMFeedbacks m_playerDeathFeedback;
         
         #endregion
 
@@ -188,7 +185,7 @@ namespace Runtime.GameControllers
         
         private void DoPlayerDeathEffect(BaseCharacter arg1, BaseCharacter arg2, Vector3 arg3)
         {
-            m_playerDeathFeedback?.PlayFeedbacks();
+            //m_playerDeathFeedback?.PlayFeedbacks();
             Debug.Log("Playing feedback");
         }
 

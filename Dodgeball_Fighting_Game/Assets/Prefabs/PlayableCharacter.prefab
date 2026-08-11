@@ -5282,7 +5282,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6086223765665142824}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Shield-Holder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5314,7 +5314,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 783698360627546544}
-  m_Layer: 0
+  - component: {fileID: 6991652266451204509}
+  m_Layer: 11
   m_Name: PlayerShield-Rotation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5337,6 +5338,21 @@ Transform:
   - {fileID: 6086223765665142824}
   m_Father: {fileID: 1849476206670470175}
   m_LocalEulerAnglesHint: {x: 56, y: 0, z: 0}
+--- !u!114 &6991652266451204509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5176004869390760492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5a3025b0164d60b3ea0c6d325cd727, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_energyShieldParent: {fileID: 783698360627546544}
+  m_energyShieldIndicator: {fileID: 3227308632181542246}
+  shieldCollider: {fileID: 0}
 --- !u!1 &5272498612397701861
 GameObject:
   m_ObjectHideFlags: 0
@@ -15202,8 +15218,6 @@ MonoBehaviour:
   m_characterModelHolder: {fileID: 4718573719737507327}
   m_indicatorHolder: {fileID: 634031086053718367}
   m_meleeIndicator: {fileID: 1798993555163547465}
-  m_energyShieldParent: {fileID: 783698360627546544}
-  m_energyShieldIndicator: {fileID: 3227308632181542246}
   m_wackVFX: {fileID: 6312280467162793481}
   m_wackChargeVFX: {fileID: 8568050069136736268}
   m_shieldPopVFX: {fileID: 5948018026340770366}
@@ -15213,7 +15227,8 @@ MonoBehaviour:
   m_aimMarker: {fileID: 2740539573446030912}
   m_healthbarLoc: {fileID: 771137953396192129}
   m_statusHolder: {fileID: 8212429611634179315}
-  m_buntAbilityData: {fileID: 11400000, guid: 786cad5ed61a4e348ad1e149ee61207c, type: 2}
+  m_dashAbilityData: {fileID: 11400000, guid: 472417641d7da804c8f4279e0b3bea07, type: 2}
+  energyShieldBehaviour: {fileID: 6991652266451204509}
   m_wackSounds:
   - {fileID: 8300000, guid: c93f0a26863c1c247bd984c369600aea, type: 3}
   - {fileID: 8300000, guid: 5f15c65535d8b1047bb40cb22632a2b5, type: 3}
@@ -15388,7 +15403,7 @@ GameObject:
   - component: {fileID: 5586979273814421316}
   - component: {fileID: 4875520543937908355}
   - component: {fileID: 7929531138678628228}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Shield-Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}

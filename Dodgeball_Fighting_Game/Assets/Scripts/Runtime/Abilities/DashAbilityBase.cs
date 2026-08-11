@@ -5,6 +5,7 @@ using Project.Scripts.Utils;
 using Runtime.Character;
 using Runtime.GameControllers;
 using Runtime.Gameplay;
+using Runtime.Gameplay.Sensors;
 using Runtime.GameplayInterfaces;
 using UnityEngine;
 
@@ -107,6 +108,7 @@ namespace Runtime.Abilities
         
         private void PointMelee()
         {
+            //ToDo: change to physics trigger
             m_hitCollidersAmount = Physics.OverlapSphereNonAlloc(m_endPosition, currentScale, m_hitColliders,
                 m_dashAbilityData.collisionDetectionLayers);
 
@@ -182,7 +184,7 @@ namespace Runtime.Abilities
             
             if (!_ball.IsNull())
             {
-                _ball.HitBall(m_knockbackDir * m_dashAbilityData.knockbackDirectionMod, 
+                _ball.HitBall(m_knockbackDir * knockbackDir, 
                     m_dashAbilityData.ballHitStrengthType, currentOwner);
                 return;
             }
@@ -197,7 +199,7 @@ namespace Runtime.Abilities
                 _collider.TryGetComponent(out IKnockbackable _knockbackable);
                 
                 _knockbackable?.ApplyKnockback(currentOwner.transform, currentOwner , currentKnockback, 
-                    m_knockbackDir * m_dashAbilityData.knockbackDirectionMod);
+                    m_knockbackDir * knockbackDir);
             }
 
             if (currentDamage > 0)
@@ -421,7 +423,7 @@ namespace Runtime.Abilities
         }
 
 
-        public override void ShowAttackIndicator(bool _isActive)
+        protected override void ShowAttackIndicator(bool _isActive)
         {
             if (m_dashAbilityData.movementType == MovementType.REACTIVATE)
             {
@@ -564,7 +566,7 @@ namespace Runtime.Abilities
             m_hasUsedAbility = false;
         }
 
-        public override async UniTask DoAbilityAsync(CancellationToken token)
+        protected override async UniTask DoAbilityAsync(CancellationToken token)
         {
             await base.DoAbilityAsync(token);
 

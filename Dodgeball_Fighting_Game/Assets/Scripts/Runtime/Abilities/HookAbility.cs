@@ -256,7 +256,7 @@ namespace Runtime.Abilities
             m_hookPoint.transform.localPosition = Vector3.zero;
         }
 
-        public override async UniTask DoAbilityAsync(CancellationToken token)
+        protected override async UniTask DoAbilityAsync(CancellationToken token)
         {
             await base.DoAbilityAsync(token);
             canUseAbility = false;
@@ -278,7 +278,7 @@ namespace Runtime.Abilities
             m_ropeVisuals.gameObject.SetActive(false);
         }
         
-        public override void ShowAttackIndicator(bool _isActive)
+        protected override void ShowAttackIndicator(bool _isActive)
         {
             base.ShowAttackIndicator(_isActive);
 

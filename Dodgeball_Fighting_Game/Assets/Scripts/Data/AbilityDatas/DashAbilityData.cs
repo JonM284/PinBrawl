@@ -7,7 +7,6 @@ namespace Data.AbilityDatas
     [CreateAssetMenu(menuName = "Dodge-ball/Ability/Dash Ability Data")]
     public class DashAbilityData: AbilityData
     {
-
         [Header("Dash Specific")] 
         
         public DashReturnPointEntity previousLeftPoint;
@@ -17,7 +16,5 @@ namespace Data.AbilityDatas
         public AnimationCurve jumpCurve;
         
         public float dashSpeed = 1;
-
-
     }
 }

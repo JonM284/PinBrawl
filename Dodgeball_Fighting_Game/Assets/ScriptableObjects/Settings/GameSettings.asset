@@ -150,6 +150,12 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
+  projectileByPlayerIndex:
+  - {fileID: 8058994172609208707, guid: c32b51bf77093804588950c7bd4c99b5, type: 3}
+  - {fileID: 4076155160706563460, guid: 3faacfe0806a1cb47863a4bdf43cd5c5, type: 3}
+  - {fileID: 3799897892995054286, guid: 57210d617f9ecb14783b9a36dc6db439, type: 3}
+  - {fileID: 6018425760750287331, guid: a306db838a34f18478f8272de05c7eb8, type: 3}
   playerKillEnergyAddAmount: 20
   hitBallEnergyAddAmount: 3
   pvpDamageEnergyAddAmount: 6
+  parryWindowTimeMax: 0.2

@@ -6,6 +6,7 @@ using Runtime.Character;
 using Runtime.GameControllers;
 using Runtime.Gameplay;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Runtime.Abilities
 {
@@ -14,36 +15,70 @@ namespace Runtime.Abilities
 
         #region Serialized Fields
 
-        [SerializeField] private LineRenderer m_rangeIndicator;
+        /// <summary>
+        /// visuals feedback for player input aiming
+        /// </summary>
+        [SerializeField] private GameObject m_directionIndicator;
+
+        /// <summary>
+        /// 2D Image used for aiming
+        /// </summary>
+        [SerializeField] private Image m_directionIndicatorVisuals;
         
+        /// <summary>
+        /// projectile spawn position
+        /// </summary>
         [SerializeField] private Transform m_shootPos;
 
         #endregion
 
         #region Private Fields
 
+        /// <summary>
+        /// amount of shots for this ability
+        /// </summary>
         private int m_amountOfShots;
         
+        /// <summary>
+        /// calculated angle for spread shot
+        /// </summary>
         private float m_culculatedAngle;
 
+        /// <summary>
+        /// calculated rotation for spread shot
+        /// </summary>
         private Quaternion m_calculatedRotation;
+
+        /// <summary>
+        /// Name of projectile for object pool spawner
+        /// </summary>
+        private string projectileNameRef;
+
+        /// <summary>
+        /// Projectile prefab reference for object pool spawner
+        /// </summary>
+        private GameObject projectilePrefabRef;
         
         #endregion
         
         #region Class Implementation
 
+        /// <summary>
+        /// Projectile variables reference
+        /// </summary>
         private ProjectileAbilityData projectileAbilityData => abilityData as ProjectileAbilityData;
 
-
+        /// <summary>
+        /// Set colors to player color
+        /// </summary>
         private void ChangeLineRendererColor()
         {
-            if (m_rangeIndicator.IsNull())
+            if (m_directionIndicator.IsNull())
             {
                 return;
             }
 
-            m_rangeIndicator.startColor = currentOwner.playerColor;
-            m_rangeIndicator.endColor = currentOwner.playerColor;
+            m_directionIndicatorVisuals.color = currentOwner.playerColor;
         }
         
         
@@ -79,8 +114,7 @@ namespace Runtime.Abilities
                 // Apply rotation to the main direction to get the spread direction
                 Vector3 spreadDirection = m_calculatedRotation * aimDirection;
                 
-                var _projectile = await ObjectPoolController.Instance.T_CreateObject(projectileAbilityData.name, 
-                    projectileAbilityData.projeciltePrefab, currentOwner.spawnerLocation.position, token);
+                var _projectile =  await GetProjectilePrefabAsync(token);
                 
                 _projectile.TryGetComponent(out ProjectileEntityBase _projectileEntity);
 
@@ -110,8 +144,7 @@ namespace Runtime.Abilities
             token.ThrowIfCancellationRequested();
             PlayRandomSound();
             
-            var _projectile = await ObjectPoolController.Instance.T_CreateObject(projectileAbilityData.name, 
-                projectileAbilityData.projeciltePrefab, currentOwner.spawnerLocation.position, token);
+            var _projectile = await GetProjectilePrefabAsync(token);
 
             _projectile.transform.forward = aimDirection;
             
@@ -132,6 +165,9 @@ namespace Runtime.Abilities
        
         #region AbilityBase Inherited Methods
 
+        /// <summary>
+        /// Initialize Ability variables
+        /// </summary>
         public override async UniTask InitializeAbilityAsync(BaseCharacter _owner, AbilityData _data, bool _canUseOnStart,
             CancellationToken token)
         {
@@ -142,22 +178,50 @@ namespace Runtime.Abilities
             lifeTimeMax = projectileAbilityData.projectileMaxLifetime;
             m_amountOfShots = projectileAbilityData.projectileAmount;
             
-            m_rangeIndicator.transform.parent = _owner.GetIndicatorParent();
+            m_directionIndicator.transform.parent = _owner.GetIndicatorParent();
             
             ChangeLineRendererColor();
         }
+
+        /// <summary>
+        /// Return projectile from ObjectPoolSpawner
+        /// </summary>
+        private async UniTask<GameObject> GetProjectilePrefabAsync(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            
+            return await ObjectPoolController.Instance.T_CreateObject(projectileNameRef, 
+                projectilePrefabRef, currentOwner.spawnerLocation.position, token);
+        }
         
+        /// <summary>
+        /// Load necessary GameObjects for this ability before match starts.
+        /// </summary>
+        /// <param name="token"></param>
         public override async UniTask PreLoadNecessaryObjectsAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             for (int i = 0; i < projectileAbilityData.projectileAmount; i++)
             {
-                await ObjectPoolController.Instance.T_PreCreateObject(projectileAbilityData.name,
-                    projectileAbilityData.projeciltePrefab, token);   
+                projectileNameRef = projectileAbilityData.isGenericCharacterPrefab
+                    ? string.Format(MatchGameController.Instance.defaultProjectilePoolNameFormat,
+                        currentOwner.characterData.characterName, currentOwner.GetPlayerIndex(),
+                        projectileAbilityData.abilityName)
+                    : projectileAbilityData.name;
+                
+                projectilePrefabRef = projectileAbilityData.isGenericCharacterPrefab
+                    ? SettingsController.Instance.GetGenericProjectileByPlayerIndex(currentOwner.GetPlayerIndex())
+                    : projectileAbilityData.projeciltePrefab;
+                
+                await ObjectPoolController.Instance.T_PreCreateObject(projectileNameRef,
+                    projectilePrefabRef, token);   
             }
         }
 
-        public override async UniTask DoAbilityAsync(CancellationToken token)
+        /// <summary>
+        /// Shoot projectile with current settings 
+        /// </summary>
+        protected override async UniTask DoAbilityAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             await base.DoAbilityAsync(token);
@@ -175,17 +239,14 @@ namespace Runtime.Abilities
             }
         }
         
-        public override void ShowAttackIndicator(bool _isActive)
+        /// <summary>
+        /// Display or Hide attack indicator for player aiming
+        /// </summary>
+        protected override void ShowAttackIndicator(bool _isActive)
         {
             base.ShowAttackIndicator(_isActive);
             
-            m_rangeIndicator.SetPosition(0, currentOwner.spawnerLocation.position + new Vector3(0,-0.001f, 0));
-            m_rangeIndicator.SetPosition(1, currentOwner.spawnerLocation.position + (aimDirection.normalized * currentRange));
-
-            m_rangeIndicator.startWidth = currentScale;
-            m_rangeIndicator.endWidth = currentScale;
-            
-            m_rangeIndicator.gameObject.SetActive(_isActive);
+            m_directionIndicator.gameObject.SetActive(_isActive);
         }
 
         #endregion

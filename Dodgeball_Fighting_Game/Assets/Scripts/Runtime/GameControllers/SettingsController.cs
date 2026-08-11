@@ -74,6 +74,11 @@ namespace Runtime.GameControllers
 
         public Sprite GetWackIcon() => _settingsData.wackIcon;
 
+        public float GetParryTiming() => _settingsData.parryWindowTimeMax;
+
+        public GameObject GetGenericProjectileByPlayerIndex(int _index) =>
+            _settingsData.projectileByPlayerIndex[_index];
+
         #endregion
 
 

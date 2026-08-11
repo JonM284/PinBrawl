@@ -149,7 +149,7 @@ namespace Runtime.Abilities
 
             if (!_ball.IsNull())
             {
-                _ball.HitBall(aimDirection * m_meleeAbilityData.knockbackDirectionMod, 
+                _ball.HitBall(aimDirection * knockbackDir, 
                     m_meleeAbilityData.ballHitStrengthType, currentOwner);
             }
 
@@ -157,7 +157,7 @@ namespace Runtime.Abilities
             _collider.TryGetComponent(out IKnockbackable _knockbackable);
             
             _knockbackable?.ApplyKnockback(currentOwner.transform, currentOwner , currentKnockback, 
-                aimDirection * m_meleeAbilityData.knockbackDirectionMod);
+                aimDirection * knockbackDir);
             _damagable?.OnDealDamage(currentOwner.transform, currentDamage, currentOwner);
             
             m_previouslyHitColliders.Add(_collider);
@@ -167,7 +167,7 @@ namespace Runtime.Abilities
 
         #region IAbility Inherited Methods
 
-        public override async UniTask DoAbilityAsync(CancellationToken token)
+        protected override async UniTask DoAbilityAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             await base.DoAbilityAsync(token);
@@ -192,7 +192,7 @@ namespace Runtime.Abilities
             canUseAbility = false;
         }
         
-        public override void ShowAttackIndicator(bool _isActive)
+        protected override void ShowAttackIndicator(bool _isActive)
         {
             base.ShowAttackIndicator(_isActive);
 
