@@ -126,14 +126,14 @@ namespace Runtime.Character
         //float
         protected float m_originalSpeed, m_currentSpeed;
         protected float m_currentDamagedAmount, m_damageAmountThreshold = 100f;
-        protected float m_damagePercentage, m_damagePercentageKnockbackMod;
+        protected float m_damagePercentage, m_damagePercentageKnockbackMod, m_maxDamagePercentageKnockbackMod = 18f;
         protected float m_ballConnectBuildUpTimerCurrent, m_ballConnectBuildUpTimerMax = 1.1f, m_calcMaxBuildUpTimer, 
             m_ballBuildUpPercentage;
         protected float m_knockbackForce, m_knockbackTime;
         protected float m_ballMeleeChargeAmount, m_ballMeleeChargeAmountMax = 1f;
         protected float m_damageIntakeMod = 1f;
         protected float m_meleeChargeThreshold = 0.8f;
-        protected float m_hitStunMaxTime = 0.1f, m_hitStunMaxFrequency = 0.6f, m_hitStunKnockbackThreshold = 150f;
+        protected float m_hitStunMaxTime = 0.1f, m_hitStunMaxFrequency = 0.1f, m_hitStunKnockbackThreshold = 150f;
         protected float m_currentHitStunTime, m_currentHitStunFrequency;
         protected float m_armoredKnockbackReductionRate = 15f, m_unarmoredKnockbackReductionRate = 8f;
         protected float m_speedModifier = 1f, m_armorModifier = 1f, m_wackSizeModifier = 1f;
@@ -1688,13 +1688,13 @@ namespace Runtime.Character
             m_canReadPlayerInput = false;
             
             PlayDamageSFX();
-            
-            Debug.Log($"[Knockback debug] _baseKnockbackAmount:{_baseKnockbackAmount} ... m_damagePercentageKnockbackMod: {m_damagePercentageKnockbackMod} " +
-                      $"... characterData.characterNaturalKnockbackResistance:{characterData.characterNaturalKnockbackResistance}");
 
-            var knockbackMod = Mathf.Max(0.01f, m_damagePercentageKnockbackMod);
+            var knockbackMod = Mathf.Min(Mathf.Max(0.01f, m_damagePercentageKnockbackMod), m_maxDamagePercentageKnockbackMod);
             m_knockbackForce = _baseKnockbackAmount * (knockbackMod) *
                                (1 - characterData.characterNaturalKnockbackResistance);
+            
+            Debug.Log($"[Knockback debug] _baseKnockbackAmount:{_baseKnockbackAmount} ... m_damagePercentageKnockbackMod: {m_damagePercentageKnockbackMod} " +
+                      $"... characterData.characterNaturalKnockbackResistance:{characterData.characterNaturalKnockbackResistance} ... KnockbackForce:{m_knockbackForce}");
             
             m_knockbackMoveVector = _forcedDirection == Vector3.zero ? transform.position - _attackerTransform.position : _forcedDirection.FlattenVector3Y();
 
@@ -1705,7 +1705,7 @@ namespace Runtime.Character
             //ToDo: can use end point calculation to do a SmashBros last hit FX
             //var m_knockbackEndPos = transform.position + (m_knockbackMoveVector.normalized * _baseKnockbackAmount);
             
-            float _percentage = m_knockbackForce / m_hitStunKnockbackThreshold;
+            float _percentage = Mathf.Clamp01(m_knockbackForce / m_hitStunKnockbackThreshold);
 
             m_currentHitStunTime = m_hitStunMaxTime * _percentage;
             m_currentHitStunFrequency = m_hitStunMaxFrequency * _percentage;

@@ -450,7 +450,7 @@ namespace Runtime.Gameplay
             ChangeBallDirection(direction);
             ChangeState(BallState.NORMAL, _currentHittingCharacter);
             
-            if (m_lastWackCharacter == _currentHittingCharacter)
+            if (m_lastWackCharacter == _currentHittingCharacter && m_previousState == BallState.NORMAL)
             {
                 return;
             }

@@ -33,7 +33,7 @@ namespace Data.AbilityDatas
 
         public float reactivationTime = 1f;
 
-        public bool isForwardKnockBack = true;
+        public KnockbackDirectionType KnockbackDirectionType;
 
         [FormerlySerializedAs("ballHitStrength")] public HitStrengthType ballHitStrengthType;
 

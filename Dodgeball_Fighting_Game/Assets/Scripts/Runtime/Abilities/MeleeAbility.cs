@@ -59,12 +59,18 @@ namespace Runtime.Abilities
                 m_indicator.Play();
             }
             
+            Debug.Log("Point Melee");
+
+            var hitRadius = (currentScale/2) * chargePercentage;
+            
             var _meleePoint = currentOwner.transform.position +
                             (aimDirection.normalized * currentRange);
 
-            m_hitAmount = Physics.OverlapSphereNonAlloc(_meleePoint, currentScale, m_hitColliders,
+            m_hitAmount = Physics.OverlapSphereNonAlloc(_meleePoint, hitRadius, m_hitColliders,
                 m_meleeAbilityData.collisionDetectionLayers);
 
+            Debug.Log($"Point Melee: hit amount:{m_hitAmount}");
+            
             if (m_hitAmount == 0)
             {
                 return;
@@ -74,6 +80,7 @@ namespace Runtime.Abilities
             {
                 if (m_previouslyHitColliders.Contains(m_hitColliders[i]))
                 {
+                    Debug.Log($"Collider is in hit colliders");
                     continue;
                 }
                 
@@ -81,9 +88,12 @@ namespace Runtime.Abilities
                 
                 if (_character == currentOwner)
                 {
+                    Debug.Log($"Collider is current owner");
                     continue;
                 }
                 
+                Debug.Log($"Collider is going to be checked");
+
                 //first check if ball -> hit ball
                 HitCollider(m_hitColliders[i]);
             }
@@ -126,13 +136,6 @@ namespace Runtime.Abilities
                     continue;
                 }
                 
-                m_hitColliders[i].TryGetComponent(out BaseCharacter _character);
-                
-                if (_character == currentOwner)
-                {
-                    continue;
-                }
-                
                 //first check if ball -> hit ball
                 HitCollider(m_hitColliders[i]);
             }
@@ -145,20 +148,43 @@ namespace Runtime.Abilities
                 return;
             }
             
+            _collider.TryGetComponent(out BaseCharacter _character);
+                
+            if (!_character.IsNull() && _character == currentOwner)
+            {
+                return;
+            }
+            
             _collider.TryGetComponent(out BallBehavior _ball);
 
+            var knockbackDirection = Vector3.zero;
+            switch (abilityData.KnockbackDirectionType)
+            {
+                case KnockbackDirectionType.AIM_DIRECTION:
+                    knockbackDirection = aimDirection;
+                    break;
+                case KnockbackDirectionType.INWARD_RELATIVE:
+                    knockbackDirection = currentOwner.transform.position - _collider.transform.position;
+                    break;
+                case KnockbackDirectionType.OUTWARD_RELATIVE:
+                    knockbackDirection = _collider.transform.position - currentOwner.transform.position;
+                    break;
+            }
+            
             if (!_ball.IsNull())
             {
-                _ball.HitBall(aimDirection * knockbackDir, 
+                _ball.HitBall(knockbackDirection.FlattenVector3Y(), 
                     m_meleeAbilityData.ballHitStrengthType, currentOwner);
+                return;
             }
 
+            //Collider could possibly not be a character, but still damageable or knockbackable
             _collider.TryGetComponent(out IDamagable _damagable);
             _collider.TryGetComponent(out IKnockbackable _knockbackable);
             
-            _knockbackable?.ApplyKnockback(currentOwner.transform, currentOwner , currentKnockback, 
-                aimDirection * knockbackDir);
+            //Deal Damage before knockback
             _damagable?.OnDealDamage(currentOwner.transform, currentDamage, currentOwner);
+            _knockbackable?.ApplyKnockback(currentOwner.transform, currentOwner , currentKnockback, knockbackDirection);
             
             m_previouslyHitColliders.Add(_collider);
         }
@@ -212,9 +238,16 @@ namespace Runtime.Abilities
            
         }
 
+        public override void ResetAbilityUse()
+        {
+            base.ResetAbilityUse();
+            m_previouslyHitColliders.Clear();
+        }
+
         private void DisplayCircleIndicator(bool _isActive)
         {
-            m_radialMeleeIndicator.transform.localScale = Vector3.one * (currentRange * 2);
+            m_radialMeleeIndicator.transform.localPosition = Vector3.zero + (Vector3.one * currentRange);
+            m_radialMeleeIndicator.transform.localScale = Vector3.one * ((currentScale * 2) * chargePercentage);
             
             m_radialMeleeIndicator.SetActive(_isActive); 
         }

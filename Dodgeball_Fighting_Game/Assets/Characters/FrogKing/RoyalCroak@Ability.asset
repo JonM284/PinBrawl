@@ -18,12 +18,12 @@ MonoBehaviour:
   abilityCooldownTimeMax: 10
   abilityKnockbackAmount: 100
   abilityDamageAmount: 300
-  abilityRange: 10
-  abilityScale: 2
+  abilityRange: 0
+  abilityScale: 5
   isUltimateAbility: 1
   isHaltMovement: 1
-  activationType: 2
-  abilityActivationWaitTimeMax: 1
+  activationType: 3
+  abilityActivationWaitTimeMax: 2
   reactivationTime: 1
   isForwardKnockBack: 1
   ballHitStrengthType: 3
@@ -32,7 +32,6 @@ MonoBehaviour:
     m_Bits: 192
   abilityCategories:
   - {fileID: 11400000, guid: 1dd039770abdc6841a397585c196d714, type: 2}
-  - {fileID: 11400000, guid: c19c5f548adbbd6418529620952d8599, type: 2}
   applicableStatusesOnHit: []
   abilityGameObject: {fileID: 8665924220425139476, guid: 3e061a60f93c423409d91c4fd2b53046, type: 3}
   meleeType: 0

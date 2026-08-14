@@ -177,14 +177,28 @@ namespace Runtime.Abilities
             }
             
             _collider.TryGetComponent(out BallBehavior _ball);
-
-            m_knockbackDir = !m_savedEndLocation.IsNull()
-                ? m_savedEndLocation.transform.position - currentOwner.transform.position
-                : aimDirection;
+            
+            m_knockbackDir = Vector3.zero;
+            switch (abilityData.KnockbackDirectionType)
+            {
+                case KnockbackDirectionType.AIM_DIRECTION:
+                    m_knockbackDir = aimDirection;
+                    break;
+                case KnockbackDirectionType.INWARD_RELATIVE:
+                    m_knockbackDir = !m_savedEndLocation.IsNull()
+                        ? m_savedEndLocation.transform.position - _collider.transform.position :
+                        currentOwner.transform.position - _collider.transform.position;
+                    break;
+                case KnockbackDirectionType.OUTWARD_RELATIVE:
+                    m_knockbackDir = !m_savedEndLocation.IsNull()
+                        ?  _collider.transform.position - m_savedEndLocation.transform.position :
+                         _collider.transform.position - currentOwner.transform.position;
+                    break;
+            }
             
             if (!_ball.IsNull())
             {
-                _ball.HitBall(m_knockbackDir * knockbackDir, 
+                _ball.HitBall(m_knockbackDir, 
                     m_dashAbilityData.ballHitStrengthType, currentOwner);
                 return;
             }
@@ -199,7 +213,7 @@ namespace Runtime.Abilities
                 _collider.TryGetComponent(out IKnockbackable _knockbackable);
                 
                 _knockbackable?.ApplyKnockback(currentOwner.transform, currentOwner , currentKnockback, 
-                    m_knockbackDir * knockbackDir);
+                    m_knockbackDir);
             }
 
             if (currentDamage > 0)

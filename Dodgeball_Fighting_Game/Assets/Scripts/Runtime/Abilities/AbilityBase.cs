@@ -88,10 +88,8 @@ namespace Runtime.Abilities
         public float currentRange => rangeAmountMax * rangeModifier;
 
         public float cooldownReductionModifier => cooldownModifier;
-
-        public float knockbackDir => abilityData.IsNull() ? 1f : abilityData.isForwardKnockBack ? 1f : -1f;
-
-        public float currentScale { get; set; }
+        
+        public float currentScale { get; protected set; }
 
         public bool isCharging { get; protected set;  }
 
@@ -135,6 +133,11 @@ namespace Runtime.Abilities
         /// </summary>
         protected void SetChargePercentage()
         {
+            if (isCharging)
+            {
+                return;
+            }
+            
             switch (abilityData.activationType)
             {
                 case ActivationType.OnHold:
@@ -196,14 +199,18 @@ namespace Runtime.Abilities
         /// </summary>
         public void OnAbilityButtonPressed()
         {
+            SetChargePercentage();
+
             switch (abilityData.activationType)
             {
                 case ActivationType.OnRelease:
                     return;
                 case ActivationType.OnAutoCharge when isCharging:
                     ReleaseAbilityCharge();
+                    if(abilityData.isHaltMovement) currentOwner.ResetCharacterMovementSpeed();
                     return;
                 case ActivationType.OnAutoCharge when !isCharging:
+                    if(abilityData.isHaltMovement) currentOwner.HaltCharacterMovement();
                     ChargeAbilityAutoAsync(destroyCancellationToken).Forget();
                     break;
                 case ActivationType.OnPress:
@@ -211,6 +218,7 @@ namespace Runtime.Abilities
                     break;
                 case ActivationType.OnHold:
                     isCharging = true;
+                    if(abilityData.isHaltMovement) currentOwner.HaltCharacterMovement();
                     break;
             }
         }
@@ -244,6 +252,7 @@ namespace Runtime.Abilities
                 case ActivationType.OnHold:
                     ReleaseAbilityCharge();
                     DoAbilityAsync(destroyCancellationToken).Forget();
+                    if(abilityData.isHaltMovement) currentOwner.ResetCharacterMovementSpeed();
                     break;
             }
         }

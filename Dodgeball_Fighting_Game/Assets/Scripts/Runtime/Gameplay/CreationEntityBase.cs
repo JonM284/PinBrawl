@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Data.AbilityDatas;
 using Project.Scripts.Utils;
+using Runtime.Abilities;
 using Runtime.Character;
 using Runtime.GameControllers;
 using Runtime.GameplayInterfaces;
@@ -260,19 +261,25 @@ namespace Runtime.Gameplay
         {
             _collider.TryGetComponent(out BallBehavior _ball);
 
+            var knockbackDirection = Vector3.zero;
+            switch (m_creationAbilityData.KnockbackDirectionType)
+            {
+                case KnockbackDirectionType.AIM_DIRECTION:
+                    knockbackDirection = m_savedAimDirection;
+                    break;
+                case KnockbackDirectionType.INWARD_RELATIVE:
+                    knockbackDirection = transform.position - _collider.transform.position;
+                    break;
+                case KnockbackDirectionType.OUTWARD_RELATIVE:
+                    knockbackDirection = _collider.transform.position - transform.position;
+                    break;
+            }
+            
             if (!_ball.IsNull())
             {
                 if (m_creationAbilityData.isHitBall)
                 {
-                    var _hitDirection = (_ball.transform.position - transform.position) *
-                                        (m_creationAbilityData.isForwardKnockBack ? 1f : -1f);
-
-                    if (m_creationAbilityData.isSavePointedDirection)
-                    {
-                        _hitDirection = m_savedAimDirection * (m_creationAbilityData.isForwardKnockBack ? 1f : -1f);
-                    }
-                
-                    _ball.HitBall(_hitDirection, m_creationAbilityData.ballHitStrengthType, m_owner);
+                    _ball.HitBall(knockbackDirection, m_creationAbilityData.ballHitStrengthType, m_owner);
                 }
                 else if(m_creationAbilityData.isWall)
                 {
@@ -286,9 +293,7 @@ namespace Runtime.Gameplay
             if (m_knockbackAmount > 0)
             {
                 _collider.TryGetComponent(out IKnockbackable _knockbackable);
-                _knockbackable?.ApplyKnockback(transform, m_owner , m_knockbackAmount, 
-                    m_creationAbilityData.isSavePointedDirection ? 
-                        m_savedAimDirection * (m_creationAbilityData.isForwardKnockBack ? 1f : -1f) : Vector3.zero);    
+                _knockbackable?.ApplyKnockback(transform, m_owner , m_knockbackAmount, knockbackDirection);    
             }
             
             if (m_damageAmount > 0)
