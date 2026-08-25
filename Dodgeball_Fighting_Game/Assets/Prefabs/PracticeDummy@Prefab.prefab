@@ -52,7 +52,6 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -74,6 +73,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -176,17 +176,17 @@ MonoBehaviour:
   m_characterModelHolder: {fileID: 7611413636718273356}
   m_indicatorHolder: {fileID: 860392208525006652}
   m_meleeIndicator: {fileID: 0}
-  m_energyShieldParent: {fileID: 0}
-  m_energyShieldIndicator: {fileID: 0}
   m_wackVFX: {fileID: 0}
   m_wackChargeVFX: {fileID: 0}
   m_shieldPopVFX: {fileID: 0}
   m_shieldPopStunVFX: {fileID: 0}
+  m_knockbackVFX: {fileID: 0}
   m_marker: {fileID: 0}
   m_aimMarker: {fileID: 0}
   m_healthbarLoc: {fileID: 0}
   m_statusHolder: {fileID: 1683139154015966560}
-  m_buntAbilityData: {fileID: 0}
+  m_dashAbilityData: {fileID: 0}
+  energyShieldBehaviour: {fileID: 0}
   m_wackSounds: []
   m_damagedSounds:
   - {fileID: 8300000, guid: 48e12a3009975db48b2c8eb80df3b782, type: 3}
@@ -251,6 +251,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -334,6 +337,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -444,9 +450,17 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: -1526964690268444965, guid: 0d3b35f016537db4291efade895db808, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -1526964690268444965, guid: 0d3b35f016537db4291efade895db808, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 62dcb0326c6dd154480554a5e62e84a7, type: 2}
+    - target: {fileID: -1526964690268444965, guid: 0d3b35f016537db4291efade895db808, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 101d18674b6e08645a8a41434c9f04d2, type: 2}
     - target: {fileID: -516098083770646512, guid: 0d3b35f016537db4291efade895db808, type: 3}
       propertyPath: m_Layer
       value: 6

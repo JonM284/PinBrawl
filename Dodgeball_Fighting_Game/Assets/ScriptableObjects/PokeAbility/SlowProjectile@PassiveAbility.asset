@@ -25,7 +25,7 @@ MonoBehaviour:
   activationType: 0
   abilityActivationWaitTimeMax: 1
   reactivationTime: 1
-  isForwardKnockBack: 1
+  KnockbackDirectionType: 0
   ballHitStrengthType: 3
   collisionDetectionLayers:
     serializedVersion: 2
@@ -35,7 +35,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 377e24acc60007346a2eb9c9d93e1595, type: 2}
   abilityGameObject: {fileID: 4351572726978402741, guid: 0299e847645882f4eb2eb636e309e116, type: 3}
   projectileMaxLifetime: 30
-  projectileShootSpeed: 14
+  projectileShootSpeed: 20
   projectileDetectionRange: 1
   projectileExplosionRange: 1
   projectileEndType: 0

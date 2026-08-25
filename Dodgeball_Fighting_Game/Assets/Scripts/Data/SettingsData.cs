@@ -38,6 +38,8 @@ namespace Data
         public float pvpDamageEnergyAddAmount = 5f;
 
         public float parryWindowTimeMax = 0.2f;
+        
+        public float hitBallBuildUpStartDelay = 0.2f;
 
     }
 }

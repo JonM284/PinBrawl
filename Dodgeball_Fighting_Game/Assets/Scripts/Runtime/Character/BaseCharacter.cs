@@ -1011,7 +1011,6 @@ namespace Runtime.Character
 
         protected async UniTask OnHitBallConnect(BallBehavior _ball)
         {
-
             HaltCharacterMovement();
             EarlyEndTimer(ballHitTimerIdentifier);
             
@@ -1589,6 +1588,7 @@ namespace Runtime.Character
         }
 
         #endregion
+        
 
         #endregion
 

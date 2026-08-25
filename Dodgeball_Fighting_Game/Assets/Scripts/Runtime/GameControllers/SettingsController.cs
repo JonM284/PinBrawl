@@ -72,6 +72,8 @@ namespace Runtime.GameControllers
 
         public float GetPlayerKillEnergyAmount() => _settingsData.playerKillEnergyAddAmount;
 
+        public float GetBuildUpStartDelay() => _settingsData.hitBallBuildUpStartDelay;
+
         public Sprite GetWackIcon() => _settingsData.wackIcon;
 
         public float GetParryTiming() => _settingsData.parryWindowTimeMax;

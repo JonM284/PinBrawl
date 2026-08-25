@@ -134,7 +134,7 @@ namespace Runtime.UI.DataModels
             allAssignableAbilities = MatchGameController.Instance.GetAllAbilities();
 
             var currentCharacterIndex = 0;
-            var maxRows = Mathf.FloorToInt(allCharacters.Count / (float)maxXIndex);
+            var maxRows = Mathf.CeilToInt(allCharacters.Count / (float)maxXIndex);
 
             for (int y = 0; y < maxRows; y++)
             {

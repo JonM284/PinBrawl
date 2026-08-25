@@ -52,7 +52,9 @@ namespace Runtime.Gameplay
 
         #region Read-Only
 
+        private static readonly int colorName = Shader.PropertyToID("_Color");
         private static readonly int outlineColorName = Shader.PropertyToID("_OutlineColor");
+
 
         #endregion
 
@@ -124,6 +126,7 @@ namespace Runtime.Gameplay
         [Header("Wack Charge visuals")]
         [SerializeField] private GameObject m_aimRotator;
         [SerializeField] private Image m_ballAimImg,m_ballChargeImg;
+        [SerializeField] private VFXPlayer ballChargeVFX;
         
         #endregion
         
@@ -321,7 +324,7 @@ namespace Runtime.Gameplay
             m_currentBallState = BallState.NORMAL;
             m_previousState = BallState.NORMAL;
             StopBall();
-            m_ballVisuals.materials[0].SetColor(outlineColorName, m_neutralColor);
+            ChangeColor(m_neutralColor);
             m_lastWackCharacter = null;
             m_currentScale = 1;
             m_trackedSpeed = m_ballMinSpeed;
@@ -388,6 +391,9 @@ namespace Runtime.Gameplay
             m_chargedWackPlayer = m_isBuildingUp ? _baseCharacter : null;
 
             m_ballChargeImg.fillAmount = 0;
+            
+            ballChargeVFX.ChangeAllStartColor(_baseCharacter.playerColor);
+            ballChargeVFX.gameObject.SetActive(_isBuildingUp);
             
             if (_isBuildingUp && !m_heavyWackVFX.IsNull() && isSemiFastBall)
             {
@@ -501,18 +507,20 @@ namespace Runtime.Gameplay
         private void EndBunt()
         {
             ChangeState(BallState.NORMAL, m_buntingCharacter);
-            m_ballVisuals.materials[0].SetColor(outlineColorName, m_neutralColor);
+            ChangeColor(m_neutralColor);
         }
 
         private void ChangeColor(BaseCharacter character)
         {
-            m_ballVisuals.materials[0].SetColor(outlineColorName, SettingsController.Instance.GetColorByPlayerIndex(character.GetPlayerIndex()));
+            m_ballVisuals.materials[0].SetColor(colorName, SettingsController.Instance.GetColorByPlayerIndex(character.GetPlayerIndex()));
+            m_ballVisuals.materials[1].SetColor(outlineColorName, SettingsController.Instance.GetColorByPlayerIndex(character.GetPlayerIndex()));
             ChangeGradient(SettingsController.Instance.GetGradientByPlayerIndex(character.GetPlayerIndex()));
         }
 
         private void ChangeColor(Color _newColor)
         {
-            m_ballVisuals.materials[0].SetColor(outlineColorName, _newColor);
+            m_ballVisuals.materials[0].SetColor(colorName, _newColor);
+            m_ballVisuals.materials[1].SetColor(outlineColorName, _newColor);
             m_ballAimImg.color = _newColor;
             m_ballChargeImg.color = _newColor;
         }

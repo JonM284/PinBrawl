@@ -15,10 +15,11 @@ MonoBehaviour:
   statusName: POiSON
   statusDescription: Deal {0} damage, every second
   statusIconRef: {fileID: 1020896172, guid: a10cb3573e0dca140b847908d070e55c, type: 3}
+  isBuff: 0
   statusIdentifierGUID: d73f85c4-5254-4727-9abc-9bcf1847f493
   timeMax: 5
   shieldChangeOverTick: 0
-  statusGameObject: {fileID: 0}
-  amountOfTimePerTick: 0.5
-  amountChangePerTick: 75
+  statusGameObject: {fileID: 1176647651618543623, guid: 1cfd996cb663a5343ad01a17ff87dd31, type: 3}
+  amountOfTimePerTick: 1
+  amountChangePerTick: 10
   isHealing: 0

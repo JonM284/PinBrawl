@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: -1, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6881467694325368412}
@@ -5352,7 +5352,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_energyShieldParent: {fileID: 783698360627546544}
   m_energyShieldIndicator: {fileID: 3227308632181542246}
-  shieldCollider: {fileID: 0}
 --- !u!1 &5272498612397701861
 GameObject:
   m_ObjectHideFlags: 0
