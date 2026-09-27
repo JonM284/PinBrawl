@@ -16,7 +16,7 @@ MonoBehaviour:
   characterArmorAmount: 600
   characterIdentifierGUID: 19669007-aac3-47a1-9990-bbd5a8f2e936
   characterNaturalKnockbackResistance: 0.15
-  characterWalkSpeed: 12
+  characterWalkSpeed: 9.5
   meleeChargeWalkSpeed: 6
   characterColliderRadius: 1
   ballMeleeColliderRadius: 2.8

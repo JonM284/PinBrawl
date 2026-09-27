@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015 Augie R. Maddox, Guavaman Enterprises. All rights reserved.
+// Copyright (c) 2015 Augie R. Maddox, Guavaman Enterprises. All rights reserved.
 
 #define REWIRED_CONTROL_MAPPER_USE_TMPRO
 
@@ -63,6 +63,8 @@ namespace Rewired.UI.ControlMapper {
         private ImageSettings _calibrationCalibratedZeroMarker;
         [SerializeField]
         private ImageSettings _calibrationDeadzone;
+        [SerializeField]
+        private ImageSettings _calibrationUpperDeadzone;
         [SerializeField]
         private TextSettings _textSettings;
         [SerializeField]
@@ -161,6 +163,9 @@ namespace Rewired.UI.ControlMapper {
                     break;
                 case "calibrationDeadzone":
                     if (_calibrationDeadzone != null) _calibrationDeadzone.CopyTo(item);
+                    break;
+                case "calibrationUpperDeadzone":
+                    if (_calibrationUpperDeadzone != null) _calibrationUpperDeadzone.CopyTo(item);
                     break;
                 case "invertToggle":
                     if (_invertToggle != null) _invertToggle.CopyTo(item);

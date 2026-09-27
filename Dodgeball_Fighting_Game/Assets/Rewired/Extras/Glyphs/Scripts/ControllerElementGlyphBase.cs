@@ -168,21 +168,37 @@ namespace Rewired.Glyphs {
         /// <param name="entries">The list of entries.</param>
         /// <returns>The number of glyphs or text objects that were displayed.</returns>
         protected virtual int ShowGlyphsOrText(ActionElementMap actionElementMap, UnityEngine.Transform parent, List<GlyphOrTextObject> entries) {
+            int usedObjectCount = 0;
+            return ShowGlyphsOrText(actionElementMap, parent, entries, ref usedObjectCount);
+        }
+        /// <summary>
+        /// Displays glyphs or text for an Action Element Map and adds them to the specified entries list.
+        /// This overload allows adding additional glyphs / text to be simultaneously displayed instead of being exclusive.
+        /// </summary>
+        /// <param name="actionElementMap">The action element map.</param>
+        /// <param name="parent">The parent transform of the objects.</param>
+        /// <param name="entries">The list of entries.</param>
+        /// <param name="currentUsedObjectCount">The current count of glyph/text objects in the entries list that are being used. This does not necessarily match entries.Count. This will be incremented if glyphs/text is found.</param>
+        /// <returns>The number of glyphs or text objects that were displayed.</returns>
+        protected virtual int ShowGlyphsOrText(ActionElementMap actionElementMap, UnityEngine.Transform parent, List<GlyphOrTextObject> entries, ref int currentUsedObjectCount) {
+            if (currentUsedObjectCount < 0) currentUsedObjectCount = 0;
             _tempGlyphs.Clear();
 
             int count = 0;
 
             if (IsAllowed(AllowedTypes.Glyphs) && GetGlyphs(actionElementMap, _tempGlyphs) > 0) {
-                if (!CreateObjectsAsNeeded(parent, entries, _tempGlyphs.Count)) return 0;
+                if (!CreateObjectsAsNeeded(parent, entries, currentUsedObjectCount + _tempGlyphs.Count)) return 0;
                 for (int i = 0; i < _tempGlyphs.Count; i++) {
-                    entries[i].ShowGlyph(_tempGlyphs[i]);
+                    entries[currentUsedObjectCount + i].ShowGlyph(_tempGlyphs[i]);
                 }
                 count += _tempGlyphs.Count;
             } else if (IsAllowed(AllowedTypes.Text) && actionElementMap != null) { // fall back to text
-                if (!CreateObjectsAsNeeded(parent, entries, 1)) return 0;
-                entries[0].ShowText(actionElementMap.elementIdentifierName);
+                if (!CreateObjectsAsNeeded(parent, entries, currentUsedObjectCount + 1)) return 0;
+                entries[currentUsedObjectCount].ShowText(actionElementMap.elementIdentifierName);
                 count += 1;
             }
+
+            currentUsedObjectCount += count;
 
             return count;
         }

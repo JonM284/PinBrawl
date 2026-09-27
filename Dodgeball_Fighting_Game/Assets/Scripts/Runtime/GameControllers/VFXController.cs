@@ -193,6 +193,35 @@ namespace GameControllers
             m_active_VFX.Add(foundVFX);
         }
 
+        public void PlayAt(VFXPlayer vfxPlayer, Vector3 position, Vector3 forwardRotation, Transform activeParent = null)
+        {
+            if (vfxPlayer.IsNull())
+            {
+                Debug.Log("No VFX Player Attached");
+                return;
+            }
+
+            
+            var foundVFX = m_cached_VFX.FirstOrDefault(c => c.vfxplayerIdentifier == vfxPlayer.vfxplayerIdentifier);
+
+            if (!foundVFX)
+            {
+                foundVFX = Instantiate(vfxPlayer);
+            }
+            else
+            {
+                m_cached_VFX.Remove(foundVFX);
+            }
+
+            foundVFX.transform.parent = !activeParent.IsNull() ? activeParent : null;
+            foundVFX.transform.position = position;
+            foundVFX.transform.forward = forwardRotation;
+
+            foundVFX.Play();
+            
+            m_active_VFX.Add(foundVFX);
+        }
+
         public void PlayBuffDebuff(bool _isBuff, Vector3 position, Quaternion rotation, Transform activeParent = null)
         {
             PlayAt(_isBuff ? commonVFXData.buffVFXPrefab : commonVFXData.debuffVFXPrefab, position, rotation,

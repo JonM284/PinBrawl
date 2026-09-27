@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -330,9 +331,20 @@ MonoBehaviour:
     _fillAmout: 0
     _fillClockwise: 0
     _fillOrigin: 0
+  _calibrationUpperDeadzone:
+    _color: {r: 0.3529412, g: 0, b: 0, a: 1}
+    _sprite: {fileID: 0}
+    _materal: {fileID: 0}
+    _type: 0
+    _preserveAspect: 0
+    _fillCenter: 0
+    _fillMethod: 0
+    _fillAmout: 0
+    _fillClockwise: 0
+    _fillOrigin: 0
   _textSettings:
     _color: {r: 1, g: 1, b: 1, a: 1}
-    _font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    _font: {fileID: 0}
     _style: 0
     _sizeMultiplier: 1
     _lineSpacing: 1
@@ -340,7 +352,7 @@ MonoBehaviour:
     _wordSpacing: 1
   _buttonTextSettings:
     _color: {r: 1, g: 1, b: 1, a: 1}
-    _font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    _font: {fileID: 0}
     _style: 0
     _sizeMultiplier: 1
     _lineSpacing: 1
@@ -348,7 +360,7 @@ MonoBehaviour:
     _wordSpacing: 1
   _inputGridFieldTextSettings:
     _color: {r: 1, g: 1, b: 1, a: 1}
-    _font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    _font: {fileID: 0}
     _style: 0
     _sizeMultiplier: 1
     _lineSpacing: 1

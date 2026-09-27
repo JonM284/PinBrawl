@@ -231,6 +231,15 @@ namespace Rewired.UI.ControlMapper
                 if(toggle == null) return;
                 this.toggle = toggle;
             }
+
+            public override string GetLabel() {
+                if (fieldInfo.glyphOrText == null ||
+                    fieldInfo == null) {
+                    return base.GetLabel();
+                }
+                if (fieldInfo.glyphOrText.actionElementMap == null) return base.GetLabel();
+                return fieldInfo.glyphOrText.actionElementMap.elementIdentifierName;
+            }
         }
 
         private class GUIToggle : GUIElement

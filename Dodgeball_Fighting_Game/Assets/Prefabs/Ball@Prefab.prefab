@@ -10319,7 +10319,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6888336680989335625
 Transform:
   m_ObjectHideFlags: 0
@@ -15307,7 +15307,7 @@ MonoBehaviour:
   m_ballMediumHit: 23
   m_ballHeavyHit: 40
   m_chargedHitSpeedMod: 1.15
-  m_ballScaleMaxSize: 8
+  m_ballScaleMaxSize: 4
   m_ballScaleModRate: 0.25
   wallLayers:
     serializedVersion: 2
@@ -15385,6 +15385,7 @@ MonoBehaviour:
     m_NumColorKeys: 3
     m_NumAlphaKeys: 3
   m_heavyWackVFX: {fileID: 2341838655945325522}
+  m_wallBounceVFX: {fileID: 4649843966235192742, guid: e35975acc0280a44f8a11f2e9bf5563c, type: 3}
   m_aimRotator: {fileID: 8823725032985226185}
   m_ballAimImg: {fileID: 1302967247842731914}
   m_ballChargeImg: {fileID: 8496793687414084703}
@@ -15864,10 +15865,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2631001989458169917}
     m_Modifications:
-    - target: {fileID: 522205604266862679, guid: 48d57212dc197b24aacf3351cf536721, type: 3}
-      propertyPath: playOnAwake
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1014343241673102741, guid: 48d57212dc197b24aacf3351cf536721, type: 3}
       propertyPath: m_Name
       value: ChargeBall@VFX
@@ -15915,10 +15912,6 @@ PrefabInstance:
     - target: {fileID: 2223179554890022668, guid: 48d57212dc197b24aacf3351cf536721, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3062419324678937601, guid: 48d57212dc197b24aacf3351cf536721, type: 3}
-      propertyPath: playOnAwake
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

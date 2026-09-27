@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2014 Augie R. Maddox, Guavaman Enterprises. All rights reserved.
+
 #pragma warning disable 0219
 #pragma warning disable 0618
 #pragma warning disable 0649
 #pragma warning disable 0414
 
 namespace Rewired.Editor {
-    using UnityEditor;
     using Rewired.Platforms;
 
     [System.ComponentModel.Browsable(false)]
@@ -74,12 +74,16 @@ namespace Rewired.Editor {
             platform = Platform.WindowsPhone8;
 #endif
 
-#if UNITY_IPHONE
+#if UNITY_IPHONE || UNITY_IOS
             platform = Platform.iOS;
 #endif
 
-#if UNITY_IOS
-            platform = Platform.iOS;
+#if UNITY_TVOS
+            platform = Platform.tvOS;
+#endif
+
+#if UNITY_VISIONOS
+            platform = Platform.VisionOS;
 #endif
 
 #if UNITY_PS3
@@ -88,6 +92,10 @@ namespace Rewired.Editor {
 
 #if UNITY_PS4
             platform = Platform.PS4;
+#endif
+
+#if UNITY_PS5
+            platform = Platform.PS5;
 #endif
 
 #if UNITY_PSP2
@@ -106,12 +114,28 @@ namespace Rewired.Editor {
             platform = Platform.XboxOne;
 #endif
 
+#if UNITY_GAMECORE_XBOXONE
+            platform = Platform.GameCoreXboxOne;
+#endif
+
+#if UNITY_GAMECORE_SCARLETT || UNITY_GAMECORE_XBOXSERIES
+            platform = Platform.GameCoreScarlett;
+#endif
+
 #if UNITY_WII
             platform = Platform.Wii;
 #endif
 
 #if UNITY_WIIU
             platform = Platform.WiiU;
+#endif
+
+#if UNITY_SWITCH
+            platform = Platform.Switch;
+#endif
+
+#if UNITY_SWITCH2 || UNITY_OUNCE
+            platform = Platform.Switch2;
 #endif
 
 #if UNITY_FLASH

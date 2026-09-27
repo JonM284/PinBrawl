@@ -55,6 +55,7 @@ namespace Rewired.UI.ControlMapper {
 
         private const float minSensitivityOtherAxes = 0.1f; // used for non-menu axes, min value to prevent axis from becoming useless
         private const float maxDeadzone = 0.8f; // max dead zone value user is allowed to set to prevent full axis from becoming useless
+        private const float maxUpperDeadzone = 0.8f;
 
         [SerializeField]
         private RectTransform rightContentContainer;
@@ -69,7 +70,13 @@ namespace Rewired.UI.ControlMapper {
         [SerializeField]
         private RectTransform deadzoneArea;
         [SerializeField]
+        private RectTransform upperDeadzoneAreaLeft;
+        [SerializeField]
+        private RectTransform upperDeadzoneAreaRight;
+        [SerializeField]
         private Slider deadzoneSlider;
+        [SerializeField]
+        private Slider upperDeadzoneSlider;
         [SerializeField]
         private Slider zeroSlider;
         [SerializeField]
@@ -90,6 +97,8 @@ namespace Rewired.UI.ControlMapper {
         private Text defaultButtonLabel;
         [SerializeField]
         private Text deadzoneSliderLabel;
+        [SerializeField]
+        private Text upperDeadzoneSliderLabel;
         [SerializeField]
         private Text zeroSliderLabel;
         [SerializeField]
@@ -147,7 +156,10 @@ namespace Rewired.UI.ControlMapper {
                 rawValueMarker == null ||
                 calibratedZeroMarker == null ||
                 deadzoneArea == null ||
+                upperDeadzoneAreaLeft == null ||
+                upperDeadzoneAreaRight == null ||
                 deadzoneSlider == null ||
+                upperDeadzoneSlider == null ||
                 sensitivitySlider == null ||
                 zeroSlider == null ||
                 invertToggle == null ||
@@ -159,6 +171,7 @@ namespace Rewired.UI.ControlMapper {
                 cancelButtonLabel == null ||
                 defaultButtonLabel == null ||
                 deadzoneSliderLabel == null ||
+                upperDeadzoneSliderLabel == null ||
                 zeroSliderLabel == null ||
                 sensitivitySliderLabel == null ||
                 invertToggleLabel == null ||
@@ -176,6 +189,7 @@ namespace Rewired.UI.ControlMapper {
             cancelButtonLabel.text = ControlMapper.GetLanguage().cancel;
             defaultButtonLabel.text = ControlMapper.GetLanguage().default_;
             deadzoneSliderLabel.text = ControlMapper.GetLanguage().calibrateWindow_deadZoneSliderLabel;
+            upperDeadzoneSliderLabel.text = ControlMapper.GetLanguage().calibrateWindow_upperDeadZoneSliderLabel;
             zeroSliderLabel.text = ControlMapper.GetLanguage().calibrateWindow_zeroSliderLabel;
             sensitivitySliderLabel.text = ControlMapper.GetLanguage().calibrateWindow_sensitivitySliderLabel;
             invertToggleLabel.text = ControlMapper.GetLanguage().calibrateWindow_invertToggleLabel;
@@ -327,6 +341,7 @@ namespace Rewired.UI.ControlMapper {
             if (!initialized) return;
             if (!axisSelected) return;
             // Enforce a max dead zone to prevent axis from becoming useless
+            float maxDeadzone = axisCalibration.upperDeadZone > 0f ? Mathf.Min(1f - axisCalibration.upperDeadZone - 0.1f, CalibrationWindow.maxDeadzone) : CalibrationWindow.maxDeadzone;
             axisCalibration.deadZone = Mathf.Clamp(value, 0.0f, maxDeadzone);
             if (value > maxDeadzone) deadzoneSlider.value = maxDeadzone; // prevent control from going outside range
             RedrawDeadzone();
@@ -336,6 +351,24 @@ namespace Rewired.UI.ControlMapper {
             if (!initialized) return;
             if (!axisSelected) return;
             axisCalibration.deadZone = origSelectedAxisCalibrationData.deadZone;
+            RedrawDeadzone();
+            RefreshControls();
+        }
+
+        public void OnUpperDeadzoneValueChange(float value) {
+            if (!initialized) return;
+            if (!axisSelected) return;
+            // Enforce a max dead zone to prevent axis from becoming useless
+            float maxDeadzone = axisCalibration.deadZone > 0f ? Mathf.Min(1f - axisCalibration.deadZone - 0.1f, CalibrationWindow.maxUpperDeadzone) : CalibrationWindow.maxUpperDeadzone;
+            axisCalibration.upperDeadZone = Mathf.Clamp(value, 0.0f, maxDeadzone);
+            if (value > maxDeadzone) upperDeadzoneSlider.value = maxDeadzone; // prevent control from going outside range
+            RedrawDeadzone();
+        }
+
+        public void OnUpperDeadzoneCancel() {
+            if (!initialized) return;
+            if (!axisSelected) return;
+            axisCalibration.upperDeadZone = origSelectedAxisCalibrationData.upperDeadZone;
             RedrawDeadzone();
             RefreshControls();
         }
@@ -381,6 +414,9 @@ namespace Rewired.UI.ControlMapper {
                 // Deadzone slider
                 deadzoneSlider.value = 0;
 
+                // Upper Deadzone slider
+                upperDeadzoneSlider.value = 0;
+
                 // Zero slider
                 zeroSlider.value = 0;
 
@@ -392,6 +428,9 @@ namespace Rewired.UI.ControlMapper {
             } else {
                 // Deadzone slider
                 deadzoneSlider.value = axisCalibration.deadZone;
+
+                // Upper Deadzone slider
+                upperDeadzoneSlider.value = axisCalibration.upperDeadZone;
 
                 // Zero slider
                 zeroSlider.value = axisCalibration.calibratedZero;
@@ -406,9 +445,18 @@ namespace Rewired.UI.ControlMapper {
 
         private void RedrawDeadzone() {
             if (!axisSelected) return;
-            float width = displayAreaWidth * axisCalibration.deadZone;
-            deadzoneArea.sizeDelta = new Vector2(width, deadzoneArea.sizeDelta.y);
-            deadzoneArea.anchoredPosition = new Vector2(axisCalibration.calibratedZero * -deadzoneArea.parent.localPosition.x, deadzoneArea.anchoredPosition.y);
+            {
+                float width = displayAreaWidth * axisCalibration.deadZone;
+                deadzoneArea.sizeDelta = new Vector2(width, deadzoneArea.sizeDelta.y);
+                deadzoneArea.anchoredPosition = new Vector2(axisCalibration.calibratedZero * -deadzoneArea.parent.localPosition.x, deadzoneArea.anchoredPosition.y);
+            }
+            {
+                float width = displayAreaWidth * axisCalibration.upperDeadZone *  0.5f;
+                float negRange = Mathf.Abs(axisCalibration.calibratedZero - axisCalibration.calibratedMin);
+                float posRange = Mathf.Abs(axisCalibration.calibratedZero - axisCalibration.calibratedMax);
+                upperDeadzoneAreaLeft.sizeDelta = new Vector2(negRange * width, upperDeadzoneAreaLeft.sizeDelta.y);
+                upperDeadzoneAreaRight.sizeDelta = new Vector2(posRange * width, upperDeadzoneAreaRight.sizeDelta.y);
+            }
         }
 
         private void RedrawCalibratedZero() {

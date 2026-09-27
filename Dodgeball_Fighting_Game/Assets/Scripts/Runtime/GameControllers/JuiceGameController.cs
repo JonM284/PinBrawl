@@ -98,6 +98,11 @@ namespace Runtime.GameControllers
             cameraRef.DOShakePosition(_duration, _strength, _amplitude, randomness);
         }
 
+        public void DoCameraShake(float _duration, Vector2 _strength, int _amplitude, float randomness)
+        {
+            cameraRef.DOShakePosition(_duration, _strength, _amplitude, randomness);
+        }
+
         public void CreateDamageText(float _amount, Vector3 _position)
         {
             CreateDamageText(Mathf.FloorToInt(_amount), _position);

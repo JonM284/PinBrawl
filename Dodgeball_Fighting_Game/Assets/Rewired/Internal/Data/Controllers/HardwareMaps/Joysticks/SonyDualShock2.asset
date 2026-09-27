@@ -30,6 +30,7 @@ MonoBehaviour:
     _negativeKey: left_stick/left
     _elementType: 0
     _compoundElementType: 0
+    _role: stick1/x
   - _id: 1
     _name: Left Stick Y
     _positiveName: Left Stick Up
@@ -39,6 +40,7 @@ MonoBehaviour:
     _negativeKey: left_stick/down
     _elementType: 0
     _compoundElementType: 0
+    _role: stick1/y
   - _id: 2
     _name: Right Stick X
     _positiveName: Right Stick Right
@@ -48,6 +50,7 @@ MonoBehaviour:
     _negativeKey: right_stick/left
     _elementType: 0
     _compoundElementType: 0
+    _role: stick2/x
   - _id: 3
     _name: Right Stick Y
     _positiveName: Right Stick Up
@@ -57,6 +60,7 @@ MonoBehaviour:
     _negativeKey: right_stick/down
     _elementType: 0
     _compoundElementType: 0
+    _role: stick2/y
   - _id: 4
     _name: Cross
     _positiveName: 
@@ -66,6 +70,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/a
   - _id: 5
     _name: Circle
     _positiveName: 
@@ -75,6 +80,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/b
   - _id: 6
     _name: Square
     _positiveName: 
@@ -84,6 +90,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/x
   - _id: 7
     _name: Triangle
     _positiveName: 
@@ -93,6 +100,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/y
   - _id: 8
     _name: L1
     _positiveName: 
@@ -102,6 +110,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/lb
   - _id: 9
     _name: L2
     _positiveName: 
@@ -111,6 +120,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/lt
   - _id: 10
     _name: R1
     _positiveName: 
@@ -120,6 +130,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/rb
   - _id: 11
     _name: R2
     _positiveName: 
@@ -129,6 +140,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/rt
   - _id: 12
     _name: Select
     _positiveName: 
@@ -138,6 +150,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/select
   - _id: 13
     _name: Start
     _positiveName: 
@@ -147,6 +160,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/start
   - _id: 14
     _name: L3
     _positiveName: 
@@ -156,6 +170,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: stick1/press
   - _id: 15
     _name: R3
     _positiveName: 
@@ -165,6 +180,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: stick2/press
   - _id: 16
     _name: D-Pad Up
     _positiveName: 
@@ -174,6 +190,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: dpad/up
   - _id: 17
     _name: D-Pad Right
     _positiveName: 
@@ -183,6 +200,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: dpad/right
   - _id: 18
     _name: D-Pad Down
     _positiveName: 
@@ -192,6 +210,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: dpad/down
   - _id: 19
     _name: D-Pad Left
     _positiveName: 
@@ -201,6 +220,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: dpad/left
   - _id: 20
     _name: Left Stick
     _positiveName: 
@@ -210,6 +230,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 100
     _compoundElementType: 0
+    _role: 
   - _id: 21
     _name: Right Stick
     _positiveName: 
@@ -219,6 +240,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 100
     _compoundElementType: 0
+    _role: 
   - _id: 22
     _name: D-Pad
     _positiveName: 
@@ -228,16 +250,20 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 100
     _compoundElementType: 10
+    _role: 
   compoundElements:
   - type: 0
     elementIdentifier: 20
     componentElementIdentifiers: 0000000001000000
+    intValue0: 1
   - type: 0
     elementIdentifier: 21
     componentElementIdentifiers: 0200000003000000
+    intValue0: 1
   - type: 10
     elementIdentifier: 22
     componentElementIdentifiers: 10000000110000001200000013000000
+    intValue0: 0
   directInput:
     description: My-Power CO., LTD PS2 adapter
     matchingCriteria:
@@ -264,6 +290,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -287,6 +314,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -310,6 +338,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -333,6 +362,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -663,6 +693,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .100000001
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -686,6 +717,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .100000001
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -709,6 +741,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .100000001
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -732,6 +765,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .100000001
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -1061,6 +1095,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .100000001
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -1084,6 +1119,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .100000001
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -1107,6 +1143,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .100000001
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -1130,6 +1167,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .100000001
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -1460,6 +1498,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1484,6 +1523,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1508,6 +1548,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1532,6 +1573,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1878,6 +1920,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -1902,6 +1945,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -1926,6 +1970,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -1950,6 +1995,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -2327,6 +2373,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2350,6 +2397,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2373,6 +2421,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2396,6 +2445,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2726,6 +2776,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -2749,6 +2800,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -2772,6 +2824,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -2795,6 +2848,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -3124,6 +3178,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -3147,6 +3202,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -3170,6 +3226,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -3193,6 +3250,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -3523,6 +3581,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -3544,6 +3603,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -3565,6 +3625,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -3586,6 +3647,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -3883,6 +3945,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -3904,6 +3967,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -3925,6 +3989,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -3946,6 +4011,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -4244,6 +4310,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -4265,6 +4332,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -4286,6 +4354,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -4307,6 +4376,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -4604,6 +4674,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -4625,6 +4696,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -4646,6 +4718,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -4667,6 +4740,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .25
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -4963,6 +5037,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -4984,6 +5059,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -5005,6 +5081,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 0
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -5026,6 +5103,7 @@ MonoBehaviour:
           sourceAxisRange: 0
           invert: 1
           axisDeadZone: .25
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -5328,6 +5406,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -5349,6 +5428,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -5370,6 +5450,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -5391,6 +5472,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -5816,6 +5898,7 @@ MonoBehaviour:
           invert: 0
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -5837,6 +5920,7 @@ MonoBehaviour:
           invert: 1
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -5858,6 +5942,7 @@ MonoBehaviour:
           invert: 0
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -5879,6 +5964,7 @@ MonoBehaviour:
           invert: 1
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -6274,26 +6360,6 @@ MonoBehaviour:
           buttonInfo:
             _excludeFromPolling: 0
             _isPressureSensitive: 0
-  fallback_WindowsUWP:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
-    variants: []
   fallback_OSX:
     description: Insten PS2 adapter
     matchingCriteria:
@@ -6324,6 +6390,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -6345,6 +6412,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -6366,6 +6434,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -6387,6 +6456,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -6812,6 +6882,7 @@ MonoBehaviour:
           invert: 0
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -6833,6 +6904,7 @@ MonoBehaviour:
           invert: 1
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -6854,6 +6926,7 @@ MonoBehaviour:
           invert: 0
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -6875,6 +6948,7 @@ MonoBehaviour:
           invert: 1
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -7300,6 +7374,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -7321,6 +7396,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -7342,6 +7418,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -7363,6 +7440,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -7788,6 +7866,7 @@ MonoBehaviour:
           invert: 0
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -7809,6 +7888,7 @@ MonoBehaviour:
           invert: 1
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -7830,6 +7910,7 @@ MonoBehaviour:
           invert: 0
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -7851,6 +7932,7 @@ MonoBehaviour:
           invert: 1
           sourceAxisRange: 0
           buttonAxisContribution: 0
+          axisUpperDeadZone: 0
           calibrateAxis: 0
           axisZero: 0
           axisMin: 0
@@ -8296,6 +8378,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -8317,6 +8400,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -8338,6 +8422,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -8359,6 +8444,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -8775,46 +8861,6 @@ MonoBehaviour:
       axes: []
       buttons: []
     variants: []
-  fallback_XBoxOne:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
-    variants: []
-  fallback_PS4:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
-    variants: []
   ps5:
     description: 
     matchingCriteria:
@@ -8829,46 +8875,6 @@ MonoBehaviour:
       axes: []
       buttons: []
     controllerName: 
-    variants: []
-  fallback_PSM:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
-    variants: []
-  fallback_PSVita:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
     variants: []
   fallback_AmazonFireTV:
     description: 
@@ -8969,6 +8975,20 @@ MonoBehaviour:
       axes: []
       buttons: []
     variants: []
+  nintendoSwitch2:
+    description: 
+    matchingCriteria:
+      axisCount: 0
+      buttonCount: 0
+      disabled: 0
+      tag: 
+      alwaysMatch: 0
+      productName_useRegex: 0
+      productName: []
+    elements:
+      axes: []
+      buttons: []
+    variants: []
   internalDriver:
     description: 
     matchingCriteria:
@@ -8985,62 +9005,386 @@ MonoBehaviour:
       axes: []
       buttons: []
     variants: []
-  sdl2_Linux:
+  sdl:
     description: 
     matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
+      axisCount: -1
+      buttonCount: -1
       disabled: 0
       tag: 
-      hatCount: 0
-      manufacturer_useRegex: 0
-      productName_useRegex: 0
-      systemName_useRegex: 0
-      manufacturer: []
-      productName: []
-      systemName: []
+      hatCount: -1
+      productName_useRegex: 1
+      productName:
+      - ".*dual[ ]*shock[\xAE ]*2.*"
+      - .*ps[ ]*2.*
+      - .*playstation[ \(\)R]*2.*
       productGUID: []
+      alternateElementCounts: []
+      platforms: 
+      excludedPlatforms: 
+      deviceType: 2
+      vidPid:
+      - vendorId: 2064
+        productId: 1
     elements:
-      axes: []
-      buttons: []
-    variants: []
-  sdl2_Windows:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      hatCount: 0
-      manufacturer_useRegex: 0
-      productName_useRegex: 0
-      systemName_useRegex: 0
-      manufacturer: []
-      productName: []
-      systemName: []
-      productGUID: []
-    elements:
-      axes: []
-      buttons: []
-    variants: []
-  sdl2_OSX:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      hatCount: 0
-      manufacturer_useRegex: 0
-      productName_useRegex: 0
-      systemName_useRegex: 0
-      manufacturer: []
-      productName: []
-      systemName: []
-      productGUID: []
-    elements:
-      axes: []
-      buttons: []
+      axes:
+      - elementIdentifier: 0
+        sourceType: 1
+        sourceAxis: 0
+        sourceAxisRange: 0
+        invert: 0
+        axisDeadZone: .200000003
+        axisUpperDeadZone: 0
+        calibrateAxis: 0
+        axisZero: 0
+        axisMin: 0
+        axisMax: 0
+        alternateCalibrations: []
+        axisInfo:
+          _dataFormat: 0
+          _excludeFromPolling: 0
+          _specialAxisType: 0
+          _pollingDeadZone: -1
+        sourceButton: 0
+        buttonAxisContribution: 0
+        sourceHat: 0
+        sourceHatDirection: 0
+        sourceHatRange: 0
+      - elementIdentifier: 1
+        sourceType: 1
+        sourceAxis: 1
+        sourceAxisRange: 0
+        invert: 1
+        axisDeadZone: .200000003
+        axisUpperDeadZone: 0
+        calibrateAxis: 0
+        axisZero: 0
+        axisMin: 0
+        axisMax: 0
+        alternateCalibrations: []
+        axisInfo:
+          _dataFormat: 0
+          _excludeFromPolling: 0
+          _specialAxisType: 0
+          _pollingDeadZone: -1
+        sourceButton: 0
+        buttonAxisContribution: 0
+        sourceHat: 0
+        sourceHatDirection: 0
+        sourceHatRange: 0
+      - elementIdentifier: 2
+        sourceType: 1
+        sourceAxis: 2
+        sourceAxisRange: 0
+        invert: 0
+        axisDeadZone: .200000003
+        axisUpperDeadZone: 0
+        calibrateAxis: 0
+        axisZero: 0
+        axisMin: 0
+        axisMax: 0
+        alternateCalibrations: []
+        axisInfo:
+          _dataFormat: 0
+          _excludeFromPolling: 0
+          _specialAxisType: 0
+          _pollingDeadZone: -1
+        sourceButton: 0
+        buttonAxisContribution: 0
+        sourceHat: 0
+        sourceHatDirection: 0
+        sourceHatRange: 0
+      - elementIdentifier: 3
+        sourceType: 1
+        sourceAxis: 3
+        sourceAxisRange: 0
+        invert: 1
+        axisDeadZone: .200000003
+        axisUpperDeadZone: 0
+        calibrateAxis: 0
+        axisZero: 0
+        axisMin: 0
+        axisMax: 0
+        alternateCalibrations: []
+        axisInfo:
+          _dataFormat: 0
+          _excludeFromPolling: 0
+          _specialAxisType: 0
+          _pollingDeadZone: -1
+        sourceButton: 0
+        buttonAxisContribution: 0
+        sourceHat: 0
+        sourceHatDirection: 0
+        sourceHatRange: 0
+      - elementIdentifier: 9
+        sourceType: 1
+        sourceAxis: 4
+        sourceAxisRange: 1
+        invert: 0
+        axisDeadZone: .0500000007
+        axisUpperDeadZone: 0
+        calibrateAxis: 0
+        axisZero: 0
+        axisMin: 0
+        axisMax: 0
+        alternateCalibrations: []
+        axisInfo:
+          _dataFormat: 0
+          _excludeFromPolling: 0
+          _specialAxisType: 0
+          _pollingDeadZone: -1
+        sourceButton: 0
+        buttonAxisContribution: 0
+        sourceHat: 0
+        sourceHatDirection: 0
+        sourceHatRange: 0
+      - elementIdentifier: 11
+        sourceType: 1
+        sourceAxis: 5
+        sourceAxisRange: 1
+        invert: 0
+        axisDeadZone: .0500000007
+        axisUpperDeadZone: 0
+        calibrateAxis: 0
+        axisZero: 0
+        axisMin: 0
+        axisMax: 0
+        alternateCalibrations: []
+        axisInfo:
+          _dataFormat: 0
+          _excludeFromPolling: 0
+          _specialAxisType: 0
+          _pollingDeadZone: -1
+        sourceButton: 0
+        buttonAxisContribution: 0
+        sourceHat: 0
+        sourceHatDirection: 0
+        sourceHatRange: 0
+      buttons:
+      - elementIdentifier: 4
+        sourceType: 0
+        sourceButton: 0
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 5
+        sourceType: 0
+        sourceButton: 1
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 6
+        sourceType: 0
+        sourceButton: 2
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 7
+        sourceType: 0
+        sourceButton: 3
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 8
+        sourceType: 0
+        sourceButton: 9
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 10
+        sourceType: 0
+        sourceButton: 10
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 12
+        sourceType: 0
+        sourceButton: 4
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 13
+        sourceType: 0
+        sourceButton: 6
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 14
+        sourceType: 0
+        sourceButton: 7
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 15
+        sourceType: 0
+        sourceButton: 8
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 16
+        sourceType: 0
+        sourceButton: 11
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 17
+        sourceType: 0
+        sourceButton: 14
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 18
+        sourceType: 0
+        sourceButton: 12
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
+      - elementIdentifier: 19
+        sourceType: 0
+        sourceButton: 13
+        sourceAxis: 0
+        sourceAxisPole: 0
+        axisDeadZone: 0
+        sourceHat: 0
+        sourceHatType: 0
+        sourceHatDirection: 0
+        requireMultipleButtons: 0
+        requiredButtons: 
+        ignoreIfButtonsActive: 0
+        ignoreIfButtonsActiveButtons: 
+        buttonInfo:
+          _excludeFromPolling: 0
+          _isPressureSensitive: 0
     variants: []
   appleGCController:
     description: 
@@ -9061,5 +9405,25 @@ MonoBehaviour:
       buttons: []
       compoundElements: []
     controllerName: 
+    variants: []
+  unityInputSystem:
+    description: 
+    matchingCriteria:
+      axisCount: 0
+      buttonCount: 0
+      disabled: 0
+      tag: 
+      alwaysMatch: 0
+      alternateElementCounts: []
+      platforms: 
+      excludedPlatforms: 
+      deviceType: 0
+      tags: []
+      productName_useRegex: 0
+      productName: []
+      vidPid: []
+    elements:
+      axes: []
+      buttons: []
     variants: []
   elementIdentifierIdCounter: 23

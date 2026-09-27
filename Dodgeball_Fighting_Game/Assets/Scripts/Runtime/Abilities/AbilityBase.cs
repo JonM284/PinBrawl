@@ -95,6 +95,8 @@ namespace Runtime.Abilities
 
         public AudioSource aSource => CommonUtils.GetRequiredComponent(ref m_audioSource,  GetComponent<AudioSource>);
 
+        private SemaphoreSlim abilityChargeLock = new SemaphoreSlim(0, 1);
+
         #endregion
         
         /// <summary>
@@ -289,7 +291,12 @@ namespace Runtime.Abilities
         protected async UniTask ChargeAbilityAutoAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-
+            
+            if (isCharging)
+            {
+                return;
+            }
+            
             isCharging = true;
             chargeTimeCurrent = 0f;
             
@@ -299,14 +306,17 @@ namespace Runtime.Abilities
                 chargePercentage = Mathf.Clamp01(chargeTimeCurrent / chargeTimeMax);
                 ShowAttackIndicator(isCharging);
                 await UniTask.Yield(PlayerLoopTiming.LastUpdate, token);
-                if (isCharging && !(chargeTimeCurrent >= chargeTimeMax)) continue;
-                
+                if (!(chargeTimeCurrent >= chargeTimeMax)) continue;
                 isCharging = false;
-                chargeTimeCurrent = chargeTimeMax;
                 break;
             }
             
+            chargeTimeCurrent = chargeTimeMax;
+            Debug.Log("Charge Ended");
+            
+            ReleaseAbilityCharge();
             DoAbilityAsync(token).Forget();
+            if(abilityData.isHaltMovement) currentOwner.ResetCharacterMovementSpeed();
         }
         
         /// <summary>

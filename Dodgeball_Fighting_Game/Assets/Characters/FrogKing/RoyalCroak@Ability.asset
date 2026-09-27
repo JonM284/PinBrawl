@@ -22,10 +22,10 @@ MonoBehaviour:
   abilityScale: 5
   isUltimateAbility: 1
   isHaltMovement: 1
-  activationType: 3
+  activationType: 2
   abilityActivationWaitTimeMax: 2
   reactivationTime: 1
-  isForwardKnockBack: 1
+  KnockbackDirectionType: 1
   ballHitStrengthType: 3
   collisionDetectionLayers:
     serializedVersion: 2

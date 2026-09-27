@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using GameControllers;
 using Project.Scripts.Utils;
 using Runtime.Character;
 using Runtime.GameControllers;
@@ -122,6 +124,7 @@ namespace Runtime.Gameplay
         [SerializeField] private Gradient m_buntGradient;
         
         [SerializeField] private VFXPlayer m_heavyWackVFX;
+        [SerializeField] private VFXPlayer m_wallBounceVFX;
 
         [Header("Wack Charge visuals")]
         [SerializeField] private GameObject m_aimRotator;
@@ -185,7 +188,7 @@ namespace Runtime.Gameplay
 
         public float minSpeed => m_ballMinSpeed;
 
-        public bool isFastBall => m_trackedSpeed >= m_ballHeavyHit;
+        public bool isFastBall => m_trackedSpeed >= m_ballMaxSpeed / 3f;
 
         public bool isSemiFastBall => m_trackedSpeed >= m_ballMediumHit;
 
@@ -245,7 +248,7 @@ namespace Runtime.Gameplay
 
         #region Class Implementation
 
-        public void Initialize(Vector3 _minPosition, Vector3 _maxPosition)
+        public async UniTask Initialize(Vector3 _minPosition, Vector3 _maxPosition)
         {
             m_stageMinPosition = _minPosition;
             m_stageMaxPosition = _maxPosition;
@@ -329,6 +332,7 @@ namespace Runtime.Gameplay
             m_currentScale = 1;
             m_trackedSpeed = m_ballMinSpeed;
             m_ballVisualsParent.transform.localScale = Vector3.one * m_currentScale;
+            m_ballVisualsParent.transform.localRotation = Quaternion.Euler(Vector3.zero);
             m_trail.startWidth = m_currentScale/2;
             cc.radius = m_charConOriginalSize;
         }
@@ -374,6 +378,7 @@ namespace Runtime.Gameplay
 
         private void ReflectBall()
         {
+            PlayWallBounceVFX();
             PlayWallHitSFX();
             
             ChangeBallDirection(Vector3.Reflect(m_ballMoveDirection, m_currentWallBounceNormal));
@@ -392,7 +397,7 @@ namespace Runtime.Gameplay
 
             m_ballChargeImg.fillAmount = 0;
             
-            ballChargeVFX.ChangeAllStartColor(_baseCharacter.playerColor);
+            //ballChargeVFX.ChangeAllStartColor(_baseCharacter.playerColor);
             ballChargeVFX.gameObject.SetActive(_isBuildingUp);
             
             if (_isBuildingUp && !m_heavyWackVFX.IsNull() && isSemiFastBall)
@@ -410,9 +415,9 @@ namespace Runtime.Gameplay
             {
                 return;
             }
-            Debug.Log("Changing Size");
+
             m_currentScale = Mathf.Clamp(m_currentScale + m_ballScaleModRate, 1, m_ballScaleMaxSize);
-            m_ballVisualsParent.transform.localScale = Vector3.one * m_currentScale;
+            m_ballVisualsParent.transform.localScale = new Vector3(m_currentScale * 0.8f, m_currentScale, m_currentScale);
             damageableDetectionSensor.SetColliderRadius(playerCheckRadius * m_currentScale);
             cc.radius = m_charConOriginalSize * m_currentScale;
             m_trail.startWidth = m_currentScale/2;
@@ -470,6 +475,10 @@ namespace Runtime.Gameplay
         {
             m_ballMoveDirection = direction.FlattenVector3Y();
             FindNextWallHitPoint(m_ballMoveDirection);
+            if (isFastBall)
+            {
+                m_ballVisualsParent.transform.forward = direction;
+            }
         }
 
         private void PlayHitBallSFX()
@@ -493,7 +502,21 @@ namespace Runtime.Gameplay
             bSource.pitch = Random.Range(0.8f, 1.2f);
             bSource.PlayOneShot(m_wallHitSFX[Random.Range(0, m_wallHitSFX.Count)]);
         }
-        
+
+        private void PlayWallBounceVFX()
+        {
+            if (m_wallBounceVFX.IsNull())
+            {
+                return;
+            }
+
+            if (isFastBall)
+            {
+                JuiceGameController.Instance.DoCameraShake(0.05f, 0.03f, 10, 90);
+            }
+            
+            VFXController.Instance.PlayAt(m_wallBounceVFX, m_currentBallBouncePosition, m_currentWallBounceNormal);
+        }
         
         private void BuntBall(BaseCharacter _currentBuntingCharacter)
         {
@@ -524,7 +547,7 @@ namespace Runtime.Gameplay
             m_ballAimImg.color = _newColor;
             m_ballChargeImg.color = _newColor;
         }
-
+        
         private void ChangeGradient(Gradient newGradient)
         {
             m_trail.colorGradient =  newGradient;
@@ -586,6 +609,11 @@ namespace Runtime.Gameplay
             }
             
             m_recentlyHitCharacters.RemoveAt(0);
+        }
+
+        public void ResetCurrentBallScaleEven()
+        {
+            m_ballVisualsParent.transform.localScale = Vector3.one * m_currentScale;
         }
 
         //Use this is wanting to do lethal league style ball bounce

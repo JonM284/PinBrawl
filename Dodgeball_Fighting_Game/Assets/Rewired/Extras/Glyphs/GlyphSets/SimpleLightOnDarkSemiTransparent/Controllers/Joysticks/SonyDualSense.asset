@@ -64,9 +64,9 @@ MonoBehaviour:
     _value: {fileID: 21300086, guid: 6c9322b3077ead5458fdad1c7e9227b5, type: 3}
   - _key: mute
     _value: {fileID: 21300090, guid: 6c9322b3077ead5458fdad1c7e9227b5, type: 3}
-  - _key: left_stick/button
+  - _key: l3
     _value: {fileID: 21300054, guid: 6c9322b3077ead5458fdad1c7e9227b5, type: 3}
-  - _key: right_stick/button
+  - _key: r3
     _value: {fileID: 21300070, guid: 6c9322b3077ead5458fdad1c7e9227b5, type: 3}
   - _key: dpad/up
     _value: {fileID: 21300032, guid: 6c9322b3077ead5458fdad1c7e9227b5, type: 3}

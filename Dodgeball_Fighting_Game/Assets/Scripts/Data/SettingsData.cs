@@ -41,5 +41,7 @@ namespace Data
         
         public float hitBallBuildUpStartDelay = 0.2f;
 
+        public int hitBuildUpWaitTimeMS = 150;
+
     }
 }

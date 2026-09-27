@@ -1,5 +1,14 @@
 ﻿// Copyright (c) 2024 Augie R. Maddox, Guavaman Enterprises. All rights reserved.
 
+/////////////////////////////////////////////////
+// For Text Mesh Pro Sprite Asset v1.1.0+
+#define SUPPORTS_AT_LEAST_TMPRO_ASSET_V_1_1_0
+/////////////////////////////////////////////////
+
+#if UNITY_6000_5_OR_NEWER || UNITY_6000_5 || UNITY_6000_6 || UNITY_6000_7 || UNITY_6000_8 || UNITY_6000_9 || UNITY_7000 || UNITY_8000 || UNITY_9000
+#define UNITY_6000_5_PLUS
+#endif
+
 #if UNITY_2020 || UNITY_2021 || UNITY_2022 || UNITY_2023 || UNITY_6000 || UNITY_6000_0_OR_NEWER
 #define UNITY_2020_PLUS
 #endif
@@ -27,7 +36,7 @@
 #define MAY_SUPPORT_TMPRO_ASSET_V_1_1_0
 #endif
 
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_6000_0_OR_NEWER && !SUPPORTS_AT_LEAST_TMPRO_ASSET_V_1_1_0
 // This Unity version is guaranteed to support at least Unity UI 2.0,
 // which uses asset version 1.1.0. Avoid most of the reflection nonsense.
 // However, some reflection is still required because
@@ -42,6 +51,7 @@
 namespace Rewired.Glyphs.UnityUI {
     using System.Reflection;
     using Rewired;
+    using Rewired.Glyphs;
     using System;
     using System.Text;
     using System.Collections.Generic;
@@ -120,6 +130,10 @@ namespace Rewired.Glyphs.UnityUI {
         private bool _rebuildRequired;
         [NonSerialized]
         private UnityEngine.Texture2D _stubTexture;
+        [NonSerialized]
+        private RewiredElementResultSelectionHandler _rewiredElementResultSelectionHandler;
+        [NonSerialized]
+        private RewiredElementResult2DSelectionHandler _rewiredElementResult2dSelectionHandler;
 
         private Tag.Pool<ControllerElementTag> __controllerElementTagPool;
         private Tag.Pool<ControllerElementTag> controllerElementTagPool {
@@ -154,6 +168,17 @@ namespace Rewired.Glyphs.UnityUI {
             }
         }
 
+        [NonSerialized]
+        private RewiredElementHelper __rewiredElementHelper;
+        private RewiredElementHelper rewiredElementHelper {
+            get {
+                if (__rewiredElementHelper == null) {
+                    __rewiredElementHelper = new RewiredElementHelper();
+                }
+                return __rewiredElementHelper;
+            }
+        }
+
         /// <summary>
         /// Text will be parsed for special tags, and the final result will be passed on to the Text Mesh Pro Text component.
         /// </summary>
@@ -164,12 +189,17 @@ namespace Rewired.Glyphs.UnityUI {
         ///   Display glyph / text for a controller element bound to an Action for a Player:
         ///   <rewiredElement [attributes]>
         ///   Attributes:
-        ///     type="[glyphOrText|glyph|text]" (optional, default: glyphOrText)
+        ///     type="[glyphOrText|gt|glyph|g|text|t]" (optional, default: glyphOrText)
         ///     playerId=[player_id] (id or name required)
         ///     playerName="[player_name]" (id or name required)
         ///     actionId=[action_id] (id or name required)
+        ///     actionId2=[action_id_2] (optional)
         ///     actionName="[action_name]" (id or name required)
-        ///     actionRange="[full|positive|negative]" (optional, default: full)
+        ///     actionName2="[action_name_2]" (optional)
+        ///     actionRange="[full|f|positive|pos|p|+|negative|neg|n|-]" (optional, default: full)
+        ///     firstPole="[positive|pos|p|+|negative|neg|n|-]" (optional, default: negative)
+        ///     action2FirstPole="[positive|pos|p|+|negative|neg|n|-]" (optional, default: [value of firstPole])
+        ///     resultIndex=[result_index] (optional, default: 0)
         ///   Example: <rewiredElement type="glyphOrText" playerId=5 actionName="MoveHorizontal" actionRange="full">
         ///
         ///   Display the name of an Action:
@@ -177,7 +207,7 @@ namespace Rewired.Glyphs.UnityUI {
         ///   Attributes:
         ///     id=[action_id] (id or name required)
         ///     name=[action_name] (id or name required)
-        ///     range="[full|positive|negative]" (optional, default: full)
+        ///     range="[full|f|positive|pos|p|+|negative|neg|n|-]" (optional, default: full)
         ///   Example: <rewiredAction name="MoveHorizontal" range="positive">
         ///
         ///   Display the name of a Player:
@@ -310,24 +340,95 @@ namespace Rewired.Glyphs.UnityUI {
             }
         }
 
+        /// <summary>
+        /// Allows you to filter which Action Element Maps are displayed by the rewiredElement tag.
+        /// When searching for mappings in the Player, the handler will be invoked for each Action Element Map found.
+        /// This allows you to, for example, allow only Action Element Maps belonging to a Controller Map in particular Map Category.
+        /// <see cref="Rewired.ActionElementMap"/> for properties which can be used as filtering criteria.
+        /// IMPORTANT: By setting this value, you are taking over the responsibility for filtering mappings results entirely. The default
+        /// filter removes disabled Action Element Maps and mappings in disabled Controller Maps. Disabled mappings are no longer removed
+        /// when this handler is overriden with your own, so you must check the enabled states if you want to exclude these mappings.
+        /// Note: This handler overrides any handler set in <see cref="ControllerElementGlyphSelectorOptions.isActionElementMapAllowedHandler"/>.
+        /// </summary>
+        public virtual IsRewiredElementAllowedHandler isRewiredElementAllowedHandler {
+            get {
+                return rewiredElementHelper.isAllowedHandler;
+            }
+            set {
+                rewiredElementHelper.isAllowedHandler = value;
+            }
+        }
+
+        /// <summary>
+        /// Allows you to evaluate all the results and decide which to display for the rewiredElement tag.
+        /// This only works for single Actions. If combining two Actions, use <see cref="rewiredElementResult2dSelectionHandler"/> instead.
+        /// After searching for mappings in the Player and collecting all possible results, the handler will be invoked.
+        /// This can be used, for example, to display the second result found instead of the first.
+        /// It could also be used to choose results from any user-defined criteria such as controller type, controller map cateogry, etc.
+        /// <see cref="Rewired.ActionElementMap"/> for properties which can be used as selection criteria.
+        /// 
+        /// The list contains all results from the search of Action Element Maps given a particular Action Range.
+        /// Each result can contain either one or two Action Element Maps.
+        /// The number of Action Element Maps returned depends on the Action Range used for the search and the bindings found.
+        /// For a full Action Range search, if a full-axis binding is found, it will be returned in the <see cref="a"/> field.
+        /// If negative and positive split-axis bindings are found instead, at least one Action Element Map will be returned
+        /// in the <see cref="a"/> (negative) or <see cref="b"/> (positive) field.
+        /// For a positive/negative Action Range search, a single Action Element Map will be returned in the <see cref="a"/> field.
+        /// </summary>
+        public virtual RewiredElementResultSelectionHandler rewiredElementResultSelectionHandler {
+            get {
+                return _rewiredElementResultSelectionHandler;
+            }
+            set {
+                _rewiredElementResultSelectionHandler = value;
+            }
+        }
+
+        /// <summary>
+        /// Allows you to evaluate all the results and decide which to display for the rewiredElement tag for two Actions.
+        /// This only works if combining two Actions. If using a single Action, use <see cref="rewiredElementResultSelectionHandler"/> instead.
+        /// After searching for mappings in the Player and collecting all possible results, the handler will be invoked.
+        /// This can be used, for example, to display the second result found instead of the first.
+        /// It could also be used to choose results from any user-defined criteria such as controller type, controller map cateogry, etc.
+        /// <see cref="Rewired.ActionElementMap"/> for properties which can be used as selection criteria.
+        /// 
+        /// The list contains all results from the search of Action Element Maps.
+        /// Each result can contain one result for each Action.
+        /// Each Action result can contain either one or two Action Element Maps.
+        /// The number of Action Element Maps returned depends on the bindings found.
+        /// If a full-axis binding is found, it will be returned in the <see cref="a"/> field.
+        /// If negative and positive split-axis bindings are found instead, at least one Action Element Map will be returned
+        /// in the <see cref="a"/> (negative) or <see cref="b"/> (positive) field.
+        /// </summary>
+        public virtual RewiredElementResult2DSelectionHandler rewiredElementResult2dSelectionHandler {
+            get {
+                return _rewiredElementResult2dSelectionHandler;
+            }
+            set {
+                _rewiredElementResult2dSelectionHandler = value;
+            }
+        }
+
+        protected virtual void Awake() {
+            Rewired.ReInput.InitializedEvent += OnRewiredInitialized;
+        }
+
         protected virtual void OnEnable() {
             Initialize();
         }
 
         protected virtual void Start() {
-            MainUpdate();
+            if (_initialized) {
+                MainUpdate();
+            }
         }
 
         protected virtual void Update() {
-            if (!ReInput.isReady) return;
+            if (!Rewired.ReInput.isReady) return;
 
 #if UNITY_EDITOR
             // Handle recompile in Play mode
             if (!Initialize()) return;
-            
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.M)) {
-                this.baseSpriteMaterial = _baseSpriteMaterial;
-            }
 
             // Handle inspector value changes
             if (_editorInspectorChanged) {
@@ -340,10 +441,69 @@ namespace Rewired.Glyphs.UnityUI {
             }
 #endif
 
-            MainUpdate();
+            if (_initialized) {
+                MainUpdate();
+            }
         }
 
         protected virtual void OnDestroy() {
+            Deinitialize();
+            Rewired.ReInput.InitializedEvent -= OnRewiredInitialized;
+        }
+
+#if UNITY_EDITOR
+
+        [NonSerialized]
+        private bool _editorInspectorChanged;
+
+        protected virtual void OnValidate() {
+            _editorInspectorChanged = true;
+        }
+
+#endif
+
+        /// <summary>
+        /// Updates glyphs / text and TMPro text value immedately.
+        /// Normally, this happens automatically in the Update loop.
+        /// </summary>
+        public virtual void ForceUpdate() {
+            if (!Rewired.ReInput.isReady) return;
+            _rebuildRequired = true;
+            Update();
+        }
+
+        /// <summary>
+        /// Gets the Controller Element Glyph Options if set, otherwise the default options.
+        /// </summary>
+        /// <returns>The Controller Element Glyph Options if set, otherwise the default options.</returns>
+        protected virtual ControllerElementGlyphSelectorOptions GetOptionsOrDefault() {
+            if (_options != null && _options.options == null) {
+                UnityEngine.Debug.LogError("Rewired: Options missing on " + typeof(ControllerElementGlyphSelectorOptions).Name + ". Global default options will be used instead.");
+                return ControllerElementGlyphSelectorOptions.defaultOptions;
+            }
+            return _options != null ? _options.options : ControllerElementGlyphSelectorOptions.defaultOptions;
+        }
+
+        private bool Initialize() {
+            if (_initialized) return true;
+#if UNITY_EDITOR
+            if (UnityEditor.EditorApplication.isCompiling) return false;
+#endif
+            _tmProText = GetComponent<TMPro.TextMeshProUGUI>();
+            _stubTexture = new UnityEngine.Texture2D(1, 1);
+            CreatePrimaryAsset();
+            if (Rewired.ReInput.isReady) {
+                // Don't fail if ReInput isn't initialized.
+                // Glyphs reset event will reinitialize this when it is ready.
+                Rewired.ReInput.glyphs.ReloadedEvent += OnGlyphsReloaded;
+            }
+            _initialized = true;
+            return true;
+        }
+
+        private void Deinitialize() {
+            if (!_initialized) return;
+
             // Clean up all assets
             if (_primaryAsset != null) {
                 if (_tmProText != null) {
@@ -371,51 +531,34 @@ namespace Rewired.Glyphs.UnityUI {
             for (int i = 0; i < _currentTags.Count; i++) {
                 _currentTags[i].ReturnToPool();
             }
-        }
-
-#if UNITY_EDITOR
-
-        [NonSerialized]
-        private bool _editorInspectorChanged;
-
-        protected virtual void OnValidate() {
-            _editorInspectorChanged = true;
-        }
-
-#endif
-
-        /// <summary>
-        /// Updates glyphs / text and TMPro text value immedately.
-        /// Normally, this happens automatically in the Update loop.
-        /// </summary>
-        public virtual void ForceUpdate() {
-            if (!ReInput.isReady) return;
-            _rebuildRequired = true;
-            Update();
-        }
-
-        /// <summary>
-        /// Gets the Controller Element Glyph Options if set, otherwise the default options.
-        /// </summary>
-        /// <returns>The Controller Element Glyph Options if set, otherwise the default options.</returns>
-        protected virtual ControllerElementGlyphSelectorOptions GetOptionsOrDefault() {
-            if (_options != null && _options.options == null) {
-                UnityEngine.Debug.LogError("Rewired: Options missing on " + typeof(ControllerElementGlyphSelectorOptions).Name + ". Global default options will be used instead.");
-                return ControllerElementGlyphSelectorOptions.defaultOptions;
+            _dirtyAssets.Clear();
+            _glyphsOrTextTemp.Clear();
+            _currentlyUsedAssets.Clear();
+            Tag.Clear(_currentTags);
+            if (Rewired.ReInput.isReady) {
+                Rewired.ReInput.glyphs.ReloadedEvent -= OnGlyphsReloaded;
             }
-            return _options != null ? _options.options : ControllerElementGlyphSelectorOptions.defaultOptions;
+            _initialized = false;
         }
 
-        private bool Initialize() {
-            if (_initialized) return true;
-#if UNITY_EDITOR
-            if (UnityEditor.EditorApplication.isCompiling) return false;
-#endif
-            _tmProText = GetComponent<TMPro.TextMeshProUGUI>();
-            _stubTexture = new UnityEngine.Texture2D(1, 1);
-            CreatePrimaryAsset();
-            _initialized = true;
-            return true;
+        private void OnRewiredInitialized() {
+            // Subscribe to glyph reload event in new ReInput session.
+            // No need to reset here because glyph reset event
+            // will be called immediately afterwards.
+            Rewired.ReInput.glyphs.ReloadedEvent -= OnGlyphsReloaded;
+            Rewired.ReInput.glyphs.ReloadedEvent += OnGlyphsReloaded;
+        }
+
+        private void OnGlyphsReloaded() {
+            Deinitialize();
+            Initialize();
+            // Force update immediately, otherwise TMP sprites will not update correctly,
+            // resulting in ? icons until _tmProText.havePropertiesChanged is called on the next frame.
+            // This happens when Rewired Input Manager is disabled, the glyph set is changed, then the RIM is enabled.
+            _rebuildRequired = true;
+            if (_initialized && isActiveAndEnabled) {
+                MainUpdate();
+            }
         }
 
         private void MainUpdate() {
@@ -437,7 +580,7 @@ namespace Rewired.Glyphs.UnityUI {
                                 // Monitor controller element glyph changes
                                 ControllerElementTag tTag = (ControllerElementTag)tag;
                                 _glyphsOrTextTemp.Clear();
-                                TryGetControllerElementGlyphsOrText((ControllerElementTag)tag, _glyphsOrTextTemp);
+                                TryGetControllerElementGlyphsOrText((ControllerElementTag)tag, i, _glyphsOrTextTemp);
                                 if (!IsEqual(_glyphsOrTextTemp, tTag.glyphsOrText)) {
                                     changed = true;
                                     break;
@@ -478,12 +621,16 @@ namespace Rewired.Glyphs.UnityUI {
                 changed = true;
             }
 
+            bool rebuild = _rebuildRequired;
+
             // Update text on change
-            if (changed || _rebuildRequired) {
+            if (changed || rebuild) {
                 // Parse text and replace Rewired tags with TMPro sprite tags
                 string newText;
                 if (ParseText(_textPrev, out newText)) {
                     _tmProText.text = newText;
+                } else {
+                    _tmProText.text = _text;
                 }
             }
 
@@ -493,16 +640,22 @@ namespace Rewired.Glyphs.UnityUI {
                 if (count > 0) {
                     for (int i = 0; i < count; i++) {
                         _dirtyAssets[i].spriteAsset.UpdateLookupTables();
+                        rebuild = true;
                     }
                     _dirtyAssets.Clear();
                 }
+            }
+
+            if (rebuild) {
+                // Required under some circumstances for TMP sprites to update
+                _tmProText.havePropertiesChanged = true;
             }
         }
 
         private bool ParseText(string text, out string newText) {
             newText = null;
 
-            // Clear current tags and build new onesfrom the text
+            // Clear current tags and build new ones from the text
             Tag.Clear(_currentTags);
 
             // Clear list so used assets can be detected after parsing
@@ -612,7 +765,7 @@ namespace Rewired.Glyphs.UnityUI {
             // Replace text with glyph / text
 
             tag.glyphsOrText.Clear();
-            if (!TryGetControllerElementGlyphsOrText(tag, tag.glyphsOrText)) {
+            if (!TryGetControllerElementGlyphsOrText(tag, _currentTags.Count - 1, tag.glyphsOrText)) {
                 replacement = null;
                 return true;
             }
@@ -680,14 +833,26 @@ namespace Rewired.Glyphs.UnityUI {
             return !string.IsNullOrEmpty(result);
         }
 
-        private bool TryGetControllerElementGlyphsOrText(ControllerElementTag tag, List<GlyphOrText> results) {
+        private bool TryGetControllerElementGlyphsOrText(ControllerElementTag tag, int tagIndex, List<GlyphOrText> results) {
             if (tag == null) return false;
 
-            ActionElementMap aemResult1;
-            ActionElementMap aemResult2;
+            ActionElementMapPair result1;
+            ActionElementMapPair result2;
 
-            _tempAems.Clear();
-            if (!GlyphTools.TryGetActionElementMaps(tag.playerId, tag.actionId, tag.actionRange, GetOptionsOrDefault(), _tempAems, out aemResult1, out aemResult2)) {
+            if (!rewiredElementHelper.TryGetActionElementMaps(
+                tag.playerId,
+                tag.actionId,
+                tag.actionId2,
+                tag.actionRange,
+                tag.resultIndex,
+                GetOptionsOrDefault(),
+                _rewiredElementResultSelectionHandler,
+                _rewiredElementResult2dSelectionHandler,
+                out result1,
+                out result2,
+                tagIndex
+                )
+            ) {
                 return false;
             }
 
@@ -695,15 +860,20 @@ namespace Rewired.Glyphs.UnityUI {
             string glyphKey;
             string name;
 
-            // Two split axis bindings
-            if (aemResult1 != null && aemResult2 != null) {
-
+            // Action 2D Stick or full D-pad
+            if (tag.actionId >= 0 &&
+                tag.actionId2 >= 0 &&
+                tag.actionId != tag.actionId2 &&
+                (result1.Count > 0 || result2.Count > 0)
+            ) {
                 GlyphOrText r = new GlyphOrText();
 
-                // Handle special combined glyphs (D-Pad Left + D-Pad Right = D-Pad Horizontal)
                 _tempAems.Clear();
-                _tempAems.Add(aemResult1);
-                _tempAems.Add(aemResult2);
+                if (result1.a != null) _tempAems.Add(result1.a);
+                if (result1.b != null) _tempAems.Add(result1.b);
+                if (result2.a != null) _tempAems.Add(result2.a);
+                if (result2.b != null) _tempAems.Add(result2.b);
+
                 if (IsGlyphAllowed(tag.type) && ActionElementMap.TryGetCombinedElementIdentifierGlyph(_tempAems, out glyph) &&
                     ActionElementMap.TryGetCombinedElementIdentifierFinalGlyphKey(_tempAems, out glyphKey)) {
                     r.glyphKey = glyphKey;
@@ -719,13 +889,58 @@ namespace Rewired.Glyphs.UnityUI {
 
             bool result = false;
 
+            if (result1.Count > 0) result |= TryGetControllerElementGlyphsOrText(tag, result1, tag.action1FirstPole, _tempAems, _tempKeys, _tempGlyphs, results);
+            if (result2.Count > 0) result |= TryGetControllerElementGlyphsOrText(tag, result2, tag.action2FirstPole != (Pole)(-1) ? tag.action2FirstPole : tag.action1FirstPole, _tempAems, _tempKeys, _tempGlyphs, results);
+
+            return result;
+        }
+        private static bool TryGetControllerElementGlyphsOrText(ControllerElementTag tag, ActionElementMapPair aemPair, Pole firstPole, List<ActionElementMap> tempAems, List<string> tempKeys, List<UnityEngine.Sprite> tempGlyphs, List<GlyphOrText> results) {
+
+            object glyph;
+            string glyphKey;
+            string name;
+
+            // Two split axis bindings
+            if (aemPair.a != null && aemPair.b != null) {
+
+                GlyphOrText r = new GlyphOrText();
+
+                // Handle special combined glyphs (D-Pad Left + D-Pad Right = D-Pad Horizontal)
+                tempAems.Clear();
+                tempAems.Add(aemPair.a);
+                tempAems.Add(aemPair.b);
+                if (IsGlyphAllowed(tag.type) && ActionElementMap.TryGetCombinedElementIdentifierGlyph(tempAems, out glyph) &&
+                    ActionElementMap.TryGetCombinedElementIdentifierFinalGlyphKey(tempAems, out glyphKey)) {
+                    r.glyphKey = glyphKey;
+                    r.sprite = glyph as UnityEngine.Sprite;
+                    results.Add(r);
+                    return true;
+                } else if (IsTextAllowed(tag.type) && ActionElementMap.TryGetCombinedElementIdentifierName(tempAems, out name)) {
+                    r.name = name;
+                    results.Add(r);
+                    return true;
+                }
+            }
+
+            bool result = false;
+
             // Positive and negative bindings
-            _tempGlyphs.Clear();
-            _tempKeys.Clear();
-            result |= TryGetGlyphsOrText(aemResult1, tag.type, _tempGlyphs, _tempKeys, results);
-            _tempGlyphs.Clear();
-            _tempKeys.Clear();
-            result |= TryGetGlyphsOrText(aemResult2, tag.type, _tempGlyphs, _tempKeys, results);
+            ActionElementMap aem1;
+            ActionElementMap aem2;
+            if (firstPole == Pole.Negative) {
+                aem1 = aemPair.a;
+                aem2 = aemPair.b;
+            } else {
+                aem1 = aemPair.b;
+                aem2 = aemPair.a;
+            }
+
+            tempGlyphs.Clear();
+            tempKeys.Clear();
+            result |= TryGetGlyphsOrText(aem1, tag.type, tempGlyphs, tempKeys, results);
+            tempGlyphs.Clear();
+            tempKeys.Clear();
+            result |= TryGetGlyphsOrText(aem2, tag.type, tempGlyphs, tempKeys, results);
 
             return result;
         }
@@ -736,7 +951,7 @@ namespace Rewired.Glyphs.UnityUI {
                 return false;
             }
 
-            InputAction action = ReInput.mapping.GetAction(tag.actionId);
+            InputAction action = Rewired.ReInput.mapping.GetAction(tag.actionId);
             if (action == null) {
                 result = null;
                 return false;
@@ -755,7 +970,7 @@ namespace Rewired.Glyphs.UnityUI {
                 return false;
             }
 
-            var player = ReInput.players.GetPlayer(tag.playerId);
+            var player = Rewired.ReInput.players.GetPlayer(tag.playerId);
             if (player == null) {
                 result = null;
                 return false;
@@ -775,7 +990,7 @@ namespace Rewired.Glyphs.UnityUI {
 
             ITMProSpriteAsset spriteAsset = asset.spriteAsset;
 
-            if (!spriteAsset.Contains(key)) {
+            if (!spriteAsset.ContainsKey(key)) {
                 
                 UnityEngine.Rect rect = sprite.rect;
 
@@ -812,7 +1027,7 @@ namespace Rewired.Glyphs.UnityUI {
             _rebuildRequired = true;
         }
 
-        #region Sprite Assets
+#region Sprite Assets
 
         private void CreatePrimaryAsset() {
             if (_primaryAsset != null) return;
@@ -894,19 +1109,23 @@ namespace Rewired.Glyphs.UnityUI {
                 if (asset == null) continue;
                 if (!_currentlyUsedAssets.Contains(asset)) { // not used anymore
                     if (unusedAssetCount >= allowedUnusedAssetCount) { // no more extras allowed
-                        // Remove from primary sprite asset fallback list
-                        _primaryAsset.spriteAsset.GetSpriteAsset().fallbackSpriteAssets.Remove(asset.spriteAsset.GetSpriteAsset());
-                        // Clean up values when adding to pool
-                        asset.spriteAsset.spriteSheet = null;
-                        asset.spriteAsset.Clear();
-                        asset.material.SetTexture(TMPro.ShaderUtilities.ID_MainTex, _stubTexture); // set to stub  to prevent TMPro from throwing null reference exceptions
-                        _assetsPool.Add(asset); // add to pool
-                        _assignedAssets.RemoveAt(i); // remove from assigned assets
+                        RemoveAsset(asset);
                     } else {
                         unusedAssetCount += 1;
                     }
                 }
             }
+        }
+
+        private void RemoveAsset(Asset asset) {
+            // Remove from primary sprite asset fallback list
+            _primaryAsset.spriteAsset.GetSpriteAsset().fallbackSpriteAssets.Remove(asset.spriteAsset.GetSpriteAsset());
+            // Clean up values when adding to pool
+            asset.spriteAsset.spriteSheet = null;
+            asset.spriteAsset.Clear();
+            asset.material.SetTexture(TMPro.ShaderUtilities.ID_MainTex, _stubTexture); // set to stub  to prevent TMPro from throwing null reference exceptions
+            _assetsPool.Add(asset); // add to pool
+            _assignedAssets.Remove(asset); // remove from assigned assets
         }
 
         private void SetDirty(Asset asset) {
@@ -935,23 +1154,75 @@ namespace Rewired.Glyphs.UnityUI {
             }
         }
 
-        #endregion
+#endregion
 
-        #region Static
+#region Static
 
         private static int shaderPropertyId_color { get { return UnityEngine.Shader.PropertyToID("_Color"); } }
 
-        private static string[] __s_displayTypeNames;
-        private static string[] s_displayTypeNames { get { return __s_displayTypeNames != null ? __s_displayTypeNames : (__s_displayTypeNames = Enum.GetNames(typeof(DisplayType))); } }
+        private static Dictionary<string, DisplayType> __s_displayTypeTerms;
+        private static Dictionary<string, DisplayType> s_displayTypeTerms {
+            get {
+                if (__s_displayTypeTerms == null) {
+                    var dict = new Dictionary<string, DisplayType>();
+                    string[] names = Enum.GetNames(typeof(DisplayType));
+                    DisplayType[] values = (DisplayType[])Enum.GetValues(typeof(DisplayType));
+                    for (int i = 0; i < names.Length; i++) {
+                        dict.Add(names[i].ToLowerInvariant(), values[i]);
+                    }
+                    dict.Add("g", DisplayType.Glyph);
+                    dict.Add("gt", DisplayType.GlyphOrText);
+                    dict.Add("t", DisplayType.Text);
+                    __s_displayTypeTerms = dict;
+                }
+                return __s_displayTypeTerms;
+            }
+        }
 
-        private static DisplayType[] __s_displayTypeValues;
-        private static DisplayType[] s_displayTypeValues { get { return __s_displayTypeValues != null ? __s_displayTypeValues : (__s_displayTypeValues = (DisplayType[])Enum.GetValues(typeof(DisplayType))); } }
+        private static Dictionary<string, AxisRange> __s_axisRangeTerms;
+        private static Dictionary<string, AxisRange> s_axisRangeTerms {
+            get {
+                if (__s_axisRangeTerms == null) {
+                    var dict = new Dictionary<string, AxisRange>();
+                    string[] names = Enum.GetNames(typeof(AxisRange));
+                    AxisRange[] values = (AxisRange[])Enum.GetValues(typeof(AxisRange));
+                    for (int i = 0; i < names.Length; i++) {
+                        dict.Add(names[i].ToLowerInvariant(), values[i]);
+                    }
+                    dict.Add("f", AxisRange.Full);
+                    dict.Add("p", AxisRange.Positive);
+                    dict.Add("pos", AxisRange.Positive);
+                    dict.Add("+", AxisRange.Positive);
+                    dict.Add("n", AxisRange.Negative);
+                    dict.Add("neg", AxisRange.Negative);
+                    dict.Add("-", AxisRange.Negative);
+                    __s_axisRangeTerms = dict;
+                }
+                return __s_axisRangeTerms;
+            }
+        }
 
-        private static string[] __s_axisRangeNames;
-        private static string[] s_axisRangeNames { get { return __s_axisRangeNames != null ? __s_axisRangeNames : (__s_axisRangeNames = Enum.GetNames(typeof(Rewired.AxisRange))); } }
-
-        private static Rewired.AxisRange[] __s_axisRangeValues;
-        private static Rewired.AxisRange[] s_axisRangeValues { get { return __s_axisRangeValues != null ? __s_axisRangeValues : (__s_axisRangeValues = (Rewired.AxisRange[])Enum.GetValues(typeof(Rewired.AxisRange))); } }
+        private static Dictionary<string, Pole> __s_poleTerms;
+        private static Dictionary<string, Pole> s_poleTerms {
+            get {
+                if (__s_axisRangeTerms == null) {
+                    var dict = new Dictionary<string, Pole>();
+                    string[] names = Enum.GetNames(typeof(Pole));
+                    Pole[] values = (Pole[])Enum.GetValues(typeof(Pole));
+                    for (int i = 0; i < names.Length; i++) {
+                        dict.Add(names[i].ToLowerInvariant(), values[i]);
+                    }
+                    dict.Add("p", Pole.Positive);
+                    dict.Add("pos", Pole.Positive);
+                    dict.Add("+", Pole.Positive);
+                    dict.Add("n", Pole.Negative);
+                    dict.Add("neg", Pole.Negative);
+                    dict.Add("-", Pole.Negative);
+                    __s_poleTerms = dict;
+                }
+                return __s_poleTerms;
+            }
+        }
 
         private static void ParseAttributes(string text, int startIndex, int count, StringBuilder sbKey, StringBuilder sbValue, Dictionary<string, string> results) {
             if (string.IsNullOrEmpty(text) || startIndex < 0 || startIndex >= text.Length) {
@@ -1019,7 +1290,7 @@ namespace Rewired.Glyphs.UnityUI {
                                     results.Add(sbKey.ToString(), sbValue.ToString());
                                     state = state_searchForKey;
                                 } else {
-                                    sbValue.Append(c);
+                                    sbValue.Append(char.ToLowerInvariant(c));
                                 }
                             }
                             break;
@@ -1121,9 +1392,9 @@ namespace Rewired.Glyphs.UnityUI {
             }
         }
 
-        #endregion
+#endregion
 
-        #region Classes
+#region Classes
 
         private delegate bool ParseTagAttributesHandler(string text, int startIndex, int count, out string replacement);
 
@@ -1211,7 +1482,11 @@ namespace Rewired.Glyphs.UnityUI {
             public DisplayType type;
             public int playerId;
             public int actionId;
+            public int actionId2;
             public AxisRange actionRange;
+            public int resultIndex;
+            public Pole action1FirstPole;
+            public Pole action2FirstPole;
 
             private readonly List<GlyphOrText> _glyphsOrText;
 
@@ -1227,8 +1502,16 @@ namespace Rewired.Glyphs.UnityUI {
                 sb.Append(playerId);
                 sb.Append(", actionId = ");
                 sb.Append(actionId);
+                sb.Append(", actionId2 = ");
+                sb.Append(actionId2);
                 sb.Append(", actionRange = ");
                 sb.Append(actionRange);
+                sb.Append(", resultIndex = ");
+                sb.Append(resultIndex);
+                sb.Append(", action1FirstPole = ");
+                sb.Append(action1FirstPole);
+                sb.Append(", action2FirstPole = ");
+                sb.Append(action2FirstPole);
                 return sb.ToString();
             }
 
@@ -1241,7 +1524,11 @@ namespace Rewired.Glyphs.UnityUI {
                 type = DisplayType.GlyphOrText;
                 playerId = -1;
                 actionId = -1;
+                actionId2 = -1;
                 actionRange = AxisRange.Full;
+                resultIndex = 0;
+                action1FirstPole = Pole.Negative;
+                action2FirstPole = (Pole)(-1);
                 _glyphsOrText.Clear();
             }
 
@@ -1261,15 +1548,9 @@ namespace Rewired.Glyphs.UnityUI {
 
                     // Type -- optional
                     if (workDictionary.TryGetValue("type", out value)) {
-                        bool found = false;
-                        for (int i = 0; i < s_displayTypeNames.Length; i++) {
-                            if (string.Equals(value, s_displayTypeNames[i], StringComparison.OrdinalIgnoreCase)) {
-                                result.type = s_displayTypeValues[i];
-                                found = true;
-                                break;
-                            }
+                        if (!s_displayTypeTerms.TryGetValue(value, out result.type)) {
+                            throw new Exception("Invalid type: " + value);
                         }
-                        if (!found) throw new Exception("Invalid type: " + value);
                     } else {
                         result.type = DisplayType.GlyphOrText; // default
                     }
@@ -1287,10 +1568,10 @@ namespace Rewired.Glyphs.UnityUI {
                     }
 
                     // Action name or id
-                    if (workDictionary.TryGetValue("actionid", out value)) {
+                    if (workDictionary.TryGetValue("actionid", out value) || workDictionary.TryGetValue("actionid1", out value)) {
                         result.actionId = int.Parse(value);
                         if (Rewired.ReInput.mapping.GetAction(result.actionId) == null) throw new Exception("Invalid Action Id: " + result.actionId);
-                    } else if (workDictionary.TryGetValue("actionname", out value)) {
+                    } else if (workDictionary.TryGetValue("actionname", out value) || workDictionary.TryGetValue("actionname1", out value)) {
                         var action = Rewired.ReInput.mapping.GetAction(value);
                         if (action == null) throw new Exception("Invalid Action name: " + value);
                         result.actionId = action.id;
@@ -1298,19 +1579,52 @@ namespace Rewired.Glyphs.UnityUI {
                         throw new Exception("Action name/id missing.");
                     }
 
+                    // Action name or id 2 -- optional
+                    if (workDictionary.TryGetValue("actionid2", out value)) {
+                        result.actionId2 = int.Parse(value);
+                        if (Rewired.ReInput.mapping.GetAction(result.actionId2) == null) throw new Exception("Invalid Action Id 2: " + result.actionId2);
+                    } else if (workDictionary.TryGetValue("actionname2", out value)) {
+                        var action = Rewired.ReInput.mapping.GetAction(value);
+                        if (action == null) throw new Exception("Invalid Action name: " + value);
+                        result.actionId2 = action.id;
+                    }
+
                     // Action Range -- optional
                     if (workDictionary.TryGetValue("actionrange", out value)) {
-                        bool found = false;
-                        for (int i = 0; i < s_axisRangeNames.Length; i++) {
-                            if (string.Equals(value, s_axisRangeNames[i], StringComparison.OrdinalIgnoreCase)) {
-                                result.actionRange = s_axisRangeValues[i];
-                                found = true;
-                                break;
-                            }
+                        if (!s_axisRangeTerms.TryGetValue(value, out result.actionRange)) {
+                            throw new Exception("Invalid Action range: " + value);
                         }
-                        if (!found) throw new Exception("Invalid Action Range: " + value);
                     } else {
                         result.actionRange = AxisRange.Full;
+                    }
+
+                    // Result Index -- optional
+                    if (workDictionary.TryGetValue("resultindex", out value)) {
+                        result.resultIndex = int.Parse(value);
+                    } else {
+                        result.resultIndex = 0;
+                    }
+
+                    if (workDictionary.TryGetValue("resultindex", out value)) {
+                        result.resultIndex = int.Parse(value);
+                    } else {
+                        result.resultIndex = 0;
+                    }
+
+                    if (workDictionary.TryGetValue("firstpole", out value) || workDictionary.TryGetValue("action1firstpole", out value)) {
+                        if (!s_poleTerms.TryGetValue(value, out result.action1FirstPole)) {
+                            throw new Exception("Invalid Action 1 first pole: " + value);
+                        }
+                    } else {
+                        result.action1FirstPole = Pole.Negative;
+                    }
+
+                    if (workDictionary.TryGetValue("action2firstpole", out value)) {
+                        if (!s_poleTerms.TryGetValue(value, out result.action2FirstPole)) {
+                            throw new Exception("Invalid Action 2 first pole: " + value);
+                        }
+                    } else {
+                        result.action2FirstPole = (Pole)(-1);
                     }
 
                     return true;
@@ -1388,15 +1702,9 @@ namespace Rewired.Glyphs.UnityUI {
 
                     // Action Range -- optional
                     if (workDictionary.TryGetValue("range", out value) || workDictionary.TryGetValue("actionrange", out value)) {
-                        bool found = false;
-                        for (int i = 0; i < s_axisRangeNames.Length; i++) {
-                            if (string.Equals(value, s_axisRangeNames[i], StringComparison.OrdinalIgnoreCase)) {
-                                result.actionRange = s_axisRangeValues[i];
-                                found = true;
-                                break;
-                            }
+                        if (!s_axisRangeTerms.TryGetValue(value, out result.actionRange)) {
+                            throw new Exception("Invalid Action range: " + value);
                         }
-                        if (!found) throw new Exception("Invalid Action Range: " + value);
                     } else {
                         result.actionRange = AxisRange.Full;
                     }
@@ -1569,11 +1877,259 @@ namespace Rewired.Glyphs.UnityUI {
             private static UnityEngine.Shader tmProShader {
                 get {
                     if (__tmProShader == null) {
+#if !UNITY_6000_5_PLUS
                         TMPro.ShaderUtilities.GetShaderPropertyIDs();
+#endif
                         __tmProShader = UnityEngine.Shader.Find("TextMeshPro/Sprite");
                     }
                     return __tmProShader;
                 }
+            }
+        }
+
+        private sealed class RewiredElementHelper {
+
+            private int _tagIndex;
+            private IsRewiredElementAllowedHandler _isAllowedHandler;
+            private readonly System.Predicate<Rewired.ActionElementMap> _internalIsAllowedHandler;
+
+            // Temp collections
+            private List<ActionElementMapPair> tempAemPairs1;
+
+            // 2D
+            private List<Pair<ActionElementMapPair>> temp2dResults;
+
+            private bool _2dInit;
+
+            private void Initialize(bool is2d) {
+                if (tempAemPairs1 == null) tempAemPairs1 = new List<ActionElementMapPair>();
+                if (is2d && !_2dInit) {
+                    if (temp2dResults == null) temp2dResults = new List<Pair<ActionElementMapPair>>();
+                    _2dInit = true;
+                }
+            }
+
+            public IsRewiredElementAllowedHandler isAllowedHandler {
+                get {
+                    return _isAllowedHandler;
+                }
+                set {
+                    _isAllowedHandler = value;
+                }
+            }
+
+            public RewiredElementHelper() {
+                _internalIsAllowedHandler = (Rewired.ActionElementMap aem) => {
+                    return _isAllowedHandler(_tagIndex, aem);
+                };
+            }
+
+            public bool TryGetActionElementMaps(
+                int playerId,
+                int actionId,
+                int actionId2,
+                AxisRange actionRange,
+                int resultIndex,
+                ControllerElementGlyphSelectorOptions options,
+                RewiredElementResultSelectionHandler selectionHandler,
+                RewiredElementResult2DSelectionHandler action2dSelectionHandler,
+                out ActionElementMapPair action1Result,
+                out ActionElementMapPair action2Result,
+                int tagIndex
+            ) {
+                _tagIndex = tagIndex;
+                action1Result = new ActionElementMapPair();
+                action2Result = new ActionElementMapPair();
+                bool result;
+                bool isAction2d = actionId2 >= 0 && actionId2 != actionId;
+                bool hasSelectionHandler = isAction2d ? action2dSelectionHandler != null : selectionHandler != null;
+
+                Initialize(isAction2d);
+
+                if (hasSelectionHandler || resultIndex > 0) { // manual result selection
+
+                    if (isAction2d) {
+
+                        result = TryGetActionElementMaps(
+                            playerId,
+                            actionId,
+                            actionId2,
+                            options,
+                            GetInternalIsAllowedHandler(),
+                            resultIndex,
+                            action2dSelectionHandler,
+                            temp2dResults,
+                            out action1Result,
+                            out action2Result,
+                            tagIndex
+                        );
+
+                    } else {
+
+                        result = TryGetActionElementMaps(
+                            playerId,
+                            actionId,
+                            actionRange,
+                            options,
+                            GetInternalIsAllowedHandler(),
+                            resultIndex,
+                            selectionHandler,
+                            tempAemPairs1,
+                            out action1Result,
+                            tagIndex
+                        );
+                    }
+
+                } else { // default -- use first found
+
+                    if (isAction2d) {
+                        
+                        result = GlyphTools.TryGetActionElementMaps(
+                            playerId,
+                            actionId,
+                            actionId2,
+                            options,
+                            GetInternalIsAllowedHandler(),
+                            out action1Result,
+                            out action2Result
+                        );
+
+                    } else {
+
+                        ActionElementMap aem1;
+                        ActionElementMap aem2;
+
+                        result = GlyphTools.TryGetActionElementMaps(
+                            playerId,
+                            actionId,
+                            actionRange,
+                            options,
+                            GetInternalIsAllowedHandler(),
+                            out aem1,
+                            out aem2
+                        );
+
+                        action1Result = new ActionElementMapPair(aem1, aem2);
+                    }
+                }
+
+                return result;
+            }
+            private static bool TryGetActionElementMaps(
+                int playerId,
+                int actionId,
+                AxisRange actionRange,
+                ControllerElementGlyphSelectorOptions options,
+                Predicate<ActionElementMap> isAllowedHandler,
+                int resultIndex,
+                RewiredElementResultSelectionHandler resultSelectionHandler,
+                List<ActionElementMapPair> tempResults,
+                out ActionElementMapPair result,
+                int tagIndex
+            ) {
+
+                result = new ActionElementMapPair();
+
+                tempResults.Clear();
+
+                GlyphTools.GetActionElementMaps(
+                    playerId,
+                    actionId,
+                    actionRange,
+                    options,
+                    isAllowedHandler,
+                    tempResults
+                );
+
+                if (tempResults.Count == 0) goto End;
+
+                try {
+                    if (resultSelectionHandler != null) { // local handler takes priority
+                        resultIndex = resultSelectionHandler(tagIndex, tempResults);
+                    } else if (resultIndex > 0) { // fall back to user-specified result index
+                        // already set
+                    } else { // error
+                        goto End;
+                    }
+                } catch (Exception ex) {
+                    UnityEngine.Debug.LogError("Rewired: An exception was thrown in rewiredElementResultSortingHandler callback. This exception was thrown by your code.\n" + ex);
+                    goto End;
+                }
+
+                if (resultIndex < 0 || resultIndex >= tempResults.Count) {
+                    goto End;
+                }
+
+                result = tempResults[resultIndex];
+
+                End:
+
+                // Clean up so as to not hold any ActionElementMap references in memory
+                tempResults.Clear();
+
+                return result.a != null || result.b != null;
+            }
+            private static bool TryGetActionElementMaps(
+                int playerId,
+                int actionId,
+                int actionId2,
+                ControllerElementGlyphSelectorOptions options,
+                Predicate<ActionElementMap> isAllowedHandler,
+                int resultIndex,
+                RewiredElementResult2DSelectionHandler resultSelectionHandler,
+                List<Pair<ActionElementMapPair>> tempResults,
+                out ActionElementMapPair action1Result,
+                out ActionElementMapPair action2Result,
+                int tagIndex
+            ) {
+
+                action1Result = new ActionElementMapPair();
+                action2Result = new ActionElementMapPair();
+
+                tempResults.Clear();
+
+                GlyphTools.GetActionElementMaps(
+                    playerId,
+                    actionId,
+                    actionId2,
+                    options,
+                    isAllowedHandler,
+                    tempResults
+                );
+
+                if (tempResults.Count == 0) goto End;
+
+                try {
+                    if (resultSelectionHandler != null) { // local handler takes priority
+                        resultIndex = resultSelectionHandler(tagIndex, tempResults);
+                    } else if (resultIndex > 0) { // fall back to user-specified result index
+                        // already set
+                    } else { // error
+                        goto End;
+                    }
+                } catch (Exception ex) {
+                    UnityEngine.Debug.LogError("Rewired: An exception was thrown in rewiredElementResultSortingHandler callback. This exception was thrown by your code.\n" + ex);
+                    goto End;
+                }
+
+                if (resultIndex < 0 || resultIndex >= tempResults.Count) {
+                    goto End;
+                }
+
+                action1Result = tempResults[resultIndex].a;
+                action2Result = tempResults[resultIndex].b;
+
+                End:
+
+                // Clean up so as to not hold any ActionElementMap references in memory
+                tempResults.Clear();
+
+                return action1Result.Count > 0 || action2Result.Count > 0;
+            }
+
+            private System.Predicate<Rewired.ActionElementMap> GetInternalIsAllowedHandler() {
+                if (_isAllowedHandler == null) return null; // no public handler, so return null so default is used
+                return _internalIsAllowedHandler;
             }
         }
 
@@ -1735,7 +2291,31 @@ namespace Rewired.Glyphs.UnityUI {
             }
         }
 
-        #region Text Mesh Pro Asset Version Support
+        /// <summary>
+        /// Delegate for setting a custom filtering handler for the rewiredElement tag.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag being evaluated. This allows you to know which tag the callback applies to if you have multiple tags to evaluate.</param>
+        /// <param name="actionElementMap">The Action Element Map being evaluated.</param>
+        /// <returns>True if allowed, false if not allowed.</returns>
+        public delegate bool IsRewiredElementAllowedHandler(int tagIndex, ActionElementMap actionElementMap);
+
+        /// <summary>
+        /// Delegate for setting a custom result selection handler for the rewiredElement tag.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag being evaluated. This allows you to know which tag the callback applies to if you have multiple tags to evaluate.</param>
+        /// <param name="results">The list of result candidtates.</param>
+        /// <returns>The index of the chosen result.</returns>
+        public delegate int RewiredElementResultSelectionHandler(int tagIndex, IList<ActionElementMapPair> results);
+
+        /// <summary>
+        /// Delegate for setting a custom result selection handler for the rewiredElement tag for two Actions.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag being evaluated. This allows you to know which tag the callback applies to if you have multiple tags to evaluate.</param>
+        /// <param name="results">The list of result candidtates.</param>
+        /// <returns>The index of the chosen result.</returns>
+        public delegate int RewiredElementResult2DSelectionHandler(int tagIndex, IList<Pair<ActionElementMapPair>> results);
+
+#region Text Mesh Pro Asset Version Support
 
         // These wrapper classes are required to support both Unity UI 1.0 and
         // Unity UI 2.0, or mores specifically, versions of Text Mesh Pro pre
@@ -1763,7 +2343,7 @@ namespace Rewired.Glyphs.UnityUI {
             TMPro.TMP_SpriteAsset GetSpriteAsset();
             ITMProSprite GetSprite(int index);
             void AddSprite(ITMProSprite sprite);
-            bool Contains(string spriteName);
+            bool ContainsKey(string spriteKey);
             void Clear();
             void UpdateLookupTables();
             void Destroy();
@@ -1974,10 +2554,10 @@ namespace Rewired.Glyphs.UnityUI {
                     _sprites.Clear();
                 }
 
-                public bool Contains(string spriteName) {
+                public bool ContainsKey(string spriteKey) {
                     int count = _sprites.Count;
                     for (int i = 0; i < count; i++) {
-                        if (string.Equals(_sprites[i].name, spriteName, StringComparison.Ordinal)) return true;
+                        if (string.Equals(_sprites[i].name, spriteKey, StringComparison.Ordinal)) return true;
                     }
                     return false;
                 }
@@ -2173,6 +2753,17 @@ namespace Rewired.Glyphs.UnityUI {
                 }
                 return s_isVersionSupported.Value;
             }
+            
+            public static void HandleReflectionException(System.Exception ex) {
+                UnityEngine.Debug.LogError(
+                  "Rewired: An exception was thrown attempting to read values from a Text Mesh Pro class using reflection. " +
+                  "This can happen due to the following:\n" + 
+                  "1. The version of Text Mesh Pro in use is incompatible with this script due to breaking changes made by Unity since this script was written. " +
+                  "If you believe this to be the cause, please report this to support.\n" +
+                  "2. The Unity Player Managed Stripping Level is set to Medium or higher and the UnityUITextMeshProGlyphHelperPreventStripping.cs script has not been added to your project. " +
+                  "See the Glyphs documentation under Unity UI TextMesh Pro Glyph Helper for more information.\n" + ex
+                );
+            }
 
             // Classes
 
@@ -2257,47 +2848,92 @@ namespace Rewired.Glyphs.UnityUI {
 
                 public UnityEngine.TextCore.Glyph glyph {
                     get {
-                        return (UnityEngine.TextCore.Glyph)_glyph.GetValue(_source);
+                        try {
+                            return (UnityEngine.TextCore.Glyph)_glyph.GetValue(_source);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                            return null;
+                        }
                     }
                     set {
-                        _glyph.SetValue(_source, value);
+                        try {
+                            _glyph.SetValue(_source, value);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                        }
                     }
                 }
 
                 public uint unicode {
                     get {
-                        return (uint)_unicode.GetValue(_source);
+                        try {
+                            return (uint)_unicode.GetValue(_source);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                            return 0;
+                        }
                     }
                     set {
                         if (value == 0x0) value = 0xFFFE;
-                        _unicode.SetValue(_source, value);
+                        try {
+                            _unicode.SetValue(_source, value);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                        }
                     }
                 }
 
                 public string name {
                     get {
-                        return (string)_name.GetValue(_source);
+                        try {
+                            return (string)_name.GetValue(_source);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                            return string.Empty;
+                        }
                     }
                     set {
-                        _name.SetValue(_source, value);
+                        try {
+                            _name.SetValue(_source, value);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                        }
                     }
                 }
 
                 public float scale {
                     get {
-                        return (float)_scale.GetValue(_source);
+                        try {
+                            return (float)_scale.GetValue(_source);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                            return 1f;
+                        }
                     }
                     set {
-                        _scale.SetValue(_source, value);
+                        try {
+                            _scale.SetValue(_source, value);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                        }
                     }
                 }
 
                 public uint glyphIndex {
                     get {
-                        return (uint)_glyphIndex.GetValue(_source);
+                        try {
+                            return (uint)_glyphIndex.GetValue(_source);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                            return 0;
+                        }
                     }
                     set {
-                        _glyphIndex.SetValue(_source, value);
+                        try {
+                            _glyphIndex.SetValue(_source, value);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                        }
                     }
                 }
 
@@ -2379,10 +3015,19 @@ namespace Rewired.Glyphs.UnityUI {
 
                 public UnityEngine.Sprite sprite {
                     get {
-                        return (UnityEngine.Sprite)_sprite.GetValue(_source);
+                        try {
+                            return (UnityEngine.Sprite)_sprite.GetValue(_source);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                            return null;
+                        }
                     }
                     set {
-                        _sprite.SetValue(_source, value);
+                        try {
+                            _sprite.SetValue(_source, value);
+                        } catch (System.Exception ex) {
+                            TMProSprite_AssetV1_1_0.HandleReflectionException(ex);
+                        }
                     }
                 }
 
@@ -2493,10 +3138,10 @@ namespace Rewired.Glyphs.UnityUI {
                     _sprites.Clear();
                 }
 
-                public bool Contains(string spriteName) {
+                public bool ContainsKey(string spriteKey) {
                     int count = _sprites.Count;
                     for (int i = 0; i < count; i++) {
-                        if (string.Equals(_sprites[i].name, spriteName, StringComparison.Ordinal)) return true;
+                        if (string.Equals(_sprites[i].name, spriteKey, StringComparison.Ordinal)) return true;
                     }
                     return false;
                 }
@@ -2514,11 +3159,11 @@ namespace Rewired.Glyphs.UnityUI {
         }
 #endif
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Enums
+#region Enums
 
         private enum DisplayType {
             Glyph,
@@ -2526,7 +3171,7 @@ namespace Rewired.Glyphs.UnityUI {
             GlyphOrText
         }
 
-        #endregion
+#endregion
     }
 }
 

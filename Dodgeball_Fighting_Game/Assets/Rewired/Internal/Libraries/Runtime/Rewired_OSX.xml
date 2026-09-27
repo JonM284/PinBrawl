@@ -395,6 +395,18 @@
             If the pointer is unavailable or invalid, returns IntPtr.Zero.
             </summary>
         </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCControllerExtension.hasMotionSensors">
+            <summary>
+            Determines if the device has motion sensors.
+            </summary>
+        </member>
+        <member name="M:Rewired.Platforms.Apple.GameController.GCControllerExtension.GetMotion">
+            <summary>
+            Gets the <see cref="T:Rewired.Platforms.Apple.GameController.GCMotion"/> object for access to motion sensor values.
+            Check <see cref="P:Rewired.Platforms.Apple.GameController.GCControllerExtension.hasMotionSensors"/> to determine if the device has motion sensors.
+            </summary>
+            <returns>Returns GCMotion object if the device has motion sensors. Returns null if the device does not have motion sensors.</returns>
+        </member>
         <member name="M:Rewired.Platforms.Apple.GameController.GCControllerExtension.GetElementSfSymbolsName(System.Int32)">
             <summary>
             Gets the native system symbol name of a controller element.
@@ -421,9 +433,101 @@
             </summary>
             <returns>Un-remapped localized name of a controller element.</returns>
         </member>
+        <member name="T:Rewired.Platforms.Apple.GameController.GCControllerMicroGamepadExtension">
+            <summary>
+            Allows access to functions on the Micro Gampad controller profile.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCControllerMicroGamepadExtension.useAbsoluteTouchpadMode">
+            <summary>
+            Gets or sets whether touchpad values are reported in absolute or relative terms.
+            If true, a press on the touchpad will return the absolute value of the point of touch.
+            If false, a press on the touchpad will initially return 0, 0 and the swipe direction
+            will determine the input vector from the initial starting position.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCControllerMicroGamepadExtension.allowDPadRotation">
+            <summary>
+            Gets or sets whether D-Pad values are reported relative to the device's current orientation.
+            </summary>
+        </member>
         <member name="T:Rewired.Platforms.Apple.GameController.GCControllerInput">
             <summary>
             Provides access to input-related methods and settings at runtime.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCControllerInput.allowedDevices">
+            <summary>
+            Read-only list of input devices that will be allowed to appear in the Joysticks list in Rewired.
+            By default, all devices will be allowed even though they do not appear in this list.
+            The <see cref="T:Rewired.Platforms.Apple.GameController.GCControllerInput.DeviceIdentifier"/> provides device matching critera.
+            To modify the list, replace it by setting this value with a new list.
+            <see cref="P:Rewired.Platforms.Apple.GameController.GCControllerInput.allowedDevices"/> and <see cref="P:Rewired.Platforms.Apple.GameController.GCControllerInput.disallowedDevices"/>
+            are used to determine which devices are allowed to appear in the Joysticks list.
+            Allowed devices in this list will override disallowed devices in <see cref="P:Rewired.Platforms.Apple.GameController.GCControllerInput.disallowedDevices"/>.
+            The only reason to set allowed devices is if you have already set disallowed devices using wide-matching
+            device identifiers, but want to re-allow specific devices using narrow-matching identifiers.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCControllerInput.disallowedDevices">
+            <summary>
+            Read-only list of input devices that will not appear in the Joysticks list in Rewired.
+            The <see cref="T:Rewired.Platforms.Apple.GameController.GCControllerInput.DeviceIdentifier"/> provides device matching critera.
+            To modify the list, replace it by setting this value with a new list.
+            <see cref="P:Rewired.Platforms.Apple.GameController.GCControllerInput.allowedDevices"/> and <see cref="P:Rewired.Platforms.Apple.GameController.GCControllerInput.disallowedDevices"/>
+            are used to determine which devices are allowed to appear in the Joysticks list.
+            To disallow a wide category of devices while allowing only specific exceptions, set
+            allow overrides in <see cref="P:Rewired.Platforms.Apple.GameController.GCControllerInput.allowedDevices"/>.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.Apple.GameController.GCControllerInput.DeviceIdentifier">
+            <summary>
+            Used to identify specific input devices for includion or exclusion.
+            All values are optional, but you must provide at least one for matching.
+            Any values provided will be required for a match to occur.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerInput.DeviceIdentifier.primaryProfileTypes">
+            <summary>
+            Match against the primary controller profile type.
+            A controller can support multiple profile types, but will always have only one primary profile type.
+            If supplied, a match will occur if any enabled bits in this value match.
+            Optional.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerInput.DeviceIdentifier.supportedProfileTypes">
+            <summary>
+            Match against all supported controller profile types.
+            A controller can support multiple profile types.
+            If supplied, a match will occur if any enabled bits in this value match.
+            Optional.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerInput.DeviceIdentifier.profileSubType">
+            <summary>
+            Match on controller profile sub type.
+            If supplied, this value will be required for matching.
+            Optional.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerInput.DeviceIdentifier.productCategory">
+            <summary>
+            Match on product category string.
+            If supplied, this value will be required for matching.
+            Optional.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerInput.DeviceIdentifier.productName">
+            <summary>
+            Match on product name string.
+            If supplied, this value will be required for matching.
+            Optional.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerInput.DeviceIdentifier.useRegex">
+            <summary>
+            Determines if regex will be used when evaluating string matches.
+            This applies to all strings.
             </summary>
         </member>
         <member name="T:Rewired.Platforms.Apple.GameController.GCControllerInput.ControllerAssignment">
@@ -524,8 +628,243 @@
             Specifies that player four is using this controller.
             </summary>
         </member>
-        <member name="M:Rewired.Platforms.Apple.GameController.GCControllerTools.GCControllerToUnityCoords(UnityEngine.Quaternion)">
-            THIS HAS NOT BEEN TESTED
+        <member name="T:Rewired.Platforms.Apple.GameController.GCMotion">
+            <summary>
+            Exposes motion sensor information.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.hasAttitude">
+            <summary>
+            Determines whether attitude is available.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.hasRotationRate">
+            <summary>
+            Determines whether rotation rate is available.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.hasGravityAndUserAcceleration">
+            <summary>
+            Determines whether gravity and user acceleration are available.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.lastEventTimestamp">
+            <summary>
+            The timestamp of the latest motion event that was received.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.eventTimeDelta">
+            <summary>
+            The time that has elapsed since the previous motion event and the latest motion event.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.sensorsActive">
+            <summary>
+            Gets and sets whether the motion sensors are active.
+            Check <see cref="P:Rewired.Platforms.Apple.GameController.GCMotion.sensorsRequireManualActivation"/> to determine if the motion sensors need to be activated manually.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.sensorsRequireManualActivation">
+            <summary>
+            Returns true if motion sensors require manual activation to function.
+            If true, set <see cref="P:Rewired.Platforms.Apple.GameController.GCMotion.sensorsActive"/> to enable or disable motion sensors.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.acceleration">
+            <summary>
+            Acceleration converted to the Unity coordinate system.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.accelerationRaw">
+            <summary>
+            Acceleration as returned by Apple Game Controller Framework.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.userAcceleration">
+            <summary>
+            User acceleration converted to the Unity coordinate system.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.userAccelerationRaw">
+            <summary>
+            User acceleration as returned by Apple Game Controller Framework.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.gravity">
+            <summary>
+            Gravity converted to the Unity coordinate system.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.gravityRaw">
+            <summary>
+            Gravity as returned by Apple Game Controller Framework.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.attitude">
+            <summary>
+            Attitude converted to the Unity coordinate system.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.attitudeRaw">
+            <summary>
+            Attitude as returned by Apple Game Controller Framework.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.rotationRate">
+            <summary>
+            Rotation rate converted to the Unity coordinate system.
+            The value has been converted to degrees per second and multiplied by the time delta from the last motion event.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Apple.GameController.GCMotion.rotationRateRaw">
+            <summary>
+            Rotation rate as returned by Apple Game Controller Framework.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.Apple.GameController.GCControllerProfileTypeFlags">
+            <summary>
+            GCController profile type flags.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileTypeFlags.None">
+            <summary>
+            None
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileTypeFlags.Generic">
+            <summary>
+            Generic
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileTypeFlags.ExtendedGamepad">
+            <summary>
+            Extended Gamepad
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileTypeFlags.MicroGamepad">
+            <summary>
+            Micro Gamepad
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileTypeFlags.Unknown">
+            <summary>
+            Unknown
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType">
+            <summary>
+            GCController profile sub types.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.None">
+            <summary>
+            None
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.XboxController">
+            <summary>
+            Microsoft Xbox Controller
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.SonyDualShock4">
+            <summary>
+            Sony DualShock
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.SonyDualSense">
+            <summary>
+            Sony DualSense
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.NintendoSwitchJoyConL">
+            <summary>
+            Nintendo Switch Joy-Con (L)
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.NintendoSwitchJoyConR">
+            <summary>
+            Nintendo Switch Joy-Con (R)
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.NintendoSwitchJoyConDual">
+            <summary>
+            Nintendo Switch Joy-Con (Dual)
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.NintendoSwitchProController">
+            <summary>
+            Nintendo Switch Pro Controller
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.ArcadeStick">
+            <summary>
+            Arcade Stick
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.DirectionalGamepad">
+            <summary>
+            Directional Gamepad
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.SiriRemoteGen1">
+            <summary>
+            Siri Remote (1st Generation)
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.SiriRemoteGen2">
+            <summary>
+            Siri Remote (2nd Generation)
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.ControlCenterRemote">
+            <summary>
+            Control Center Remote
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.UniversalElectronicsRemote">
+            <summary>
+            Universal Electronics Remote
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.CoalescedRemote">
+            <summary>
+            Coalesced Remote
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.SpatialController">
+            <summary>
+            Spatial Controller
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.SpatialStylus">
+            <summary>
+            Spatial Stylus
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.Keyboard">
+            <summary>
+            Keyboard
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.Mouse">
+            <summary>
+            Mouse
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.MFi">
+            <summary>
+            MFi
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.HID">
+            <summary>
+            HID
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Apple.GameController.GCControllerProfileSubType.Unknown">
+            <summary>
+            Unknown
+            </summary>
         </member>
         <member name="T:Rewired.Platforms.MacOS.IOKit.IOKitControllerExtension">
             <summary>
@@ -590,116 +929,6 @@
         <member name="P:Rewired.Platforms.MacOS.IOKit.IOKitControllerExtension.usage">
             <summary>
             HID usage.
-            </summary>
-        </member>
-        <member name="F:Rewired.InputSources.SDL2.SDL.SDL_EventType.SDL_USEREVENT">
-            Events ::SDL_USEREVENT through ::SDL_LASTEVENT are for your use,
-            and should be allocated with SDL_RegisterEvents()
-        </member>
-        <member name="F:Rewired.InputSources.SDL2.SDL.SDL_EventType.SDL_LASTEVENT">
-            This last event is only for bounding internal arrays
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_CommonEvent">
-            \brief Fields shared by every event
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_WindowEvent">
-            \brief Window state change event data (event.window.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_KeyboardEvent">
-            \brief Keyboard button event structure (event.key.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_TextEditingEvent">
-            \brief Keyboard text editing event structure (event.edit.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_MouseMotionEvent">
-            \brief Mouse motion event structure (event.motion.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_MouseButtonEvent">
-            \brief Mouse button event structure (event.button.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_MouseWheelEvent">
-            \brief Mouse wheel event structure (event.wheel.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_JoyAxisEvent">
-            \brief Joystick axis motion event structure (event.jaxis.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_JoyBallEvent">
-            \brief Joystick trackball motion event structure (event.jball.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_JoyHatEvent">
-            \brief Joystick hat position change event structure (event.jhat.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_JoyButtonEvent">
-            \brief Joystick button event structure (event.jbutton.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_JoyDeviceEvent">
-            \brief Joystick device event structure (event.jdevice.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_ControllerAxisEvent">
-            \brief Game controller axis motion event structure (event.caxis.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_ControllerButtonEvent">
-            \brief Game controller button event structure (event.cbutton.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_ControllerDeviceEvent">
-            \brief Controller device event structure (event.cdevice.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_TouchFingerEvent">
-            \brief Touch finger event structure (event.tfinger.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_MultiGestureEvent">
-            \brief Multiple Finger Gesture Event (event.mgesture.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_DollarGestureEvent">
-            \brief Dollar Gesture Event (event.dgesture.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_DropEvent">
-            \brief An event used to request a file open by the system (event.drop.*)
-                   This event is disabled by default, you can enable it with SDL_EventState()
-            \note If you enable this event, you must free the filename in the event.
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_QuitEvent">
-            \brief The "quit requested" event
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_OSEvent">
-            \brief OS Specific event
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_UserEvent">
-            \brief A user-defined event type (event.user.*)
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_SysWMEvent">
-              \brief A video driver dependent system event (event.syswm.*)
-                     This event is disabled by default, you can enable it with SDL_EventState()
-            
-              \note If you want to use this event, you should include SDL_syswm.h.
-        </member>
-        <member name="T:Rewired.InputSources.SDL2.SDL.SDL_Event">
-            \brief General event structure
-        </member>
-        <member name="F:Rewired.InputSources.SDL2.SDL.SDL_Scancode.SDL_SCANCODE_A">
-              \name Usage page 0x07
-            
-              These values are from usage page 0x07 (USB keyboard page).
-        </member>
-        <member name="F:Rewired.InputSources.SDL2.SDL.SDL_Scancode.SDL_SCANCODE_AUDIONEXT">
-              \name Usage page 0x0C
-            
-              These values are mapped from usage page 0x0C (USB consumer page).
-        </member>
-        <member name="F:Rewired.InputSources.SDL2.SDL.SDL_Scancode.SDL_SCANCODE_BRIGHTNESSDOWN">
-              \name Walther keys
-            
-              These are values that Christian Walther added (for mac keyboard?).
-        </member>
-        <member name="M:Rewired.InputSources.SDL2.SDL2InputSource.GetGameControllerCount">
-            <summary>
-            The value returned cannot be used to iterate! Always use GetJoystickCount!
-            </summary>
-            <returns>Number of Game Controllers</returns>
-        </member>
-        <member name="M:Rewired.InputSources.SDL2.SDL2Joystick.ProcessAxisValue(System.Int32)">
-            <summary>
-            Convert from +/- 32768 to +/- 1.0f
             </summary>
         </member>
     </members>

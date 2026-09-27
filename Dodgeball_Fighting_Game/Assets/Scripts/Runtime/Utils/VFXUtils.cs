@@ -43,7 +43,7 @@ namespace Utils
 
         public static void ReturnToPool(this VFXPlayer vfxPlayer)
         {
-            Debug.Log($"Returning {vfxPlayer.vfxplayerIdentifier} to pool: {Time.time}");
+            //Debug.Log($"Returning {vfxPlayer.vfxplayerIdentifier} to pool: {Time.time}");
             vfxController.ReturnToPool(vfxPlayer);
         }
 
@@ -53,7 +53,7 @@ namespace Utils
             {
                 return;
             }
-            Debug.Log($"playing {vfxPlayer.vfxplayerIdentifier}: {Time.time}");
+            //Debug.Log($"playing {vfxPlayer.vfxplayerIdentifier}: {Time.time}");
             vfxController.PlayAt(vfxPlayer, position, rotation, activeParent);
         }
 

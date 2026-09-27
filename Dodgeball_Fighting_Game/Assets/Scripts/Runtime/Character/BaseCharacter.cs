@@ -97,6 +97,7 @@ namespace Runtime.Character
 
         [SerializeField] private GameObject m_meleeIndicator;
 
+        [Header("VFX")]
         [SerializeField] private VFXPlayer m_wackVFX;
         [SerializeField] private VFXPlayer m_wackChargeVFX;
         [SerializeField] private VFXPlayer m_shieldPopVFX;
@@ -127,7 +128,7 @@ namespace Runtime.Character
         protected float m_originalSpeed, m_currentSpeed;
         protected float m_currentDamagedAmount, m_damageAmountThreshold = 100f;
         protected float m_damagePercentage, m_damagePercentageKnockbackMod, m_maxDamagePercentageKnockbackMod = 18f;
-        protected float m_ballConnectBuildUpTimerCurrent, m_ballConnectBuildUpTimerMax = 1.1f, m_calcMaxBuildUpTimer, 
+        protected float m_ballConnectBuildUpTimerCurrent, m_ballConnectBuildUpTimeMin = 0.05f, m_ballConnectBuildUpTimerMax = 1.1f, m_calcMaxBuildUpTimer, 
             m_ballBuildUpPercentage;
         protected float m_knockbackForce, m_knockbackTime;
         protected float m_ballMeleeChargeAmount, m_ballMeleeChargeAmountMax = 1f;
@@ -193,6 +194,8 @@ namespace Runtime.Character
         private int m_abilityUseCharges = 0;
 
         private CancellationTokenSource cts = new CancellationTokenSource();
+
+        private CharacterModelController characterModelController; 
 
         private SemaphoreSlim wackBallSemaphoreSlim = new SemaphoreSlim(1,1);
 
@@ -376,6 +379,17 @@ namespace Runtime.Character
             
             m_isInitialized = true;
             canUseAbilities = true;
+        }
+
+        public async UniTask AssignCharacterModelController(CharacterModelController _characterModelController)
+        {
+            if (_characterModelController.IsNull())
+            {
+                return;
+            }
+
+            characterModelController = _characterModelController;
+            await characterModelController.Initialize(playerColor);
         }
 
         private async UniTask InitializeChosenAbility(CancellationToken token)
@@ -954,7 +968,6 @@ namespace Runtime.Character
             
             try
             {
-
                 while (m_playerHittingBall)
                 {
                     m_hitAmount = Physics.OverlapSphereNonAlloc(m_sphereCheckLocation.position, m_wackRangeCurrent,
@@ -1025,35 +1038,48 @@ namespace Runtime.Character
 
             m_ballConnectBuildUpTimerCurrent = 0f;
 
-            m_calcMaxBuildUpTimer = m_ballConnectBuildUpTimerMax * _ball.speedPercentage;
-            
+            m_calcMaxBuildUpTimer = m_ballConnectBuildUpTimeMin + m_ballConnectBuildUpTimerMax * _ball.speedPercentage;
+
+            _ball.ResetCurrentBallScaleEven();
             _ball.SetBuildUp(true, this);
-            
             _ball.ForceChangeColorTo(playerColor);
 
-            _ball.ChargedWackResizeBall();
-
-            while (m_ballConnectBuildUpTimerCurrent < m_calcMaxBuildUpTimer)
+            if (!characterModelController.IsNull())
             {
-                if (m_ballConnectBuildUpTimerCurrent >= m_calcMaxBuildUpTimer)
+                characterModelController.PlayFlashingOutlineEffect(destroyCancellationToken).Forget();
+            }
+            
+            try
+            {
+                while (m_ballConnectBuildUpTimerCurrent < m_calcMaxBuildUpTimer)
                 {
-                    break;
-                }
-                
-                m_ballConnectBuildUpTimerCurrent += Time.deltaTime;
+                    if (m_ballConnectBuildUpTimerCurrent >= m_calcMaxBuildUpTimer)
+                    {
+                        break;
+                    }
 
-                m_ballBuildUpPercentage = m_ballConnectBuildUpTimerCurrent / m_calcMaxBuildUpTimer;
+                    m_ballConnectBuildUpTimerCurrent += Time.deltaTime;
+
+                    m_ballBuildUpPercentage = m_ballConnectBuildUpTimerCurrent / m_calcMaxBuildUpTimer;
                 
-                _ball.UpdateBallCharge(m_ballBuildUpPercentage, m_playerAimVector);
-                
-                await UniTask.Yield(PlayerLoopTiming.Update);
+                    _ball.UpdateBallCharge(m_ballBuildUpPercentage, m_playerAimVector);
+                    await UniTask.Yield(PlayerLoopTiming.Update);
+                }
+            }
+            finally
+            {
+                if (!characterModelController.IsNull())
+                {
+                    characterModelController.StopBlinkingOutlineEffect();
+                }
             }
             
             //ToDo: Ball Hit VFX when going fast?
             
             JuiceGameController.Instance.DoCameraShake(0.1f, 0.1f, 10, 10);
-            
+
             _ball.SetBuildUp(false, this);
+            _ball.ChargedWackResizeBall();
             
             _ball.HitBall(m_playerAimVector, HitStrengthType.MEDIUM,this);
 
@@ -1236,7 +1262,7 @@ namespace Runtime.Character
                 return;
             }
 
-            if (isShielding || isEvading)
+            if (isShielding || isEvading || !canUseAbilities)
             {
                 return;
             }
@@ -1542,6 +1568,7 @@ namespace Runtime.Character
                 }
                 
                 _status.statusTimeCurrent -= Time.deltaTime;
+                _status.OnTick();
 
                 if (_status.statusTimeCurrent > 0)
                 {

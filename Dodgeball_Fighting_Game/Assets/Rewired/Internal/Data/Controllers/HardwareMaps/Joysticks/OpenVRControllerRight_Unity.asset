@@ -30,6 +30,7 @@ MonoBehaviour:
     _negativeKey: stick/left
     _elementType: 0
     _compoundElementType: 0
+    _role: stick2/x
   - _id: 1
     _name: Stick Y
     _positiveName: Stick Up
@@ -39,51 +40,57 @@ MonoBehaviour:
     _negativeKey: stick/down
     _elementType: 0
     _compoundElementType: 0
+    _role: stick2/y
   - _id: 5
     _name: Stick Button
     _positiveName: 
     _negativeName: 
-    _key: stick_button
+    _key: stick/button
     _positiveKey: 
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: stick2/press
   - _id: 6
     _name: Stick Touch
     _positiveName: 
     _negativeName: 
-    _key: stick_touch
+    _key: stick/touch
     _positiveKey: 
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: 
   - _id: 2
-    _name: Index Trigger
-    _positiveName: Index Trigger
+    _name: Trigger
+    _positiveName: Trigger
     _negativeName: 
-    _key: index_trigger
-    _positiveKey: index_trigger
+    _key: trigger
+    _positiveKey: trigger
     _negativeKey: 
     _elementType: 0
     _compoundElementType: 0
+    _role: gamepad/rt
   - _id: 7
-    _name: Index Trigger Touch
+    _name: Trigger Touch
     _positiveName: 
     _negativeName: 
-    _key: index_trigger_touch
+    _key: trigger/touch
     _positiveKey: 
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: 
   - _id: 3
-    _name: Grip Button/Trigger
-    _positiveName: Grip Button/Trigger
+    _name: Grip
+    _positiveName: Grip
     _negativeName: 
-    _key: grip_button_trigger
-    _positiveKey: grip_button_trigger
+    _key: grip
+    _positiveKey: grip
     _negativeKey: 
     _elementType: 0
     _compoundElementType: 0
+    _role: gamepad/b
   - _id: 4
     _name: Button 1
     _positiveName: 
@@ -93,6 +100,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/a
   - _id: 8
     _name: Stick
     _positiveName: 
@@ -102,6 +110,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 100
     _compoundElementType: 0
+    _role: 
   compoundElements:
   - type: 0
     elementIdentifier: 8
@@ -744,6 +753,20 @@ MonoBehaviour:
       axes: []
       buttons: []
     variants: []
+  nintendoSwitch2:
+    description: 
+    matchingCriteria:
+      axisCount: 0
+      buttonCount: 0
+      disabled: 0
+      tag: 
+      alwaysMatch: 0
+      productName_useRegex: 0
+      productName: []
+    elements:
+      axes: []
+      buttons: []
+    variants: []
   internalDriver:
     description: 
     matchingCriteria:
@@ -836,5 +859,24 @@ MonoBehaviour:
       buttons: []
       compoundElements: []
     controllerName: 
+    variants: []
+  unityInputSystem:
+    description: 
+    matchingCriteria:
+      axisCount: 0
+      buttonCount: 0
+      disabled: 0
+      tag: 
+      alwaysMatch: 0
+      alternateElementCounts: []
+      platforms: 
+      deviceType: 0
+      tags: []
+      productName_useRegex: 0
+      productName: []
+      vidPid: []
+    elements:
+      axes: []
+      buttons: []
     variants: []
   elementIdentifierIdCounter: 9

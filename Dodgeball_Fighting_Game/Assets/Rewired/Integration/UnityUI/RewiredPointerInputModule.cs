@@ -3,64 +3,100 @@
 // https://bitbucket.org/Unity-Technologies/ui/src
 // Heavily modified to add multiple pointer support, interchangeable touch and mouse input sources, and 128 buttons per mouse.
 
-#region Defines
-#if UNITY_2020 || UNITY_2021 || UNITY_2022 || UNITY_2023 || UNITY_6000 || UNITY_6000_0_OR_NEWER
+#if UNITY_6000 || UNITY_6000_0_OR_NEWER
+#define UNITY_6000_PLUS
+#endif
+
+#if UNITY_2023 || UNITY_6000_PLUS
+#define UNITY_2023_PLUS
+#endif
+
+#if UNITY_2022 || UNITY_2023_PLUS
+#define UNITY_2022_PLUS
+#endif
+
+#if UNITY_2021 || UNITY_2022_PLUS
+#define UNITY_2021_PLUS
+#endif
+
+#if UNITY_2020_2 || UNITY_2020_3 || UNITY_2020_4 || UNITY_2021_PLUS
+#define UNITY_2020_2_PLUS
+#endif
+
+#if UNITY_2020 || UNITY_2021_PLUS
 #define UNITY_2020_PLUS
 #endif
+
 #if UNITY_2019 || UNITY_2020_PLUS
 #define UNITY_2019_PLUS
 #endif
+
 #if UNITY_2018 || UNITY_2019_PLUS
 #define UNITY_2018_PLUS
 #endif
+
 #if UNITY_2017 || UNITY_2018_PLUS
 #define UNITY_2017_PLUS
 #endif
+
 #if UNITY_5 || UNITY_2017_PLUS
 #define UNITY_5_PLUS
 #endif
+
 #if UNITY_5_1 || UNITY_5_2 || UNITY_5_3_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_1_PLUS
 #endif
+
 #if UNITY_5_2 || UNITY_5_3_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_2_PLUS
 #endif
+
 #if UNITY_5_3_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_3_PLUS
 #endif
+
 #if UNITY_5_4_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_4_PLUS
 #endif
+
 #if UNITY_5_5_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_5_PLUS
 #endif
+
 #if UNITY_5_6_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_6_PLUS
 #endif
+
 #if UNITY_5_7_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_7_PLUS
 #endif
+
 #if UNITY_5_8_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_8_PLUS
 #endif
+
 #if UNITY_5_9_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_9_PLUS
 #endif
+
+#if !UNITY_2019_PLUS || ENABLE_LEGACY_INPUT_MANAGER
+#define REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_MANAGER
+#elif UNITY_2019_PLUS && ENABLE_INPUT_SYSTEM
+#define REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_SYSTEM
+#endif
+
 #pragma warning disable 0219
 #pragma warning disable 0618
 #pragma warning disable 0649
-#endregion
 
 namespace Rewired.Integration.UnityUI {
     using System;
     using System.Text;
-    using UnityEngine;
-    using UnityEngine.EventSystems;
     using System.Collections.Generic;
     using Rewired.UI;
 
     // Content added for Rewired
-    public abstract class RewiredPointerInputModule : BaseInputModule {
+    public abstract class RewiredPointerInputModule : UnityEngine.EventSystems.BaseInputModule {
 
         public const int kMouseLeftId = -1;
         public const int kMouseRightId = -2;
@@ -283,20 +319,20 @@ namespace Rewired.Integration.UnityUI {
             }
         }
 
-        protected PlayerPointerEventData GetTouchPointerEventData(int playerId, int touchDeviceIndex, Touch input, out bool pressed, out bool released) {
+        protected PlayerPointerEventData GetTouchPointerEventData(int playerId, int touchDeviceIndex, Rewired.UnityTouch input, out bool pressed, out bool released) {
             PlayerPointerEventData pointerData;
             var created = GetPointerData(playerId, touchDeviceIndex, input.fingerId, out pointerData, true, PointerEventType.Touch);
 
             pointerData.Reset();
 
-            pressed = created || (input.phase == TouchPhase.Began);
-            released = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
+            pressed = created || (input.phase == Rewired.UnityTouch.TouchPhase.Began);
+            released = (input.phase == Rewired.UnityTouch.TouchPhase.Canceled) || (input.phase == Rewired.UnityTouch.TouchPhase.Ended);
 
             if(created)
                 pointerData.position = input.position;
 
             if(pressed)
-                pointerData.delta = Vector2.zero;
+                pointerData.delta = UnityEngine.Vector2.zero;
             else
                 pointerData.delta = input.position - pointerData.position;
 
@@ -347,7 +383,7 @@ namespace Rewired.Integration.UnityUI {
                 return tracked;
             }
 
-            public void SetButtonState(int button, PointerEventData.FramePressState stateForMouseButton, PlayerPointerEventData data) {
+            public void SetButtonState(int button, UnityEngine.EventSystems.PointerEventData.FramePressState stateForMouseButton, PlayerPointerEventData data) {
                 var toModify = GetButtonState(button);
                 toModify.eventData.buttonState = stateForMouseButton;
                 toModify.eventData.buttonData = data;
@@ -383,12 +419,12 @@ namespace Rewired.Integration.UnityUI {
             if(created)
                 leftData.position = mouseInputSource.screenPosition;
 
-            Vector2 pos = mouseInputSource.screenPosition;
+            UnityEngine.Vector2 pos = mouseInputSource.screenPosition;
 
             if(mouseInputSource.locked || !mouseInputSource.enabled) {
                 // We don't want to do ANY cursor-based interaction when the mouse is locked
-                leftData.position = new Vector2(-1.0f, -1.0f);
-                leftData.delta = Vector2.zero;
+                leftData.position = new UnityEngine.Vector2(-1.0f, -1.0f);
+                leftData.delta = UnityEngine.Vector2.zero;
             } else {
                 leftData.delta = pos - leftData.position;
                 leftData.position = pos;
@@ -450,7 +486,7 @@ namespace Rewired.Integration.UnityUI {
             return null;
         }
 
-        private static bool ShouldStartDrag(Vector2 pressPos, Vector2 currentPos, float threshold, bool useDragThreshold) {
+        private static bool ShouldStartDrag(UnityEngine.Vector2 pressPos, UnityEngine.Vector2 currentPos, float threshold, bool useDragThreshold) {
             if(!useDragThreshold)
                 return true;
 
@@ -458,7 +494,7 @@ namespace Rewired.Integration.UnityUI {
         }
 
         protected virtual void ProcessMove(PlayerPointerEventData pointerEvent) {
-            GameObject targetGO;
+            UnityEngine.GameObject targetGO;
             if(pointerEvent.sourceType == PointerEventType.Mouse) {
                 IMouseInputSource source = GetMouseInputSource(pointerEvent.playerId, pointerEvent.inputSourceIndex);
                 if(source != null) {
@@ -481,7 +517,7 @@ namespace Rewired.Integration.UnityUI {
 
             if(!pointerEvent.dragging
                 && ShouldStartDrag(pointerEvent.pressPosition, pointerEvent.position, eventSystem.pixelDragThreshold, pointerEvent.useDragThreshold)) {
-                ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.beginDragHandler);
+                UnityEngine.EventSystems.ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, UnityEngine.EventSystems.ExecuteEvents.beginDragHandler);
                 pointerEvent.dragging = true;
             }
 
@@ -490,13 +526,13 @@ namespace Rewired.Integration.UnityUI {
                 // Before doing drag we should cancel any pointer down state
                 // And clear selection!
                 if(pointerEvent.pointerPress != pointerEvent.pointerDrag) {
-                    ExecuteEvents.Execute(pointerEvent.pointerPress, pointerEvent, ExecuteEvents.pointerUpHandler);
+                    UnityEngine.EventSystems.ExecuteEvents.Execute(pointerEvent.pointerPress, pointerEvent, UnityEngine.EventSystems.ExecuteEvents.pointerUpHandler);
 
                     pointerEvent.eligibleForClick = false;
                     pointerEvent.pointerPress = null;
                     pointerEvent.rawPointerPress = null;
                 }
-                ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.dragHandler);
+                UnityEngine.EventSystems.ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, UnityEngine.EventSystems.ExecuteEvents.dragHandler);
             }
         }
 
@@ -544,9 +580,9 @@ namespace Rewired.Integration.UnityUI {
             return sb.ToString();
         }
 
-        protected void DeselectIfSelectionChanged(GameObject currentOverGo, BaseEventData pointerEvent) {
+        protected void DeselectIfSelectionChanged(UnityEngine.GameObject currentOverGo, UnityEngine.EventSystems.BaseEventData pointerEvent) {
             // Selection tracking
-            var selectHandlerGO = ExecuteEvents.GetEventHandler<ISelectHandler>(currentOverGo);
+            var selectHandlerGO = UnityEngine.EventSystems.ExecuteEvents.GetEventHandler<UnityEngine.EventSystems.ISelectHandler>(currentOverGo);
             // if we have clicked something new, deselect the old thing
             // leave 'selection handling' up to the press event though.
             if (selectHandlerGO != eventSystem.currentSelectedGameObject) {
@@ -554,7 +590,7 @@ namespace Rewired.Integration.UnityUI {
             }
         }
 
-        protected void CopyFromTo(PointerEventData @from, PointerEventData @to) {
+        protected void CopyFromTo(UnityEngine.EventSystems.PointerEventData @from, UnityEngine.EventSystems.PointerEventData @to) {
             @to.position = @from.position;
             @to.delta = @from.delta;
             @to.scrollDelta = @from.scrollDelta;
@@ -562,18 +598,18 @@ namespace Rewired.Integration.UnityUI {
             @to.pointerEnter = @from.pointerEnter;
         }
 
-        protected PointerEventData.FramePressState StateForMouseButton(int playerId, int mouseIndex, int buttonId) {
+        protected UnityEngine.EventSystems.PointerEventData.FramePressState StateForMouseButton(int playerId, int mouseIndex, int buttonId) {
             IMouseInputSource mouseInputSource = GetMouseInputSource(playerId, mouseIndex);
-            if(mouseInputSource == null) return PointerEventData.FramePressState.NotChanged;
+            if(mouseInputSource == null) return UnityEngine.EventSystems.PointerEventData.FramePressState.NotChanged;
             var pressed = mouseInputSource.GetButtonDown(buttonId);
             var released = mouseInputSource.GetButtonUp(buttonId);
             if(pressed && released)
-                return PointerEventData.FramePressState.PressedAndReleased;
+                return UnityEngine.EventSystems.PointerEventData.FramePressState.PressedAndReleased;
             if(pressed)
-                return PointerEventData.FramePressState.Pressed;
+                return UnityEngine.EventSystems.PointerEventData.FramePressState.Pressed;
             if(released)
-                return PointerEventData.FramePressState.Released;
-            return PointerEventData.FramePressState.NotChanged;
+                return UnityEngine.EventSystems.PointerEventData.FramePressState.Released;
+            return UnityEngine.EventSystems.PointerEventData.FramePressState.NotChanged;
         }
 
         protected class ButtonState {
@@ -591,11 +627,11 @@ namespace Rewired.Integration.UnityUI {
 
             private MouseButtonEventData m_EventData;
         }
-
+        
         private sealed class UnityInputSource : IMouseInputSource, ITouchInputSource {
 
-            private Vector2 m_MousePosition;
-            private Vector2 m_MousePositionPrev;
+            private UnityEngine.Vector2 m_MousePosition;
+            private UnityEngine.Vector2 m_MousePositionPrev;
             private int m_LastUpdatedFrame = -1;
 
             int IMouseInputSource.playerId {
@@ -609,7 +645,14 @@ namespace Rewired.Integration.UnityUI {
             bool IMouseInputSource.enabled {
                 get {
                     TryUpdate();
-                    return Input.mousePresent;
+#if REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_MANAGER
+                    return UnityEngine.Input.mousePresent;
+#elif REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_SYSTEM
+                    return UnityEngine.InputSystem.Mouse.current != null &&
+                        UnityEngine.InputSystem.Mouse.current.enabled;
+#else
+                    throw new System.NotImplementedException();
+#endif
                 }
             }
 
@@ -617,7 +660,7 @@ namespace Rewired.Integration.UnityUI {
                 get {
                     TryUpdate();
 #if UNITY_5_PLUS
-                    return Cursor.lockState == CursorLockMode.Locked;
+                    return UnityEngine.Cursor.lockState == UnityEngine.CursorLockMode.Locked;
 #else
                     return false;
 #endif
@@ -626,52 +669,160 @@ namespace Rewired.Integration.UnityUI {
 
             int IMouseInputSource.buttonCount {
                 get {
-                    TryUpdate(); return 3;
+                    TryUpdate();
+                    return 3;
                 }
             }
 
             bool IMouseInputSource.GetButtonDown(int button) {
-                TryUpdate(); return Input.GetMouseButtonDown(button);
+                TryUpdate();
+#if REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_MANAGER
+                return UnityEngine.Input.GetMouseButtonDown(button);
+#elif REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_SYSTEM
+                return (GetButtonFlags(UnityEngine.InputSystem.Mouse.current, button) & ButtonFlags.Down) != 0;
+#else
+                throw new System.NotImplementedException();
+#endif
             }
 
             bool IMouseInputSource.GetButtonUp(int button) {
-                TryUpdate(); return Input.GetMouseButtonUp(button);
+                TryUpdate();
+#if REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_MANAGER
+                return UnityEngine.Input.GetMouseButtonUp(button);
+#elif REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_SYSTEM
+                return (GetButtonFlags(UnityEngine.InputSystem.Mouse.current, button) & ButtonFlags.Up) != 0;
+#else
+                throw new System.NotImplementedException();
+#endif
             }
 
             bool IMouseInputSource.GetButton(int button) {
-                TryUpdate(); return Input.GetMouseButton(button);
+                TryUpdate();
+#if REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_MANAGER
+                return UnityEngine.Input.GetMouseButton(button);
+#elif REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_SYSTEM
+                return (GetButtonFlags(UnityEngine.InputSystem.Mouse.current, button) & ButtonFlags.On) != 0;
+#else
+                throw new System.NotImplementedException();
+#endif
             }
 
-            Vector2 IMouseInputSource.screenPosition {
-                get { TryUpdate(); return Input.mousePosition; }
+            UnityEngine.Vector2 IMouseInputSource.screenPosition {
+                get {
+                    TryUpdate();
+                    return GetMousePosition();
+                }
             }
 
-            Vector2 IMouseInputSource.screenPositionDelta {
-                get { TryUpdate(); return m_MousePosition - m_MousePositionPrev; }
+            UnityEngine.Vector2 IMouseInputSource.screenPositionDelta {
+                get {
+                    TryUpdate();
+                    return m_MousePosition - m_MousePositionPrev;
+                }
             }
 
-            Vector2 IMouseInputSource.wheelDelta {
-                get { TryUpdate(); return Input.mouseScrollDelta; }
+            UnityEngine.Vector2 IMouseInputSource.wheelDelta {
+                get {
+                    TryUpdate();
+#if REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_MANAGER
+                    return UnityEngine.Input.mouseScrollDelta;
+#elif REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_SYSTEM
+                    return UnityEngine.InputSystem.Mouse.current != null ?
+                        UnityEngine.InputSystem.Mouse.current.scroll.value :
+                        new UnityEngine.Vector2();
+#else
+                    throw new System.NotImplementedException();
+#endif
+                    
+                }
             }
 
             bool ITouchInputSource.touchSupported {
-                get { TryUpdate(); return Input.touchSupported; }
+                get {
+                    TryUpdate();
+#if UNITY_5_PLUS
+                    return Rewired.ReInput.touch.touchSupported;
+#else
+                    return false;
+#endif
+                }
             }
 
             int ITouchInputSource.touchCount {
-                get { TryUpdate(); return Input.touchCount; }
+                get {
+                    TryUpdate();
+                    return Rewired.ReInput.touch.touchCount;
+                }
             }
 
-            Touch ITouchInputSource.GetTouch(int index) {
-                TryUpdate(); return Input.GetTouch(index);
+            Rewired.UnityTouch ITouchInputSource.GetTouch(int index) {
+                TryUpdate();
+                return Rewired.ReInput.touch.GetTouch(index);
             }
 
             private void TryUpdate() {
-                if(Time.frameCount == m_LastUpdatedFrame) return;
-                m_LastUpdatedFrame = Time.frameCount;
+                if(UnityEngine.Time.frameCount == m_LastUpdatedFrame) return;
+                m_LastUpdatedFrame = UnityEngine.Time.frameCount;
                 m_MousePositionPrev = m_MousePosition;
-                m_MousePosition = Input.mousePosition;
+                m_MousePosition = GetMousePosition();
             }
+
+            private UnityEngine.Vector2 GetMousePosition() {
+#if REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_MANAGER
+                    return UnityEngine.Input.mousePosition;
+#elif REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_SYSTEM
+                return UnityEngine.InputSystem.Mouse.current != null ?
+                    UnityEngine.InputSystem.Mouse.current.position.value :
+                    new UnityEngine.Vector2();
+#else
+                    throw new System.NotImplementedException();
+#endif
+            }
+
+#if REWIRED_POINTER_INPUT_MODULE_USE_UNITY_INPUT_SYSTEM
+
+            private static ButtonFlags GetButtonFlags(UnityEngine.InputSystem.Mouse mouse, int index) {
+                if (mouse == null) return ButtonFlags.None;
+                UnityEngine.InputSystem.Controls.ButtonControl control;
+                switch (index) {
+                    case 0:
+                        control = mouse.leftButton;
+                        break;
+                    case 1:
+                        control = mouse.rightButton;
+                        break;
+                    case 2:
+                        control = mouse.middleButton;
+                        break;
+                    case 3:
+                        control = mouse.backButton;
+                        break;
+                    case 4:
+                        control = mouse.forwardButton;
+                        break;
+                    default:
+                        return ButtonFlags.None;
+                }
+                return GetButtonFlags(control);
+            }
+            
+            private static ButtonFlags GetButtonFlags(UnityEngine.InputSystem.Controls.ButtonControl control) {
+                ButtonFlags flags = ButtonFlags.None;
+                if (control == null) return flags;
+                if (control.isPressed) flags |= ButtonFlags.On;
+                if (control.wasPressedThisFrame) flags |= ButtonFlags.Down;
+                if (control.wasReleasedThisFrame) flags |= ButtonFlags.Up;
+                return flags;
+            }
+
+            private enum ButtonFlags {
+                None = 0,
+                On = 1,
+                Down = 2,
+                Up = 4
+            }
+            
+#endif
         }
     }
 

@@ -30,6 +30,7 @@ MonoBehaviour:
     _negativeKey: left_stick/left
     _elementType: 0
     _compoundElementType: 0
+    _role: stick1/x
   - _id: 1
     _name: Left Stick Y
     _positiveName: Left Stick Up
@@ -39,6 +40,7 @@ MonoBehaviour:
     _negativeKey: left_stick/down
     _elementType: 0
     _compoundElementType: 0
+    _role: stick1/y
   - _id: 2
     _name: Right Stick X
     _positiveName: Right Stick Right
@@ -48,6 +50,7 @@ MonoBehaviour:
     _negativeKey: right_stick/left
     _elementType: 0
     _compoundElementType: 0
+    _role: stick2/x
   - _id: 3
     _name: Right Stick Y
     _positiveName: Right Stick Up
@@ -57,6 +60,7 @@ MonoBehaviour:
     _negativeKey: right_stick/down
     _elementType: 0
     _compoundElementType: 0
+    _role: stick2/y
   - _id: 4
     _name: Button 1
     _positiveName: 
@@ -66,6 +70,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/x
   - _id: 5
     _name: Button 2
     _positiveName: 
@@ -75,6 +80,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/y
   - _id: 6
     _name: Button 3
     _positiveName: 
@@ -84,6 +90,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/a
   - _id: 7
     _name: Button 4
     _positiveName: 
@@ -93,6 +100,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/b
   - _id: 8
     _name: Left Shoulder 1 (5)
     _positiveName: 
@@ -102,6 +110,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/lb
   - _id: 9
     _name: Left Shoulder 2 (7)
     _positiveName: 
@@ -111,6 +120,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/lt
   - _id: 10
     _name: Right Shoulder 1 (6)
     _positiveName: 
@@ -120,6 +130,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/rb
   - _id: 11
     _name: Right Shoulder 2 (8)
     _positiveName: 
@@ -129,6 +140,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/rt
   - _id: 12
     _name: Button 9
     _positiveName: 
@@ -138,6 +150,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/select
   - _id: 13
     _name: Button 10
     _positiveName: 
@@ -147,6 +160,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: gamepad/start
   - _id: 14
     _name: Left Stick Button
     _positiveName: 
@@ -156,6 +170,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: stick1/press
   - _id: 15
     _name: Right Stick Button
     _positiveName: 
@@ -165,6 +180,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: stick2/press
   - _id: 16
     _name: D-Pad Up
     _positiveName: 
@@ -174,6 +190,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: dpad/up
   - _id: 17
     _name: D-Pad Right
     _positiveName: 
@@ -183,6 +200,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: dpad/right
   - _id: 18
     _name: D-Pad Down
     _positiveName: 
@@ -192,6 +210,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: dpad/down
   - _id: 19
     _name: D-Pad Left
     _positiveName: 
@@ -201,6 +220,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 1
     _compoundElementType: 0
+    _role: dpad/left
   - _id: 20
     _name: Left Stick
     _positiveName: 
@@ -210,6 +230,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 100
     _compoundElementType: 0
+    _role: 
   - _id: 21
     _name: Right Stick
     _positiveName: 
@@ -219,6 +240,7 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 100
     _compoundElementType: 0
+    _role: 
   - _id: 22
     _name: D-Pad
     _positiveName: 
@@ -228,16 +250,20 @@ MonoBehaviour:
     _negativeKey: 
     _elementType: 100
     _compoundElementType: 10
+    _role: 
   compoundElements:
   - type: 0
     elementIdentifier: 20
     componentElementIdentifiers: 0000000001000000
+    intValue0: 0
   - type: 0
     elementIdentifier: 21
     componentElementIdentifiers: 0200000003000000
+    intValue0: 0
   - type: 11
     elementIdentifier: 22
     componentElementIdentifiers: 10000000110000001200000013000000
+    intValue0: 0
   directInput:
     description: 
     matchingCriteria:
@@ -282,6 +308,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -306,6 +333,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -330,6 +358,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -354,6 +383,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -732,6 +762,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -755,6 +786,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -778,6 +810,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -801,6 +834,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1132,6 +1166,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1153,6 +1188,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1174,6 +1210,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1195,6 +1232,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1493,6 +1531,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1514,6 +1553,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1535,6 +1575,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 0
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1556,6 +1597,7 @@ MonoBehaviour:
         sourceAxisRange: 0
         invert: 1
         axisDeadZone: .00999999978
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1859,6 +1901,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1880,6 +1923,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1901,6 +1945,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -1922,6 +1967,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2318,26 +2364,6 @@ MonoBehaviour:
           _excludeFromPolling: 0
           _isPressureSensitive: 0
     variants: []
-  fallback_WindowsUWP:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
-    variants: []
   fallback_OSX:
     description: 
     matchingCriteria:
@@ -2368,6 +2394,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2389,6 +2416,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2410,6 +2438,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2431,6 +2460,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2857,6 +2887,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2878,6 +2909,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2899,6 +2931,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -2920,6 +2953,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -3366,6 +3400,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -3387,6 +3422,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -3408,6 +3444,7 @@ MonoBehaviour:
         invert: 0
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -3429,6 +3466,7 @@ MonoBehaviour:
         invert: 1
         sourceAxisRange: 0
         buttonAxisContribution: 0
+        axisUpperDeadZone: 0
         calibrateAxis: 0
         axisZero: 0
         axisMin: 0
@@ -3845,46 +3883,6 @@ MonoBehaviour:
       axes: []
       buttons: []
     variants: []
-  fallback_XBoxOne:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
-    variants: []
-  fallback_PS4:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
-    variants: []
   ps5:
     description: 
     matchingCriteria:
@@ -3899,46 +3897,6 @@ MonoBehaviour:
       axes: []
       buttons: []
     controllerName: 
-    variants: []
-  fallback_PSM:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
-    variants: []
-  fallback_PSVita:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      alwaysMatch: 0
-      productName_useRegex: 0
-      productName: []
-      matchUnityVersion: 0
-      matchUnityVersion_min: 
-      matchUnityVersion_max: 
-      matchSysVersion: 0
-      matchSysVersion_min: 
-      matchSysVersion_max: 
-    elements:
-      axes: []
-      buttons: []
     variants: []
   fallback_AmazonFireTV:
     description: 
@@ -4039,6 +3997,20 @@ MonoBehaviour:
       axes: []
       buttons: []
     variants: []
+  nintendoSwitch2:
+    description: 
+    matchingCriteria:
+      axisCount: 0
+      buttonCount: 0
+      disabled: 0
+      tag: 
+      alwaysMatch: 0
+      productName_useRegex: 0
+      productName: []
+    elements:
+      axes: []
+      buttons: []
+    variants: []
   internalDriver:
     description: 
     matchingCriteria:
@@ -4055,7 +4027,7 @@ MonoBehaviour:
       axes: []
       buttons: []
     variants: []
-  sdl2_Linux:
+  sdl:
     description: 
     matchingCriteria:
       axisCount: 0
@@ -4063,51 +4035,14 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 0
-      manufacturer_useRegex: 0
       productName_useRegex: 0
-      systemName_useRegex: 0
-      manufacturer: []
       productName: []
-      systemName: []
       productGUID: []
-    elements:
-      axes: []
-      buttons: []
-    variants: []
-  sdl2_Windows:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      hatCount: 0
-      manufacturer_useRegex: 0
-      productName_useRegex: 0
-      systemName_useRegex: 0
-      manufacturer: []
-      productName: []
-      systemName: []
-      productGUID: []
-    elements:
-      axes: []
-      buttons: []
-    variants: []
-  sdl2_OSX:
-    description: 
-    matchingCriteria:
-      axisCount: 0
-      buttonCount: 0
-      disabled: 0
-      tag: 
-      hatCount: 0
-      manufacturer_useRegex: 0
-      productName_useRegex: 0
-      systemName_useRegex: 0
-      manufacturer: []
-      productName: []
-      systemName: []
-      productGUID: []
+      alternateElementCounts: []
+      includePlatforms: 
+      excludePlatforms: 
+      deviceType: 0
+      vidPid: []
     elements:
       axes: []
       buttons: []
@@ -4126,10 +4061,32 @@ MonoBehaviour:
       productName: []
       primaryProfileType: 0
       profileSubTypes: 
+      includePlatforms: 
+      excludePlatforms: 
     elements:
       axes: []
       buttons: []
       compoundElements: []
     controllerName: 
+    variants: []
+  unityInputSystem:
+    description: 
+    matchingCriteria:
+      axisCount: 0
+      buttonCount: 0
+      disabled: 0
+      tag: 
+      alwaysMatch: 0
+      alternateElementCounts: []
+      platforms: 
+      excludedPlatforms: 
+      deviceType: 0
+      tags: []
+      productName_useRegex: 0
+      productName: []
+      vidPid: []
+    elements:
+      axes: []
+      buttons: []
     variants: []
   elementIdentifierIdCounter: 23

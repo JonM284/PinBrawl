@@ -249,6 +249,7 @@
             <summary>
             Determines if the entry at the specified index is valid.
             Invalid entries are not used by the dictionary.
+            Warning: Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration!
             </summary>
             <param name="index">The index. Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration.</param>
             <returns>Returns true if the entry at the specified index is valid. Returns false if invalid.</returns>
@@ -256,6 +257,7 @@
         <member name="M:Rewired.Utils.Classes.Data.ADictionary`2.GetKeyAt(System.Int32)">
             <summary>
             Gets the key at the specified index.
+            Warning: Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration!
             </summary>
             <param name="index">The index. Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration.</param>
             <returns>Returns the key at the specified index.</returns>
@@ -265,6 +267,7 @@
         <member name="M:Rewired.Utils.Classes.Data.ADictionary`2.GetValueAt(System.Int32)">
             <summary>
             Gets the value at the specified index.
+            Warning: Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration!
             </summary>
             <param name="index">The index. Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration.</param>
             <returns>Returns the value at the specified index.</returns>
@@ -274,6 +277,7 @@
         <member name="M:Rewired.Utils.Classes.Data.ADictionary`2.GetEntryAt(System.Int32)">
             <summary>
             Gets the entry at the specified index.
+            Warning: Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration!
             </summary>
             <param name="index">The index. Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration.</param>
             <returns>Returns the entry at the specified index.</returns>
@@ -285,6 +289,7 @@
             Gets the key at the specified index.
             This is the fastest method to use for indexed access when the dictionary is full and no items have been removed.
             Up to 50% faster than GetNext... on a full dictionary.
+            Warning: Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration!
             </summary>
             <param name="index">The index. Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration.</param>
             <param name="key">The key</param>
@@ -295,6 +300,7 @@
             Gets the value at the specified index.
             This is the fastest method to use for indexed access when the dictionary is full and no items have been removed.
             Up to 50% faster than GetNext... on a full dictionary.
+            Warning: Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration!
             </summary>
             <param name="index">The index. Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration.</param>
             <param name="value">The value</param>
@@ -305,6 +311,7 @@
             Gets the entry at the specified index.
             This is the fastest method to use for indexed access when the dictionary is full and no items have been removed.
             Up to 50% faster than GetNext... on a full dictionary.
+            Warning: Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration!
             </summary>
             <param name="index">The index. Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration.</param>
             <param name="entry">The entry</param>
@@ -411,6 +418,7 @@
         <member name="M:Rewired.Utils.Classes.Data.ADictionary`2.RemoveAt(System.Int32)">
             <summary>
             Removes the entry at the specified index.
+            Warning: Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration!
             </summary>
             <param name="index">The index. Use <see cref="P:Rewired.Utils.Classes.Data.ADictionary`2.TotalCount"/> to get the count for iteration.</param>
             <returns>Returns true if the entry at the specified index was removed. Returns false if the entry was invalid.</returns>
@@ -452,6 +460,16 @@
             Set this to null to restore the default equality comparer.
             </summary>
         </member>
+        <member name="E:Rewired.Utils.Classes.Data.RingBuffer`1.RemovedEvent">
+            <summary>
+            Sent when an item is dequeued, cleared, or discarded due to a buffer overrun.
+            </summary>
+        </member>
+        <member name="E:Rewired.Utils.Classes.Data.RingBuffer`1.BufferOverrunEvent">
+            <summary>
+            Sent when an a buffer overrun occurs.
+            </summary>
+        </member>
         <member name="P:Rewired.Utils.Classes.Data.RingBuffer`1.Item(System.Int32)">
             <summary>
             Gets or sets the item at the specified index.
@@ -461,9 +479,17 @@
         </member>
         <member name="M:Rewired.Utils.Classes.Data.RingBuffer`1.#ctor(System.Int32)">
             <summary>
-            Creates an instance of this class.
+            Creates a fixed-capacity ring buffer.
+            Memory for the buffer is allocated immediately.
             </summary>
-            <param name="capacity">The maximum capacity of the buffer.</param>
+            <param name="capacity">The capacity of the buffer.</param>
+        </member>
+        <member name="M:Rewired.Utils.Classes.Data.RingBuffer`1.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Creates a variable-capacity ring buffer that expands as needed until it reaches maxCapacity.
+            </summary>
+            <param name="startingCapacity">The starting capacity of the buffer.</param>
+            <param name="maxCapacity">The maximum capacity of the buffer.</param>
         </member>
         <member name="M:Rewired.Utils.Classes.Data.RingBuffer`1.Enqueue(`0)">
             <summary>
@@ -555,6 +581,30 @@
             <param name="item">The item to remove from the buffer.</param>
             <param name="comparer">The equality comparer to be used to determine if the item is in the buffer.</param>
             <returns>The number of items removed from the buffer.</returns>
+        </member>
+        <member name="M:Rewired.Utils.Classes.Data.RingBuffer`1.CopyTo(System.Collections.Generic.IList{`0},System.Int32,System.Int32)">
+            <summary>
+            Copies a specific number of items in the buffer starting at the specified index.
+            </summary>
+            <param name="destination">The list to which the data will be copied.</param>
+            <param name="startIndex">The starting index of data to copy.</param>
+            <param name="count">The number of items to copy.</param>
+            <returns>The number of items copied.</returns>
+        </member>
+        <member name="M:Rewired.Utils.Classes.Data.RingBuffer`1.CopyTo(System.Collections.Generic.IList{`0},System.Int32)">
+            <summary>
+            Copies all remaining data in the buffer starting at the specified index.
+            </summary>
+            <param name="destination">The list to which the data will be copied.</param>
+            <param name="startIndex">The starting index of data to copy.</param>
+            <returns>The number of items copied.</returns>
+        </member>
+        <member name="M:Rewired.Utils.Classes.Data.RingBuffer`1.CopyTo(System.Collections.Generic.IList{`0})">
+            <summary>
+            Copies data in the buffer.
+            </summary>
+            <param name="destination">The list to which the data will be copied.</param>
+            <returns>The number of items copied.</returns>
         </member>
         <member name="M:Rewired.Utils.Classes.Data.RingBuffer`1.Clear">
             <summary>
@@ -1700,6 +1750,7 @@
             </summary>
         </member>
         <member name="T:Rewired.Utils.Libraries.CLZF2.CLZF2">
+            <exclude></exclude>
             <summary>
             Improved C# LZF Compressor, a very small data compression library.
             The compression algorithm is extremely fast. 
@@ -3375,7 +3426,7 @@
             The display name of the element with the conflicting assignment.
             </summary>
         </member>
-        <member name="M:Rewired.ElementAssignmentConflictInfo.#ctor(System.Boolean,System.Boolean,System.Int32,Rewired.ControllerType,System.Int32,System.Int32,System.Int32,System.Int32,Rewired.ControllerElementType,System.Int32,UnityEngine.KeyCode,Rewired.ModifierKeyFlags)">
+        <member name="M:Rewired.ElementAssignmentConflictInfo.#ctor(System.Boolean,System.Boolean,System.Int32,Rewired.ControllerType,System.Int32,System.Int32,System.Int32,System.Int32,Rewired.ControllerElementType,System.Int32,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags)">
             <summary>
             Creates a new ElementAssignmentConflictInfo.
             </summary>
@@ -3473,7 +3524,7 @@
             Is the axis inverted? (Only used for full axis assignments.)
             </summary>
         </member>
-        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
+        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
             <summary>
             A struct for use in element assignment conflict checking.
             Overload for complete assignment.
@@ -3491,7 +3542,7 @@
             <param name="axisContribution">The positive / negative contribution for the assignment. (Only used for split axes and buttons.)</param>
             <param name="invert">Is the axis inverted? (Only used for full axis assignments.)</param>
         </member>
-        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
+        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
             <summary>
             A struct for use in element assignment conflict checking.
             Overload for complete assignment to replace an existing element map.
@@ -3510,7 +3561,7 @@
             <param name="invert">Is the axis inverted? (Only used for full axis assignments.)</param>
             <param name="elementMapId"></param>
         </member>
-        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
+        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
             <summary>
             A struct for use in element assignment conflict checking.
             Overload for complete assignment.
@@ -3528,7 +3579,7 @@
             <param name="axisContribution">The positive / negative contribution for the assignment. (Only used for split axes and buttons.)</param>
             <param name="invert">Is the axis inverted? (Only used for full axis assignments.)</param>
         </member>
-        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
+        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
             <summary>
             A struct for use in element assignment conflict checking.
             Overload for complete assignment to replace an existing element map.
@@ -3630,7 +3681,7 @@
             <param name="axisContribution">The positive / negative contribution for the assignment. (Only used for split axes and buttons.)</param>
             <param name="elementMapId"></param>
         </member>
-        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole)">
+        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole)">
             <summary>
             A struct for use in element assignment conflict checking.
             Overload for assignment of a keyboard key.
@@ -3644,7 +3695,7 @@
             <param name="actionId">The id of the Action being assigned.</param>
             <param name="axisContribution">The positive / negative contribution for the assignment. (Only used for split axes and buttons.)</param>
         </member>
-        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Int32)">
+        <member name="M:Rewired.ElementAssignmentConflictCheck.#ctor(System.Int32,Rewired.ControllerType,System.Int32,System.Int32,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Int32)">
             <summary>
             A struct for use in element assignment conflict checking.
             Overload for assignment of a keyboard key to replace an existing element map.
@@ -3750,7 +3801,7 @@
             Is the axis inverted? Used only for axis assignments.
             </summary>
         </member>
-        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
+        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
             <summary>
             A struct for use in element assignment.
             Overload for complete assignment to replace an existing element map.
@@ -3765,7 +3816,7 @@
             <param name="invert">Is the axis inverted? Used only for axis assignments.</param>
             <param name="elementMapId">The id of the ActionElementMap that this assignment will be replacing. (Optional)</param>
         </member>
-        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.ControllerType,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
+        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.ControllerType,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
             <summary>
             A struct for use in element assignment.
             Overload for complete assignment to replace an existing element map.
@@ -3781,7 +3832,7 @@
             <param name="invert">Is the axis inverted? Used only for axis assignments.</param>
             <param name="elementMapId">The id of the ActionElementMap that this assignment will be replacing. (Optional)</param>
         </member>
-        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
+        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
             <summary>
             A struct for use in element assignment.
             Overload for complete new assignment.
@@ -3795,7 +3846,7 @@
             <param name="axisContribution">Does this Action contribute positive or negative values to the final Action's input value? Used for split axis and button/key assignments.</param>
             <param name="invert">Is the axis inverted? Used only for axis assignments.</param>
         </member>
-        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.ControllerType,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
+        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.ControllerType,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
             <summary>
             A struct for use in element assignment.
             Overload for complete new assignment.
@@ -3869,7 +3920,7 @@
             <param name="axisContribution">Does this Action contribute positive or negative values to the final Action's input value? Used for split axis and button/key assignments.</param>
             <param name="elementMapId">The id of the ActionElementMap that this assignment will be replacing. (Optional)</param>
         </member>
-        <member name="M:Rewired.ElementAssignment.#ctor(UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole)">
+        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole)">
             <summary>
             A struct for use in element assignment.
             Overload for assignment of a keyboard key.
@@ -3879,7 +3930,7 @@
             <param name="actionId">The id of the Action that will be bound to the controller element.</param>
             <param name="axisContribution">Does this Action contribute positive or negative values to the final Action's input value? Used for split axis and button/key assignments.</param>
         </member>
-        <member name="M:Rewired.ElementAssignment.#ctor(UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Int32)">
+        <member name="M:Rewired.ElementAssignment.#ctor(Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Int32)">
             <summary>
             A struct for use in element assignment.
             Overload for assignment of a keyboard key to replace an existing element map.
@@ -3890,7 +3941,7 @@
             <param name="axisContribution">Does this Action contribute positive or negative values to the final Action's input value? Used for split axis and button/key assignments.</param>
             <param name="elementMapId">The id of the ActionElementMap that this assignment will be replacing. (Optional)</param>
         </member>
-        <member name="M:Rewired.ElementAssignment.CompleteAssignment(Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
+        <member name="M:Rewired.ElementAssignment.CompleteAssignment(Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
             <summary>
             Creates a struct for use in element assignment.
             For complete assignment to replace an existing element map.
@@ -3906,7 +3957,7 @@
             <param name="elementMapId">The id of the ActionElementMap that this assignment will be replacing. (Optional)</param>
             <returns>ElementAssignment</returns>
         </member>
-        <member name="M:Rewired.ElementAssignment.CompleteAssignment(Rewired.ControllerType,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
+        <member name="M:Rewired.ElementAssignment.CompleteAssignment(Rewired.ControllerType,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean,System.Int32)">
             <summary>
             Creates a struct for use in element assignment.
             For complete assignment to replace an existing element map.
@@ -3923,7 +3974,7 @@
             <param name="elementMapId">The id of the ActionElementMap that this assignment will be replacing. (Optional)</param>
             <returns>ElementAssignment</returns>
         </member>
-        <member name="M:Rewired.ElementAssignment.CompleteAssignment(Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
+        <member name="M:Rewired.ElementAssignment.CompleteAssignment(Rewired.ElementAssignmentType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
             <summary>
             Creates a struct for use in element assignment.
             For complete new assignment.
@@ -3938,7 +3989,7 @@
             <param name="invert">Is the axis inverted? Used only for axis assignments.</param>
             <returns>ElementAssignment</returns>
         </member>
-        <member name="M:Rewired.ElementAssignment.CompleteAssignment(Rewired.ControllerType,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
+        <member name="M:Rewired.ElementAssignment.CompleteAssignment(Rewired.ControllerType,Rewired.ControllerElementType,System.Int32,Rewired.AxisRange,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Boolean)">
             <summary>
             Creates a struct for use in element assignment.
             For complete new assignment.
@@ -4019,7 +4070,7 @@
             <param name="elementMapId">The id of the ActionElementMap that this assignment will be replacing. (Optional)</param>
             <returns>ElementAssignment</returns>
         </member>
-        <member name="M:Rewired.ElementAssignment.KeyboardKeyAssignment(UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole)">
+        <member name="M:Rewired.ElementAssignment.KeyboardKeyAssignment(Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole)">
             <summary>
             Creates a struct for use in element assignment.
             For assignment of a keyboard key.
@@ -4030,7 +4081,7 @@
             <param name="axisContribution">Does this Action contribute positive or negative values to the final Action's input value? Used for split axis and button/key assignments.</param>
             <returns>ElementAssignment</returns>
         </member>
-        <member name="M:Rewired.ElementAssignment.KeyboardKeyAssignment(UnityEngine.KeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Int32)">
+        <member name="M:Rewired.ElementAssignment.KeyboardKeyAssignment(Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,System.Int32,Rewired.Pole,System.Int32)">
             <summary>
             Creates a struct for use in element assignment.
             For assignment of a keyboard key to replace an existing element map.
@@ -4425,6 +4476,102 @@
             application sessions and should not be saved or loaded.
             </summary>
         </member>
+        <member name="T:Rewired.UnityTouch">
+            <summary>
+            A reimplementation of UnityEngine.Touch due to the deprecation of Unity Input Manager.
+            Touch input can come from either UnityEngine.Input or UnityEngine.InputSystem, depending on settings.
+            If Unity Input System is the source, some values will be invalid due to incompatibilities between the two systems.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.inputSourceType">
+            <summary>
+            The source of input.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.altitudeAngle">
+            <summary>
+            Value of 0 radians indicates that the stylus is parallel to the surface, pi/2 indicates that it is perpendicular.
+            If the source of input is Unity Input System, this value will always be 0.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.azimuthAngle">
+            <summary>
+            Value of 0 radians indicates that the stylus is pointed along the x-axis of the device.
+            If the source of input is Unity Input System, this value will always be 0.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.deltaPosition">
+            <summary>
+            The position delta since last change in pixel coordinates.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.deltaTime">
+            <summary>
+            Amount of time that has passed since the last recorded change in Touch values.
+            If the source of input is Unity Input System, this value will always be 0.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.fingerId">
+            <summary>
+            The unique id for the touch.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.maximumPossiblePressure">
+            <summary>
+            The maximum possible pressure value for a platform. If Input.touchPressureSupported returns false, the value of this property will always be 1.0f.
+            If the source of input is Unity Input System, this value will always be 1.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.phase">
+            <summary>
+            Describes the phase of the touch.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.position">
+            <summary>
+            The position of the touch in screen space pixel coordinates.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.pressure">
+            <summary>
+            The current amount of pressure being applied to a touch.
+            For Unity Input Manager source:
+            1.0f is considered to be the pressure of an average touch.
+            If Input.touchPressureSupported returns false, the value of this property will always be 1.0f.
+            For Unity Input System source:
+            
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.radius">
+            <summary>
+            An estimated value of the radius of a touch.
+            For Unity Input Manager source:
+            Add radiusVariance to get the maximum touch size, subtract it to get the minimum touch size.
+            For Unity Input System source:
+            
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.radiusVariance">
+            <summary>
+            This value determines the accuracy of the touch radius. Add this value to the radius to get the maximum touch size, subtract it to get the minimum touch size.
+            If the source of input is Unity Input System, this value will always be 0.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.rawPosition">
+            <summary>
+            The first position of the touch contact in screen space pixel coordinates.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.tapCount">
+            <summary>
+            Number of taps.
+            </summary>
+        </member>
+        <member name="F:Rewired.UnityTouch.type">
+            <summary>
+            A value that indicates whether a touch was of Direct, Indirect, or Stylus type.
+            </summary>
+        </member>
         <member name="P:Rewired.ButtonStateRecorder.lastTimeStateChangedToPressed">
             <summary>
             Returns the last time the button state became pressed exactly.
@@ -4501,6 +4648,9 @@
             </summary>
         </member>
         <member name="T:Rewired.Internal.GUIText">
+            <exclude></exclude>
+        </member>
+        <member name="T:Rewired.Internal.GlobalObjectProvider">
             <exclude></exclude>
         </member>
         <member name="T:Rewired.Internal.OnGUIHelper">
@@ -4675,6 +4825,12 @@
             <summary>
             Event fired when the raw value changes.
             </summary>
+        </member>
+        <member name="T:Rewired.Internal.Helpers.ActionElementMapHelper">
+            <exclude></exclude>
+        </member>
+        <member name="M:Rewired.Internal.Helpers.ActionElementMapHelper.TryGetSplitAxisMaps(Rewired.ActionElementMap,Rewired.ActionElementMap@,Rewired.ActionElementMap@)">
+            <exclude></exclude>
         </member>
         <member name="T:Rewired.ComponentControls.ComponentControl">
             <summary>
@@ -5999,6 +6155,22 @@
             This is a component wrapper for Player Controller which can be added to a GameObject.
             </summary>
         </member>
+        <member name="P:Rewired.Components.PlayerController.ElementWithSourceInfo.absoluteSourceSensitivity">
+            <summary>
+            The absolute to relative sensitivity multiplier for axes. This is only applied when the axis coordinate mode is set to Relative and the axis receives
+            Absolute coordinate mode input (joystick axes, keyboard keys, etc.).
+            This is equivalent to pixels per second on a 1920x1080 screen.
+            The final result can also be affected by <see cref="P:Rewired.Components.PlayerController.ElementWithSourceInfo.absoluteToRelativeScalingMode"/> and, for a mouse, <see cref="P:Rewired.Components.PlayerMouse.pointerSpeed"/>.
+            </summary>
+        </member>
+        <member name="P:Rewired.Components.PlayerController.ElementWithSourceInfo.absoluteToRelativeScalingMode">
+            <summary>
+            Determines how a relative axis value will be scaled when controlled by an absolute axis (eg: a joystick).
+            This can be used to scale axis value based on screen or viewport resolution.
+            This is used for scaling mouse pointer speed.
+            Set <see cref="P:Rewired.PlayerController.absoluteToRelativeScalingReferenceResolution"/> to use a custom scaling reference resolution.
+            </summary>
+        </member>
         <member name="P:Rewired.Components.PlayerController.playerId">
             <summary>
             The Player id of the Player used for the source of input.
@@ -6342,6 +6514,21 @@
             Debug information is logged.
             </summary>
         </member>
+        <member name="T:Rewired.Config.UnityInputSourceType">
+            <summary>
+            Unity input source types.
+            </summary>
+        </member>
+        <member name="F:Rewired.Config.UnityInputSourceType.InputManager">
+            <summary>
+            Unity Input Manager (Legacy).
+            </summary>
+        </member>
+        <member name="F:Rewired.Config.UnityInputSourceType.InputSystem">
+            <summary>
+            Unity Input System.
+            </summary>
+        </member>
         <member name="T:Rewired.Config.LogLevel">
             <exclude></exclude>
             <summary>
@@ -6489,6 +6676,13 @@
         <member name="P:Rewired.Controller.extension">
             <summary>
             Gets an object used to access controller and platform-specific controller functions.
+            If the controller contains more than one extension, this will only return the first extension.
+            Use <see cref="P:Rewired.Controller.Extensions"/> to access all the Controller Extensions.
+            </summary>
+        </member>
+        <member name="P:Rewired.Controller.Extensions">
+            <summary>
+            List of Controller Extensions in this controller.
             </summary>
         </member>
         <member name="P:Rewired.Controller.ElementIdentifiers">
@@ -6835,6 +7029,8 @@
         <member name="M:Rewired.Controller.GetExtension``1">
             <summary>
             Gets an object used to access controller and platform-specific controller functions.
+            If the controller contains more than one extension, this will return the first extension of the specified type.
+            Use <see cref="P:Rewired.Controller.Extensions"/> to access all the Controller Extensions.
             </summary>
             <typeparam name="T">Type</typeparam>
             <returns>Extension</returns>
@@ -6919,6 +7115,11 @@
             The controller element identifier.
             </summary>
         </member>
+        <member name="P:Rewired.Controller.Element.excludeFromPolling">
+            <summary>
+            Determines if the element is excluded from rebind polling.
+            </summary>
+        </member>
         <member name="P:Rewired.Controller.Element.isMemberElement">
             <summary>
             Returns True if the element is a member of a compound element such as an Axis2D.
@@ -6999,6 +7200,17 @@
             Do not set this value extremely low or noisy axes will be detected when at rest.
             A value of -1 means the default global polling dead zone will be used instead.
             [Default = -1]
+            </summary>
+        </member>
+        <member name="P:Rewired.Controller.Axis.axisCoordinateMode">
+            <summary>
+            The coordinate mode of the axis.
+            This describes the format of the data returned by the axis.
+            </summary>
+        </member>
+        <member name="P:Rewired.Controller.Axis.excludeFromPolling">
+            <summary>
+            Determines if the element is excluded from rebind polling.
             </summary>
         </member>
         <member name="M:Rewired.Controller.Axis.GetCalibratedValueForPolling(Rewired.UpdateLoopType,Rewired.AxisCalibration)">
@@ -9507,6 +9719,82 @@
             <param name="actionHandle">Action handle</param>
             <returns>List of action origins</returns>
         </member>
+        <member name="P:Rewired.ControllerExtensions.TrackedDeviceExtension.isTracked">
+            <summary>
+            Is this device tracked?
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.TrackedDeviceExtension.trackedValues">
+            <summary>
+            The values that are tracked by the device.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.TrackedDeviceExtension.position">
+            <summary>
+            The position of the device.
+            Check <see cref="P:Rewired.ControllerExtensions.TrackedDeviceExtension.trackedValues"/> to see if this value is available on this device.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.TrackedDeviceExtension.rotation">
+            <summary>
+            The rotation of the device.
+            Check <see cref="P:Rewired.ControllerExtensions.TrackedDeviceExtension.trackedValues"/> to see if this value is available on this device.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.TrackedDeviceExtension.velocity">
+            <summary>
+            The velocity of the device.
+            Check <see cref="P:Rewired.ControllerExtensions.TrackedDeviceExtension.trackedValues"/> to see if this value is available on this device.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.TrackedDeviceExtension.angularVelocity">
+            <summary>
+            The angular velocity of the device.
+            Check <see cref="P:Rewired.ControllerExtensions.TrackedDeviceExtension.trackedValues"/> to see if this value is available on this device.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.TrackedDeviceExtension.acceleration">
+            <summary>
+            The acceleration of the device.
+            Check <see cref="P:Rewired.ControllerExtensions.TrackedDeviceExtension.trackedValues"/> to see if this value is available on this device.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.TrackedDeviceExtension.angularAcceleration">
+            <summary>
+            The angular acceleration of the device.
+            Check <see cref="P:Rewired.ControllerExtensions.TrackedDeviceExtension.trackedValues"/> to see if this value is available on this device.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.HololensHandExtension.sourceLossRisk">
+            <summary>
+            The source loss risk.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.HololensHandExtension.sourceLossMitigationDirection">
+            <summary>
+            The source loss mitigation direction.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.WMRSpatialControllerExtension.sourceLossRisk">
+            <summary>
+            The source loss risk.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.WMRSpatialControllerExtension.sourceLossMitigationDirection">
+            <summary>
+            The source loss mitigation direction.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.WMRSpatialControllerExtension.pointerPosition">
+            <summary>
+            The pointer position.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerExtensions.WMRSpatialControllerExtension.pointerRotation">
+            <summary>
+            The pointer rotation.
+            </summary>
+        </member>
         <member name="T:Rewired.Joystick">
             <summary>
             A joystick with buttons and axes.
@@ -9677,44 +9965,44 @@
         </member>
         <member name="M:Rewired.Keyboard.GetKeyCodeByButtonIndex(System.Int32)">
             <summary>
-            Gets the KeyCode of the key at the specified button index.
+            Gets the KeyboardKeyCode of the key at the specified button index.
             </summary>
             <param name="buttonIndex">The index of the button.</param>
-            <returns>KeyCode of the key.</returns>
+            <returns>KeyboardKeyCode of the key.</returns>
         </member>
         <member name="M:Rewired.Keyboard.GetKeyCodeById(System.Int32)">
             <summary>
-            Gets the KeyCode of the key with the specified element identifier id.
+            Gets the KeyboardKeyCode of the key with the specified element identifier id.
             </summary>
             <param name="elementIdentifierId">The element identifier id.</param>
-            <returns>KeyCode of the key.</returns>
+            <returns>KeyboardKeyCode of the key.</returns>
         </member>
-        <member name="M:Rewired.Keyboard.GetButtonIndexByKeyCode(UnityEngine.KeyCode)">
+        <member name="M:Rewired.Keyboard.GetButtonIndexByKeyCode(Rewired.KeyboardKeyCode)">
             <summary>
-            Gets the Button index that corresponds to the specified KeyCode.
+            Gets the Button index that corresponds to the specified KeyboardKeyCode.
             </summary>
-            <param name="keyCode">The KeyCode of the key.</param>
+            <param name="keyCode">The KeyboardKeyCode of the key.</param>
             <returns>Button index. -1 if not found.</returns>
         </member>
-        <member name="M:Rewired.Keyboard.GetElementIdentifierByKeyCode(UnityEngine.KeyCode)">
+        <member name="M:Rewired.Keyboard.GetElementIdentifierByKeyCode(Rewired.KeyboardKeyCode)">
             <summary>
-            Gets the Controller Element Identifier corresponding to the specified KeyCode.
+            Gets the Controller Element Identifier corresponding to the specified KeyboardKeyCode.
             </summary>
-            <param name="keyCode">The KeyCode of the key.</param>
+            <param name="keyCode">The KeyboardKeyCode of the key.</param>
             <returns>Controller Element Identifier. Null if not found.</returns>
         </member>
-        <member name="M:Rewired.Keyboard.KeyCodeToModifierKey(UnityEngine.KeyCode)">
+        <member name="M:Rewired.Keyboard.KeyCodeToModifierKey(Rewired.KeyboardKeyCode)">
             <summary>
             Gets the modifier key for the specified key code.
-            For example, KeyCode.LeftShift will return ModifierKey.Shift.
+            For example, KeyboardKeyCode.LeftShift will return ModifierKey.Shift.
             </summary>
             <param name="key">The key code of the key.</param>
             <returns>The modifier key for the specified key code. If the key code does not represent a modifier key, ModifierKey.None will be returned.</returns>
         </member>
-        <member name="M:Rewired.Keyboard.KeyCodeToModifierKeyFlags(UnityEngine.KeyCode)">
+        <member name="M:Rewired.Keyboard.KeyCodeToModifierKeyFlags(Rewired.KeyboardKeyCode)">
             <summary>
             Gets the modifier key flags for the specified key code.
-            For example, KeyCode.LeftShift will return ModifierKeyFlags.LeftShift.
+            For example, KeyboardKeyCode.LeftShift will return ModifierKeyFlags.LeftShift.
             </summary>
             <param name="key">The key code of the key.</param>
             <returns>The modifier key flags for the specified key code. If the key code does not represent a modifier key, ModifierKeyFlags.None will be returned.</returns>
@@ -9727,7 +10015,7 @@
             <param name="key">The key code of the modifier key.</param>
             <returns>True if the modifier key flags contains a specific modifier key, false if not.</returns>
         </member>
-        <member name="M:Rewired.Keyboard.ModifierKeyFlagsContain(Rewired.ModifierKeyFlags,UnityEngine.KeyCode)">
+        <member name="M:Rewired.Keyboard.ModifierKeyFlagsContain(Rewired.ModifierKeyFlags,Rewired.KeyboardKeyCode)">
             <summary>
             Determines if the modifier key flags contains a specific key.
             </summary>
@@ -9747,7 +10035,7 @@
             Converts modifier key flags to a key code.
             </summary>
             <param name="flags">The modifier key flags. Only one modifier key flag value should be passed at a time.</param>
-            <returns>Key code equivalent of the modifier key flags. If none, returns KeyCode.None.</returns>
+            <returns>Key code equivalent of the modifier key flags. If none, returns KeyboardKeyCode.None.</returns>
         </member>
         <member name="M:Rewired.Keyboard.ModifierKeyToModifierKeyFlags(Rewired.ModifierKey)">
             <summary>
@@ -9756,7 +10044,7 @@
             <param name="key">The key code of the key.</param>
             <returns>Modifier key flags equivalent of the modifier key. If none, returns ModifierKeyFlags.None.</returns>
         </member>
-        <member name="M:Rewired.Keyboard.GetKeyName(UnityEngine.KeyCode)">
+        <member name="M:Rewired.Keyboard.GetKeyName(Rewired.KeyboardKeyCode)">
             <summary>
             Gets the display name for the specified key code.
             This may return words and/or symbols for some keys. Example: "Keypad 0", ";", "Back Quote".
@@ -9765,14 +10053,14 @@
             <param name="key">The key code of the key.</param>
             <returns>The display name for the specified key code. The returned value will be localized if localization is in use.</returns>
         </member>
-        <member name="M:Rewired.Keyboard.GetKeyName(UnityEngine.KeyCode,Rewired.ModifierKeyFlags)">
+        <member name="M:Rewired.Keyboard.GetKeyName(Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags)">
             <summary>
             Creates a string containing all display names for a key and modifier key combination.
             This may return words and/or symbols for some keys. Example: "Keypad 0", ";", "Back Quote".
             Modifier keys will precede the primary key.
             Each key will be separated by the + character.
             If you need RTL support, you must build the string yourself using
-            <see cref="M:Rewired.Keyboard.GetModifierKeyName(Rewired.ModifierKey)"/> and <see cref="M:Rewired.Keyboard.GetKeyName(UnityEngine.KeyCode)"/>.
+            <see cref="M:Rewired.Keyboard.GetModifierKeyName(Rewired.ModifierKey)"/> and <see cref="M:Rewired.Keyboard.GetKeyName(Rewired.KeyboardKeyCode)"/>.
             The returned value will be localized if localization is in use.
             </summary>
             <param name="key">The key code of the key.</param>
@@ -10286,6 +10574,9 @@
         <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_NintendoSwitch">
             <exclude></exclude>
         </member>
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_NintendoSwitch2">
+            <exclude></exclude>
+        </member>
         <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_GameCore_Base">
             <exclude></exclude>
         </member>
@@ -10352,25 +10643,25 @@
         <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_InternalDriver">
             <exclude></exclude>
         </member>
-        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL2_Base">
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL_Base">
             <exclude></exclude>
         </member>
-        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL2_Base.MatchingCriteria">
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL_Base.MatchingCriteria">
             <exclude></exclude>
         </member>
-        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL2_Base.Elements">
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL_Base.Elements">
             <exclude></exclude>
         </member>
-        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL2_Base.Element">
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL_Base.Element">
             <exclude></exclude>
         </member>
-        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL2_Base.Button">
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL_Base.Button">
             <exclude></exclude>
         </member>
-        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL2_Base.Axis">
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL_Base.Axis">
             <exclude></exclude>
         </member>
-        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL2">
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_SDL">
             <exclude></exclude>
         </member>
         <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_Steam_Base">
@@ -10439,6 +10730,9 @@
         <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_AppleGCController_Base.AppleGCControllerElementIdentifierButtons">
             <exclude></exclude>
         </member>
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_AppleGCController_Base.AppleGCControllerPlatform">
+            <exclude></exclude>
+        </member>
         <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_AppleGCController">
             <exclude></exclude>
         </member>
@@ -10465,6 +10759,24 @@
             </summary>
         </member>
         <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_WindowsWGI">
+            <exclude></exclude>
+        </member>
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_UnityInputSystem_Base">
+            <exclude></exclude>
+        </member>
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_UnityInputSystem_Base.MatchingCriteria">
+            <exclude></exclude>
+        </member>
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_UnityInputSystem_Base.Elements">
+            <exclude></exclude>
+        </member>
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_UnityInputSystem_Base.Button">
+            <exclude></exclude>
+        </member>
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_UnityInputSystem_Base.Axis">
+            <exclude></exclude>
+        </member>
+        <member name="T:Rewired.Data.Mapping.HardwareJoystickMap.Platform_UnityInputSystem">
             <exclude></exclude>
         </member>
         <member name="T:Rewired.Data.Mapping.HardwareControllerTemplateMap">
@@ -10534,6 +10846,9 @@
             <exclude></exclude>
         </member>
         <member name="T:Rewired.Data.Mapping.AxisCalibrationType">
+            <exclude></exclude>
+        </member>
+        <member name="T:Rewired.Data.Mapping.BoolWithDefault">
             <exclude></exclude>
         </member>
         <member name="T:Rewired.Data.Mapping.SpecialAxisType">
@@ -10623,6 +10938,11 @@
             Runtime only!
             </summary>
         </member>
+        <member name="M:Rewired.Data.ConfigVars.GetPlatformVar_supportXRControllers">
+            <summary>
+            Runtime only!
+            </summary>
+        </member>
         <member name="M:Rewired.Data.ConfigVars.SetPlatformVar_ignoreInputWhenAppNotInFocus(System.Boolean)">
             <summary>
             Runtime only!
@@ -10664,6 +10984,11 @@
             </summary>
         </member>
         <member name="M:Rewired.Data.ConfigVars.SetPlatformVar_enhancedDeviceSupportExcludedDeviceTypes(System.Collections.Generic.IList{Rewired.Config.EnhancedDeviceSupportDeviceType})">
+            <summary>
+            Runtime only!
+            </summary>
+        </member>
+        <member name="M:Rewired.Data.ConfigVars.SetPlatformVar_supportXRControllers(System.Boolean)">
             <summary>
             Runtime only!
             </summary>
@@ -12135,6 +12460,23 @@
             <param name="index">The index of the element.</param>
             <returns>The element at the specified index. Returns null if no element exists at the specified index or it is not the correct type.</returns>
         </member>
+        <member name="P:Rewired.PlayerController.absoluteToRelativeScalingReferenceResolution">
+            <summary>
+            The reference resolution for absolute to relative value scaling.
+            This is used in conjunction with <see cref="P:Rewired.PlayerController.Axis.absoluteToRelativeScalingMode"/> to
+            determine how to scale absolute values to relative values.
+            When <see cref="P:Rewired.PlayerController.Axis.absoluteToRelativeScalingMode"/> is set to any of the screen / viewport
+            scaling modes, if the scaling mode is based on the horizontal dimension of the screen / viewport, the horizontal resolution will
+            be divided by the reference X resolution to determine the final scaling factor. For example, if the horizontal reference resolution
+            is 1920 pixels and the current screen / viewport horizontal resolution is 3840 pixels, the final scaling multiplier will be 2, resulting
+            in a doubling of value to compensate for the increased resolution.
+            If the scaling mode is based on the vertical dimension of the screen / viewport, the vertical resolution will
+            be divided by the reference Y resolution to determine the final scaling factor. For example, if the vertical reference resolution
+            is 1080 pixels and the current screen / viewport horizontal resolution is 720 pixels, the final scaling multiplier will be 0.66667, resulting
+            in a reduction of value to compensate for the decreased resolution.
+            [Default = 1920x1080]
+            </summary>
+        </member>
         <member name="T:Rewired.PlayerController.Factory">
             <summary>
             Class for creating Player Controller instances.
@@ -12147,6 +12489,56 @@
             <param name="definition">Definition use to set initial values in the controller.</param>
             <returns>A new Player Controller.</returns>
         </member>
+        <member name="T:Rewired.PlayerController.AbsoluteToRelativeScalingMode">
+            <summary>
+            Determines how the values will be scaled when controlled by an absolute value (eg: a joystick).
+            </summary>
+        </member>
+        <member name="F:Rewired.PlayerController.AbsoluteToRelativeScalingMode.None">
+            <summary>
+            No scaling.
+            </summary>
+        </member>
+        <member name="F:Rewired.PlayerController.AbsoluteToRelativeScalingMode.ScreenWidth">
+            <summary>
+            Scales based on the screen width.
+            </summary>
+        </member>
+        <member name="F:Rewired.PlayerController.AbsoluteToRelativeScalingMode.ScreenHeight">
+            <summary>
+            Scales based on the screen height.
+            </summary>
+        </member>
+        <member name="F:Rewired.PlayerController.AbsoluteToRelativeScalingMode.MaxScreenDimension">
+            <summary>
+            Scales based on the larger of screen width or height.
+            </summary>
+        </member>
+        <member name="F:Rewired.PlayerController.AbsoluteToRelativeScalingMode.MinScreenDimension">
+            <summary>
+            Scales based on the smaller of screen width or height.
+            </summary>
+        </member>
+        <member name="F:Rewired.PlayerController.AbsoluteToRelativeScalingMode.ViewportWidth">
+            <summary>
+            Scales based on the viewport width.
+            </summary>
+        </member>
+        <member name="F:Rewired.PlayerController.AbsoluteToRelativeScalingMode.ViewportHeight">
+            <summary>
+            Scales based on the viewport height.
+            </summary>
+        </member>
+        <member name="F:Rewired.PlayerController.AbsoluteToRelativeScalingMode.MaxViewportDimension">
+            <summary>
+            Scales based on the larger of viewport width or height.
+            </summary>
+        </member>
+        <member name="F:Rewired.PlayerController.AbsoluteToRelativeScalingMode.MinViewportDimension">
+            <summary>
+            Scales based on the smaller of viewport width or height.
+            </summary>
+        </member>
         <member name="T:Rewired.PlayerController.Axis">
             <summary>
             An Axis that uses Player Actions as the value source.
@@ -12156,6 +12548,15 @@
             <summary>
             The absolute to relative sensitivity multiplier. This is only applied when the axis coordinate mode is set to Relative and the axis receives
             Absolute coordinate mode input (joystick axes, keyboard keys, etc.).
+            This is equivalent to pixels per second on a 1920x1080 screen.
+            The final result can also be affected by <see cref="P:Rewired.PlayerController.Axis.absoluteToRelativeScalingMode"/> and, for a mouse, <see cref="P:Rewired.PlayerMouse.pointerSpeed"/>.
+            </summary>
+        </member>
+        <member name="P:Rewired.PlayerController.Axis.absoluteToRelativeScalingMode">
+            <summary>
+            Determines how a relative axis value will be scaled when controlled by an absolute axis (eg: a joystick).
+            This can be used to scale axis value based on screen or viewport resolution.
+            This is used for scaling mouse pointer speed.
             </summary>
         </member>
         <member name="P:Rewired.PlayerController.Axis.coordinateMode">
@@ -12201,15 +12602,17 @@
             Absolute coordinate mode input (joystick axes, keyboard keys, etc.).
             </summary>
         </member>
+        <member name="F:Rewired.PlayerController.Axis.Definition.absoluteToRelativeScalingMode">
+            <summary>
+            Determines how a relative axis value will be scaled when controlled by an absolute axis (eg: a joystick).
+            This can be used to scale axis value based on screen or viewport resolution.
+            This is used for scaling mouse pointer speed.
+            </summary>
+        </member>
         <member name="T:Rewired.PlayerController.MouseAxis">
             <summary>
             A Mouse Axis that uses Player Actions as the value source.
             Source value is automatically scaled to screen resolution.
-            </summary>
-        </member>
-        <member name="P:Rewired.PlayerController.MouseAxis.value">
-            <summary>
-            The current value.
             </summary>
         </member>
         <member name="T:Rewired.PlayerController.MouseAxis.Definition">
@@ -12771,6 +13174,20 @@
             </summary>
             <param name="joystick">The joystick to remove.</param>
         </member>
+        <member name="M:Rewired.Platforms.Custom.CustomInputSource.GetControllers">
+            <summary>
+            Gets a read-only list of all controllers.
+            </summary>
+            <returns>Read-only list of all controllers.</returns>
+        </member>
+        <member name="M:Rewired.Platforms.Custom.CustomInputSource.GetControllers``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            Gets controllers of the specified type.
+            </summary>
+            <param name="results">The results list.</param>
+            <typeparam name="T">Type of the Controller.</typeparam>
+            <returns>The number of Controllers returned.</returns>
+        </member>
         <member name="M:Rewired.Platforms.Custom.CustomInputSource.GetJoysticks">
             <summary>
             Gets a read-only list of all joysticks.
@@ -12780,13 +13197,17 @@
         <member name="M:Rewired.Platforms.Custom.CustomInputSource.OnJoystickConnected">
             <summary>
             Event to call when a joystick is connected.
-            This must be called by a subclass when a joystick is disconnected.
+            This must be called by a subclass when a joystick is connected.
+            This is called automatically by <see cref="M:Rewired.Platforms.Custom.CustomInputSource.AddController(Rewired.Platforms.Custom.CustomInputSource.Controller)"/> and
+            <see cref="M:Rewired.Platforms.Custom.CustomInputSource.AddJoystick(Rewired.Platforms.Custom.CustomInputSource.Joystick)"/> and does not need to be called manually.
             </summary>
         </member>
         <member name="M:Rewired.Platforms.Custom.CustomInputSource.OnJoystickDisconnected">
             <summary>
             Event to call when a joystick is disconnected.
             This must be called by a subclass when a joystick is disconnected.
+            This is called automatically by <see cref="M:Rewired.Platforms.Custom.CustomInputSource.RemoveController(Rewired.Platforms.Custom.CustomInputSource.Controller)"/> and
+            <see cref="M:Rewired.Platforms.Custom.CustomInputSource.RemoveJoystick(Rewired.Platforms.Custom.CustomInputSource.Joystick)"/> and does not need to be called manually.
             </summary>
         </member>
         <member name="M:Rewired.Platforms.Custom.CustomInputSource.Dispose">
@@ -12820,6 +13241,30 @@
             Custom input source Controller base class.
             </summary>
         </member>
+        <member name="E:Rewired.Platforms.Custom.CustomInputSource.Controller.ConnectedStateChangedEvent">
+            <summary>
+            Event triggered when the connected state of the controller changes.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.id">
+            <summary>
+            Unique id of the controller.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.type">
+            <summary>
+            The controller type.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.systemId">
+            <summary>
+            The system id of the joystick.
+            This value represents a unique device identifier, either assigned directly by the system or
+            a derived value based on some unique system-defined identifier.
+            Example: If the system provides a string path for a particular device, a long value can be
+            derived from the path by assigining an id to each unique path string.
+            </summary>
+        </member>
         <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.customName">
             <summary>
             Custom name for this controller, if any.
@@ -12847,11 +13292,75 @@
             Only set this if controllers can be uniquely identified on this platform across application sessions and system power cycles.
             </summary>
         </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.buttonCount">
+            <summary>
+            The number of buttons.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.axisCount">
+            <summary>
+            The number of axes.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.Elements">
+            <summary>
+            The list of Elements.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.Axes">
+            <summary>
+            The list of Axes. Generally this should not be used.
+            Use <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Controller.GetAxisValue(System.Int32)"/> and <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Controller.SetAxisValue(System.Int32,System.Single)"/> instead.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.Buttons">
+            <summary>
+            The list of Buttons. Generally this should not be used.
+            Use <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Controller.GetButtonValue(System.Int32)"/> and <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Controller.SetButtonValue(System.Int32,System.Boolean)"/> instead.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.Extensions">
+            <summary>
+            The list of Controller Extensions.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.supportsVibration">
+            <summary>
+            Determines whether this joystick supports vibration.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.extension">
+            <summary>
+            The Controller Extension.
+            This will only return the first controller extension.
+            Use <see cref="P:Rewired.Platforms.Custom.CustomInputSource.Controller.Extensions"/> to access all controller extensions in the controller.
+            This should no longer be used for setting the extension value.
+            Use <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Controller.AddExtension(Rewired.Controller.Extension)"/> instead.
+            This setter was left for legacy compatibility.
+            </summary>
+            <exception cref="T:System.NotSupportedException">The value is set after Controller has been initialized.</exception>
+        </member>
+        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Controller.Components">
+            <summary>
+            The list of Components.
+            </summary>
+        </member>
         <member name="M:Rewired.Platforms.Custom.CustomInputSource.Controller.#ctor(System.String)">
             <summary>
             Constructor.
             </summary>
             <param name="deviceName">The name of this device.</param>
+        </member>
+        <member name="M:Rewired.Platforms.Custom.CustomInputSource.Controller.#ctor(Rewired.Platforms.Custom.CustomInputSource.Controller.InitOptions)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="initOptions">The initialization options.</param>
+        </member>
+        <member name="M:Rewired.Platforms.Custom.CustomInputSource.Controller.#ctor(Rewired.Platforms.Custom.CustomInputSource.Controller.InitOptions,System.Int32,System.Int32)">
+            <param name="initOptions"></param>
+            <param name="axisCount"></param>
+            <param name="buttonCount"></param>
         </member>
         <member name="M:Rewired.Platforms.Custom.CustomInputSource.Controller.Disconnect">
             <summary>
@@ -12868,55 +13377,24 @@
             Update function. Called when input should be updated.
             </summary>
         </member>
+        <member name="M:Rewired.Platforms.Custom.CustomInputSource.Controller.AddExtension(Rewired.Controller.Extension)">
+            <summary>
+            Adds a Controller Extension.
+            This can only be called during construction.
+            </summary>
+            <param name="extension"></param>
+            <returns>True if the extension was added successfully, false if not.</returns>
+            <exception cref="T:System.ArgumentNullException">Extension is null.</exception>
+            <exception cref="T:System.NotSupportedException">This function is called after Controller has been initialized.</exception>
+        </member>
         <member name="T:Rewired.Platforms.Custom.CustomInputSource.Joystick">
             <summary>
             Joystick base class.
             </summary>
         </member>
-        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Joystick.systemId">
-            <summary>
-            The system id of the joystick.
-            This value represents a unique device identifier, either assigned directly by the system or
-            a derived value based on some unique system-defined identifier.
-            Example: If the system provides a string path for a particular device, a long value can be
-            derived from the path by assigining an id to each unique path string.
-            </summary>
-        </member>
         <member name="P:Rewired.Platforms.Custom.CustomInputSource.Joystick.unityId">
             <summary>
             The UnityEngine.Input joystick id (1-based index) of this joystick, if any.
-            </summary>
-        </member>
-        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Joystick.Axes">
-            <summary>
-            The list of Axes. Generally this should not be used.
-            Use <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Joystick.GetAxisValue(System.Int32)"/> and <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Joystick.SetAxisValue(System.Int32,System.Single)"/> instead.
-            </summary>
-        </member>
-        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Joystick.Buttons">
-            <summary>
-            The list of Buttons. Generally this should not be used.
-            Use <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Joystick.GetButtonValue(System.Int32)"/> and <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Joystick.SetButtonValue(System.Int32,System.Boolean)"/> instead.
-            </summary>
-        </member>
-        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Joystick.supportsVibration">
-            <summary>
-            Determines whether this joystick supports vibration.
-            </summary>
-        </member>
-        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Joystick.extension">
-            <summary>
-            The Controller Extension.
-            </summary>
-        </member>
-        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Joystick.buttonCount">
-            <summary>
-            The number of buttons.
-            </summary>
-        </member>
-        <member name="P:Rewired.Platforms.Custom.CustomInputSource.Joystick.axisCount">
-            <summary>
-            The number of axes.
             </summary>
         </member>
         <member name="M:Rewired.Platforms.Custom.CustomInputSource.Joystick.#ctor(System.String,System.Int64,System.Int32,System.Int32)">
@@ -12939,6 +13417,24 @@
             <param name="axisCount">The number of axes.</param>
             <param name="buttonCount">The number of buttons.</param>
         </member>
+        <member name="M:Rewired.Platforms.Custom.CustomInputSource.Joystick.#ctor(Rewired.Platforms.Custom.CustomInputSource.Joystick.InitOptions)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="initOptions"></param>
+        </member>
+        <member name="T:Rewired.Platforms.Custom.CustomInputSource.UnifiedKeyboard">
+            <summary>
+            Unified Keyboard base class.
+            This represents a standardized keyboard that takes input from all keyboards connected to the system.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.Custom.CustomInputSource.UnifiedMouse">
+            <summary>
+            Unified Mouse base class.
+            This represents a standardized mouse with a fixed number of elements that takes input from all mice connected to the system.
+            </summary>
+        </member>
         <member name="T:Rewired.Platforms.Custom.CustomInputSource.Element">
             <summary>
             Controller element base class.
@@ -12947,6 +13443,12 @@
         <member name="T:Rewired.Platforms.Custom.CustomInputSource.Axis">
             <summary>
             Controller axis element.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.Custom.CustomInputSource.Axis.value">
+            <summary>
+            Gets the current axis value.
+            To set the value, call <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Axis.SetValue(System.Single)"/> or <see cref="M:Rewired.Platforms.Custom.CustomInputSource.Axis.SetValue(System.Single,System.Double)"/> instead.
             </summary>
         </member>
         <member name="T:Rewired.Platforms.Custom.CustomInputSource.Button">
@@ -12970,6 +13472,21 @@
             <summary>
             Floating-point value of the button.
             This is only used if the button type is Pressure Sensitive.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.Custom.CustomInputSource.Vector2Element">
+            <summary>
+            Vector2 element.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.Custom.CustomInputSource.Vector3Element">
+            <summary>
+            Vector3 element.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.Custom.CustomInputSource.QuaternionElement">
+            <summary>
+            Quaternion element.
             </summary>
         </member>
         <member name="T:Rewired.Platforms.Custom.CustomPlatformInitOptions">
@@ -13193,7 +13710,7 @@
             <summary>
             Sets a key value.
             </summary>
-            <param name="keyCode">KeyCode of the key.</param>
+            <param name="keyCode">Key code of the key.</param>
             <param name="value">Value</param>
         </member>
         <member name="T:Rewired.Platforms.Custom.CustomPlatformUnifiedKeyboardSource.KeyPropertyMap">
@@ -13487,6 +14004,33 @@
             Clears custom platform settings.
             </summary>
         </member>
+        <member name="T:Rewired.Platforms.UnityInputManager.UnityInputManagerSettings">
+            <summary>
+            Settings for Unity Input Manager.
+            </summary>
+        </member>
+        <member name="P:Rewired.Platforms.UnityInputManager.UnityInputManagerSettings.disallowedJoysticks">
+            <summary>
+            Read-only list of joystick names that will not in the Joysticks list in Rewired.
+            To modify the list, replace it by setting this value with a new list.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.UnityInputManager.UnityInputManagerSettings.DeviceIdentifier">
+            <summary>
+            Used to identify a specific input device for exclusion.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.UnityInputManager.UnityInputManagerSettings.DeviceIdentifier.name">
+            <summary>
+            The name of the joystick as returned by UnityEngine.Input.GetJoystickNames.
+            If <see cref="F:Rewired.Platforms.UnityInputManager.UnityInputManagerSettings.DeviceIdentifier.useRegex"/> is true, this will be evaulated as regex when matching.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.UnityInputManager.UnityInputManagerSettings.DeviceIdentifier.useRegex">
+            <summary>
+            Determines if regex will be used when evaluating name match.
+            </summary>
+        </member>
         <member name="T:Rewired.Platforms.Platform">
             <exclude></exclude>
             <summary>
@@ -13524,57 +14068,108 @@
         </member>
         <member name="F:Rewired.Platforms.WindowsStandalonePrimaryInputSource.RawInput">
             <summary>
-            Use Raw Input for the input source. Note: Raw Input carries significant advantages over Direct Input such as better Bluetooth controller support, support for more elements on certain controllers, better controller recognition, etc. Does not require any extra libraries. Windows Control Panel joystick calibration does not affect Joystick axes.
+            Use Raw Input. Note: Raw Input carries significant advantages over Direct Input such as better Bluetooth controller support, support for more elements on certain controllers, better controller recognition, etc. Does not require any extra libraries. Windows Control Panel joystick calibration does not affect Joystick axes.
             </summary>
         </member>
         <member name="F:Rewired.Platforms.WindowsStandalonePrimaryInputSource.DirectInput">
             <summary>
-            Use Direct Input for the input source. Installation of DirectX end-user runtimes may be required for Direct Input support. Windows Control Panel joystick calibration settings affect Joystick axes.
+            Use Direct Input. Installation of DirectX end-user runtimes may be required for Direct Input support. Windows Control Panel joystick calibration settings affect Joystick axes.
             </summary>
         </member>
         <member name="F:Rewired.Platforms.WindowsStandalonePrimaryInputSource.XInput">
             <summary>
-            Use XInput for the input source. This will use XInput only. All non-XInput compatible controllers will be non-functional. To support both XInput and non-XInput controllers, use Raw Input or Direct Input instead and enable the Use XInput option. Supports XBox Controller 2-motor vibration, independent trigger values, but only supports 4 XInput-compatible controllers at once. Installation of DirectX end-user runtimes is required on Windows XP.
+            Use XInput. This will use XInput only. All non-XInput compatible controllers will be non-functional. To support both XInput and non-XInput controllers, use Raw Input or Direct Input instead and enable the Use XInput option. Supports XBox Controller 2-motor vibration, independent trigger values, but only supports 4 XInput-compatible controllers at once. Installation of DirectX end-user runtimes is required on Windows XP.
             </summary>
         </member>
         <member name="F:Rewired.Platforms.WindowsStandalonePrimaryInputSource.WindowsGamingInput">
             <summary>
-            Use Windows.Gaming.Input for the input source. This will use Windows.Gaming.Input only for controllers. All non-WindowsGamingInput compatible controllers will be non-functional. At the present time, only Gamepads are supported. To support all controller types, use Raw Input or Direct Input instead and enable the Use Windows Gaming Input option. Supports XBox Controller 4-motor vibration, independent trigger values, and supports more than 4 XInput-compatible controllers at once. (Requires Windows 10, October 2018 Update version 1809 (10.0.17763.0) or greater. Will fall back to other input sources on older versions of Windows.)
+            Use Windows.Gaming.Input. This will use Windows.Gaming.Input only for controllers. All non-WindowsGamingInput compatible controllers will be non-functional. At the present time, only Gamepads are supported. To support all controller types, use Raw Input or Direct Input instead and enable the Use Windows Gaming Input option. Supports XBox Controller 4-motor vibration, independent trigger values, and supports more than 4 XInput-compatible controllers at once. (Requires Windows 10, October 2018 Update version 1809 (10.0.17763.0) or greater. Will fall back to other input sources on older versions of Windows.)
             </summary>
         </member>
         <member name="F:Rewired.Platforms.WindowsStandalonePrimaryInputSource.SDL2">
             <summary>
-            Use SDL2 for the input source. This option requires the SDL2 runtime library to be installed. Note: SDL2 does not support as many devices as other native input sources.
+            Use SDL2. This option requires the SDL2 runtime library to be installed. Note: SDL2 does not support as many devices as other native input sources.
             </summary>
         </member>
-        <member name="F:Rewired.Platforms.WindowsStandalonePrimaryInputSource.Unity">
+        <member name="F:Rewired.Platforms.WindowsStandalonePrimaryInputSource.SDL3">
             <summary>
-            Use Unity fallback input.
+            Use SDL3. This option requires the SDL3 runtime library to be installed. Note: SDL3 does not support as many devices as other native input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.WindowsStandalonePrimaryInputSource.UnityInputManager">
+            <summary>
+            Use Unity Input Manager (legacy). (Not recommended)
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.WindowsStandalonePrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System. (Not recommended)
             </summary>
         </member>
         <member name="T:Rewired.Platforms.OSXStandalonePrimaryInputSource">
             <summary>
             OSX Standalone input sources.
+            Deprecated: Use MacOSStandalonePrimaryInputSource instead.
             </summary>
         </member>
         <member name="F:Rewired.Platforms.OSXStandalonePrimaryInputSource.Native">
             <summary>
-            Use native input for the input source. This provides the best device support.
+            Use native input. This provides the best device support.
             </summary>
         </member>
         <member name="F:Rewired.Platforms.OSXStandalonePrimaryInputSource.GameController">
             <summary>
-            Use Apple Game Controller framework for the input source. This provides support only for devices supported by the Game Controller framework. This may not include all devices supported by the Native input source.
+            Use Apple Game Controller framework. This provides support only for devices supported by the Game Controller framework. This may not include all devices supported by the Native input source.
             </summary>
         </member>
         <member name="F:Rewired.Platforms.OSXStandalonePrimaryInputSource.SDL2">
             <summary>
-             SDL2 - Use SDL2 for the input source. May be required for Steam Streaming and Steam Controller support in OSX. This option requires the SDL2 runtime library to be installed. Note: SDL2 does not support as many devices as other native input sources.
+             Use SDL2. May be required for Steam Streaming and Steam Controller support in OSX. This option requires the SDL2 runtime library to be installed. Note: SDL2 does not support as many devices as other native input sources.
             </summary>
         </member>
-        <member name="F:Rewired.Platforms.OSXStandalonePrimaryInputSource.Unity">
+        <member name="F:Rewired.Platforms.OSXStandalonePrimaryInputSource.UnityInputManager">
             <summary>
-            Unity Input - Use Unity fallback input.
+            Use Unity Input Manager (legacy). (Not recommended)
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.OSXStandalonePrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System. (Not recommended)
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.MacOSStandalonePrimaryInputSource">
+            <summary>
+            MacOS Standalone input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.MacOSStandalonePrimaryInputSource.Native">
+            <summary>
+            Use native input. This provides the best device support.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.MacOSStandalonePrimaryInputSource.GameController">
+            <summary>
+            Use Apple Game Controller framework. This provides support only for devices supported by the Game Controller framework. This may not include all devices supported by the Native input source.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.MacOSStandalonePrimaryInputSource.SDL2">
+            <summary>
+             Use SDL2. This option requires the SDL2 runtime library to be installed. Note: SDL2 does not support as many devices as other native input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.MacOSStandalonePrimaryInputSource.SDL3">
+            <summary>
+             Use SDL3. This option requires the SDL3 runtime library to be installed. Note: SDL3 does not support as many devices as other native input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.MacOSStandalonePrimaryInputSource.UnityInputManager">
+            <summary>
+            Use Unity Input Manager (legacy). (Not recommended)
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.MacOSStandalonePrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System. (Not recommended)
             </summary>
         </member>
         <member name="T:Rewired.Platforms.LinuxStandalonePrimaryInputSource">
@@ -13584,17 +14179,27 @@
         </member>
         <member name="F:Rewired.Platforms.LinuxStandalonePrimaryInputSource.Native">
             <summary>
-            Use native input for the input source. This provides the best device support.
+            Use native input. This provides the best device support.
             </summary>
         </member>
         <member name="F:Rewired.Platforms.LinuxStandalonePrimaryInputSource.SDL2">
             <summary>
-            SDL2 - Use SDL2 for the input source. May be required for Steam Streaming and Steam Controller support in Linux. This option requires the SDL2 runtime library to be installed. Note: SDL2 does not support as many devices as other native input sources.
+            Use SDL2. This option requires the SDL2 runtime library to be installed. Note: SDL2 does not support as many devices as other native input sources.
             </summary>
         </member>
-        <member name="F:Rewired.Platforms.LinuxStandalonePrimaryInputSource.Unity">
+        <member name="F:Rewired.Platforms.LinuxStandalonePrimaryInputSource.SDL3">
             <summary>
-            Unity Input - Use Unity fallback input.
+            Use SDL3 This option requires the SDL3 runtime library to be installed. Note: SDL3 does not support as many devices as other native input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.LinuxStandalonePrimaryInputSource.UnityInputManager">
+            <summary>
+            Use Unity Input Manager (legacy). (Not recommended)
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.LinuxStandalonePrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System. (Not recommended)
             </summary>
         </member>
         <member name="T:Rewired.Platforms.WindowsUWPPrimaryInputSource">
@@ -13602,14 +14207,99 @@
             Windows 10 Universal input sources.
             </summary>
         </member>
-        <member name="T:Rewired.Platforms.XboxOnePrimaryInputSource">
+        <member name="F:Rewired.Platforms.WindowsUWPPrimaryInputSource.Native">
             <summary>
-            Xbox One input sources.
+            Use native input. This provides the best device support.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.WindowsUWPPrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.AndroidPrimaryInputSource">
+            <summary>
+            Android input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.AndroidPrimaryInputSource.UnityInputManager">
+            <summary>
+            Use Unity Input Manager (legacy).
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.AndroidPrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.IOSPrimaryInputSource">
+            <summary>
+            iOS input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.IOSPrimaryInputSource.Native">
+            <summary>
+            Use native input. This provides the best device support.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.IOSPrimaryInputSource.UnityInputManager">
+            <summary>
+            Use Unity Input Manager (legacy).
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.IOSPrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.TVOSPrimaryInputSource">
+            <summary>
+            tvOS input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.TVOSPrimaryInputSource.Native">
+            <summary>
+            Use native input. This provides the best device support.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.TVOSPrimaryInputSource.UnityInputManager">
+            <summary>
+            Use Unity Input Manager (legacy).
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.TVOSPrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System.
+            </summary>
+        </member>
+        <member name="T:Rewired.Platforms.VisionOSPrimaryInputSource">
+            <summary>
+            tvOS input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.VisionOSPrimaryInputSource.Native">
+            <summary>
+            Use native input. This provides the best device support.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.VisionOSPrimaryInputSource.UnityInputManager">
+            <summary>
+            Use Unity Input Manager (legacy).
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.VisionOSPrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System.
             </summary>
         </member>
         <member name="T:Rewired.Platforms.GameCoreXboxOnePrimaryInputSource">
             <summary>
             GameCore Xbox One input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.GameCoreXboxOnePrimaryInputSource.Native">
+            <summary>
+            Use native input. This provides the best device support.
             </summary>
         </member>
         <member name="T:Rewired.Platforms.GameCoreScarlettPrimaryInputSource">
@@ -13622,14 +14312,44 @@
             PS4 input sources.
             </summary>
         </member>
+        <member name="F:Rewired.Platforms.PS4PrimaryInputSource.PS4UnityInputManager">
+            <summary>
+            Use Unity Input Manager + Unity PS4 library functions.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.PS4PrimaryInputSource.PS4UnityInputSystem">
+            <summary>
+            Use Unity Input System + Unity PS4 library functions.
+            </summary>
+        </member>
         <member name="T:Rewired.Platforms.PS5PrimaryInputSource">
             <summary>
             PS5 input sources.
             </summary>
         </member>
+        <member name="F:Rewired.Platforms.PS5PrimaryInputSource.PS5UnityInputManager">
+            <summary>
+            Use Unity Input Manager + Unity PS5 library functions.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.PS5PrimaryInputSource.PS5UnityInputSystem">
+            <summary>
+            Use Unity Input System + Unity PS5 library functions.
+            </summary>
+        </member>
         <member name="T:Rewired.Platforms.WebGLPrimaryInputSource">
             <summary>
             WebGL input sources.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.WebGLPrimaryInputSource.Native">
+            <summary>
+            Use native input.
+            </summary>
+        </member>
+        <member name="F:Rewired.Platforms.WebGLPrimaryInputSource.UnityInputSystem">
+            <summary>
+            Use Unity Input System. (Not recommended)
             </summary>
         </member>
         <member name="T:Rewired.Platforms.DirectInputAxis">
@@ -13698,145 +14418,63 @@
             WebGL Browser types.
             </summary>
         </member>
-        <member name="T:Rewired.Platforms.XboxOne.IXboxOneInputSource">
-            <summary>
-            Interface for Xbox One input source for accessing special functions.
-            </summary>
+        <member name="T:Rewired.Platforms.UnityInputSystem.UnityInputSystemInputSourceBase">
             <exclude></exclude>
         </member>
-        <member name="T:Rewired.Platforms.XboxOne.XboxOneGamepadExtension">
-            <summary>
-            Allows access to platform-specific controller functions such as vibration.
-            </summary>
+        <member name="T:Rewired.Platforms.UnityInputSystem.UnityInputSystemInputSourceBase.InputDeviceInfoComponent">
+            <exclude></exclude>
         </member>
-        <member name="P:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.xboxOneUserId">
-            <summary>
-            The Xbox One user id to which this controller is assigned.
-            </summary>
+        <member name="T:Rewired.Platforms.UnityInputSystem.UnityInputSystemInputSourceBase.IntensityVibrationComponent">
+            <exclude></exclude>
         </member>
-        <member name="P:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.xboxOneJoystickId">
-            <summary>
-            The Xbox One joystick id for this controller.
-            </summary>
+        <member name="T:Rewired.Platforms.UnityInputSystem.UnityInputSystemInputSourceBase.VibrationComponent">
+            <exclude></exclude>
         </member>
-        <member name="P:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.vibrationMotorCount">
+        <member name="M:Rewired.Platforms.UnityInputSystem.UnityInputSystemInputSourceBase.VibrationComponent.AddMotor(Rewired.Platforms.Custom.ControllerComponents.IVibrationMotor)">
             <summary>
-            The number of vibration motors in this controller.
+            Adds a motor to the component.
+            This must only be called during construction.
+            If called after initialization, an exception will be thrown.
             </summary>
+            <param name="motor">The motor.</param>
+            <exception cref="T:System.NotSupportedException">If called after the component has been initialized.</exception>
+            <returns>True on success, false on failure.</returns>
         </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.SetVibration(System.Int32,System.Single)">
-            <summary>
-            Sets vibration level for a motor at a specified index.
-            </summary>
-            <param name="motorIndex">Motor index</param>
-            <param name="motorLevel">Motor level [float: 0.0 - 1.0]</param>
+        <member name="T:Rewired.Platforms.UnityInputSystem.UnityInputSystemControllerExtensionBase">
+            <exclude></exclude>
         </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.SetVibration(System.Int32,System.Single,System.Single)">
+        <member name="M:Rewired.Platforms.UnityInputSystem.UnityInputSystemControllerExtensionBase.OnUpdateData(Rewired.UpdateLoopType)">
             <summary>
-            Sets vibration level for a motor at a specified index with a timeout.
+            Called when data is updated.
             </summary>
-            <param name="motorIndex">Motor index</param>
-            <param name="motorLevel">Motor level [float: 0.0 - 1.0]</param>
-            <param name="duration">Length of time in seconds to activate the motor before it stops. [0 = Infinite]</param>
+            <param name="updateLoop">The current update loop type.</param>
         </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.SetVibration(System.Int32,System.Single,System.Boolean)">
+        <member name="M:Rewired.Platforms.UnityInputSystem.UnityInputSystemControllerExtensionBase.OnSourceUpdated(Rewired.Interfaces.IControllerExtensionSource)">
             <summary>
-            Sets vibration level for a motor at a specified index.
+            Called when the source is updated.
             </summary>
-            <param name="motorIndex">Motor index</param>
-            <param name="motorLevel">Motor level [float: 0.0 - 1.0]</param>
-            <param name="stopOtherMotors">Stop other motors?</param>
+            <param name="source">The source.</param>
         </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.SetVibration(System.Int32,System.Single,System.Single,System.Boolean)">
+        <member name="M:Rewired.Platforms.UnityInputSystem.UnityInputSystemControllerExtensionBase.GetSource">
             <summary>
-            Sets vibration level for a motor at a specified index with a timeout.
+            Get the Controller Extension source.
             </summary>
-            <param name="motorIndex">Motor index</param>
-            <param name="motorLevel">Motor level [float: 0.0 - 1.0]</param>
-            <param name="duration">Length of time in seconds to activate the motor before it stops. [0 = Infinite]</param>
-            <param name="stopOtherMotors">Stop other motors?</param>
+            <returns>Controller Extension source</returns>
         </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.GetVibration(System.Int32)">
+        <member name="M:Rewired.Platforms.UnityInputSystem.UnityInputSystemControllerExtensionBase.ShallowCopy">
             <summary>
-            Gets vibration level for a motor at a specified index.
+            Makes a shallow copy of the object.
             </summary>
-            <param name="motorIndex">Motor index</param>
-            <returns>Motor level [float: 0.0 - 1.0]</returns>
+            <returns>Shallow copy of the object.</returns>
         </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.GetVibration(Rewired.Platforms.XboxOne.XboxOneGamepadMotorType)">
-            <summary>
-            Gets vibration level for a specific motor.
-            </summary>
-            <param name="motor">Motor type</param>
-            <returns>Motor level [float: 0.0 - 1.0]</returns>
+        <member name="T:Rewired.Platforms.UnityInputSystem.UnityInputSystemInputSourceInitOptions">
+            <exclude></exclude>
         </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.StopVibration">
-            <summary>
-            Stops vibration on all motors.
-            </summary>
+        <member name="T:Rewired.Platforms.UnityInputSystem.UnityInputSystemDeviceMatchingProperties">
+            <exclude></exclude>
         </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.SetVibration(Rewired.Platforms.XboxOne.XboxOneGamepadMotorType,System.Single)">
-            <summary>
-            Sets vibration leves on an individual motor.
-            </summary>
-            <param name="motor">Motor type</param>
-            <param name="motorLevel">Motor level [float: 0.0 - 1.0]</param>
-        </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.SetVibration(Rewired.Platforms.XboxOne.XboxOneGamepadMotorType,System.Single,System.Boolean)">
-            <summary>
-            Sets vibration level on an individual motor.
-            </summary>
-            <param name="motor">Motor type</param>
-            <param name="motorLevel">Motor level [float: 0.0 - 1.0]</param>
-            <param name="stopOtherMotors">Stop other motors?</param>
-        </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.SetVibration(System.Single,System.Single)">
-            <summary>
-            Sets vibration level for left and right motors.
-            </summary>
-            <param name="leftMotorLevel">float: 0.0 - 1.0</param>
-            <param name="rightMotorLevel">float: 0.0 - 1.0</param>
-        </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.SetVibration(System.Single,System.Single,System.Boolean)">
-            <summary>
-            Sets vibration level for left and right motors.
-            </summary>
-            <param name="leftMotorLevel">float: 0.0 - 1.0</param>
-            <param name="rightMotorLevel">float: 0.0 - 1.0</param>
-            <param name="stopOtherMotors">Stop other motors?</param>
-        </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.SetVibration(System.Single,System.Single,System.Single,System.Single)">
-            <summary>
-            Sets vibration levels on all 4 motors.
-            </summary>
-            <param name="leftMotorLevel">Left motor level [float: 0.0 - 1.0]</param>
-            <param name="rightMotorLevel">Right motor level [float: 0.0 - 1.0]</param>
-            <param name="leftTriggerLevel">Left trigger level [float: 0.0 - 1.0]</param>
-            <param name="rightTriggerLevel">Right trigger level [float: 0.0 - 1.0]</param>
-        </member>
-        <member name="M:Rewired.Platforms.XboxOne.XboxOneGamepadExtension.PulseVibrateMotor(Rewired.Platforms.XboxOne.XboxOneGamepadMotorType,System.Single,System.Single,System.Single)">
-            <summary>
-            Pulses the vibration motor for a specified duration.
-            </summary>
-            <param name="motor">Motor type</param>
-            <param name="startLevel">Start motor level [float: 0.0 - 1.0]</param>
-            <param name="endLevel">End motor level [float: 0.0 - 1.0]</param>
-            <param name="duration">Duration in seconds</param>
-        </member>
-        <member name="T:Rewired.Platforms.XboxOne.XboxOneGamepadMotorType">
-            <summary>
-            XBox One game pad motors. Used for vibration.
-            </summary>
-        </member>
-        <member name="T:Rewired.Platforms.XboxOne.XboxOneGamepadVibration">
-            <summary>
-            For passing Xbox One gamepad vibration data.
-            </summary>
-        </member>
-        <member name="T:Rewired.Platforms.XboxOne.XboxOneInputSource">
-            <summary>
-            Input source for the Xbox One platform.
-            </summary>
+        <member name="T:Rewired.Platforms.UnityInputSystem.UnityInputSystemDeviceType">
+            <exclude></exclude>
         </member>
         <member name="T:Rewired.ActiveControllerChangedDelegate">
             <summary>
@@ -14001,9 +14639,56 @@
             Calculation type for 2D deadzones.
             </summary>
         </member>
+        <member name="F:Rewired.DeadZone2DType.Radial">
+            <summary>
+            Uses the magnitude of both axes of input to compare against the dead zone.
+            Use this for the smoothest stick input.
+            </summary>
+        </member>
+        <member name="F:Rewired.DeadZone2DType.Axial">
+            <summary>
+            Each axis is compared against the dead zone individually.
+            This will result in input snapping to zero on each axis when
+            entering each respective dead zone.
+            This can be useful for games that primarly use input in the
+            four cardinal directions.
+            </summary>
+        </member>
+        <member name="T:Rewired.Axis2DClampType">
+            <summary>
+            Clamp types for Axis2D.
+            </summary>
+        </member>
+        <member name="F:Rewired.Axis2DClampType.None">
+            <summary>
+            Do not clamp input.
+            If the individual axes are range calibrated,
+            they will still be clamped individually.
+            </summary>
+        </member>
+        <member name="F:Rewired.Axis2DClampType.Radial">
+            <summary>
+            Clamp input to a unit circle.
+            </summary>
+        </member>
+        <member name="F:Rewired.Axis2DClampType.Axial">
+            <summary>
+            Clamp input to -1 to +1 axially.
+            </summary>
+        </member>
         <member name="T:Rewired.AxisSensitivity2DType">
             <summary>
             Calculation type for sensitivity on 2D axes.
+            </summary>
+        </member>
+        <member name="F:Rewired.AxisSensitivity2DType.Radial">
+            <summary>
+            Sensitivity will be calculated using the magnitude of input and applied to the input vector.
+            </summary>
+        </member>
+        <member name="F:Rewired.AxisSensitivity2DType.Axial">
+            <summary>
+            Sensitivity will be calculated using each individual axis of input and applied individually to each.
             </summary>
         </member>
         <member name="T:Rewired.ElementAssignmentType">
@@ -14365,6 +15050,21 @@
         <member name="T:Rewired.JoystickType">
             <summary>
             Joystick type.
+            </summary>
+        </member>
+        <member name="F:Rewired.InputSource.XboxOne">
+            <summary>
+            XboxOne XDK (based on Unity Input Manager)
+            </summary>
+        </member>
+        <member name="F:Rewired.InputSource.PS4">
+            <summary>
+            PS4 (Unity Input Manager)
+            </summary>
+        </member>
+        <member name="F:Rewired.InputSource.PS5">
+            <summary>
+            PS5 (Unity Input Manager)
             </summary>
         </member>
         <member name="T:Rewired.Initializer">
@@ -15435,7 +16135,7 @@
         </member>
         <member name="P:Rewired.ActionElementMap.keyCode">
             <summary>
-            The keyboard key code. Only used for keyboard bindings. Returns UnityEngine.KeyCode value.
+            The keyboard key code. Only used for keyboard bindings.
             </summary>
         </member>
         <member name="P:Rewired.ActionElementMap.hasModifiers">
@@ -15594,6 +16294,21 @@
             Maps calibration data to a controller's axes.
             </summary>
         </member>
+        <member name="T:Rewired.CalibrationMap.InitOptions">
+            <summary>
+            Initialization options for <see cref="T:Rewired.CalibrationMap"/>.
+            </summary>
+        </member>
+        <member name="P:Rewired.CalibrationMap.InitOptions.axisCalibrations">
+            <summary>
+            List of <see cref="T:Rewired.AxisCalibration"/>.
+            </summary>
+        </member>
+        <member name="P:Rewired.CalibrationMap.InitOptions.axis2DCalibrations">
+            <summary>
+            List of <see cref="T:Rewired.Axis2DCalibration"/>.
+            </summary>
+        </member>
         <member name="P:Rewired.CalibrationMap.Axes">
             <summary>
             Get a list of the AxisCalibration objects.
@@ -15604,11 +16319,28 @@
             The number of axes in the map.
             </summary>
         </member>
+        <member name="P:Rewired.CalibrationMap.Axes2D">
+            <summary>
+            Get a list of the Axis2DCalibration objects.
+            </summary>
+        </member>
+        <member name="P:Rewired.CalibrationMap.axis2DCount">
+            <summary>
+            The number of 2D axes in the map.
+            </summary>
+        </member>
         <member name="M:Rewired.CalibrationMap.#ctor(Rewired.AxisCalibration[])">
             <summary>
             Creates a CalibrationMap from an array of AxisCalibrations.
             </summary>
             <param name="axisCalibrations">Array of AxisCalibrations</param>
+        </member>
+        <member name="M:Rewired.CalibrationMap.#ctor(Rewired.CalibrationMap.InitOptions)">
+            <summary>
+            Creates a CalibrationMap from incoming options.
+            </summary>
+            <exception cref="T:System.ArgumentNullException">A required value in initOptions is null.</exception>
+            <param name="initOptions">The initialization options.</param>
         </member>
         <member name="M:Rewired.CalibrationMap.Reset">
             <summary>
@@ -15622,11 +16354,28 @@
             <param name="index">Index of the Axis</param>
             <returns>AxisCalibration</returns>
         </member>
+        <member name="M:Rewired.CalibrationMap.GetAxis2D(System.Int32)">
+            <summary>
+            Gets an Axis2DCalibration at a particular index.
+            </summary>
+            <param name="index">Index of the Axis2D</param>
+            <returns>Axis2DCalibration</returns>
+        </member>
         <member name="M:Rewired.CalibrationMap.GetCalibratedValue(System.Int32,System.Single)">
             <summary>
             Calibrates the incoming value by the AxisCalibration at a particular index.
             </summary>
             <param name="axisIndex">Index of the Axis</param>
+            <param name="value">Incoming value to calibrate</param>
+            <returns>Calibrated value</returns>
+        </member>
+        <member name="M:Rewired.CalibrationMap.GetCalibratedValue2D(System.Int32,System.Int32,System.Int32,UnityEngine.Vector2)">
+            <summary>
+            Calibrates the incoming value by the Axis2DCalibration at a particular index.
+            </summary>
+            <param name="axis2DIndex">Index of the Axis2D</param>
+            <param name="xAxisIndex">Index of the X Axis</param>
+            <param name="yAxisIndex">Index of the Y Axis</param>
             <param name="value">Incoming value to calibrate</param>
             <returns>Calibrated value</returns>
         </member>
@@ -15638,12 +16387,27 @@
             <param name="data">Calibration data</param>
             <returns>Success / failure</returns>
         </member>
+        <member name="M:Rewired.CalibrationMap.SetAxis2DData(System.Int32,Rewired.Axis2DCalibrationData)">
+            <summary>
+            Sets calibration settings for an Axis2D at a particular index.
+            </summary>
+            <param name="index">Index of the Axis2D</param>
+            <param name="data">Calibration data</param>
+            <returns>Success / failure</returns>
+        </member>
         <member name="M:Rewired.CalibrationMap.GetAxisData(System.Int32)">
             <summary>
             Gets a struct containing the calibration data for an Axis at a particular index.
             </summary>
             <param name="index">Index of the Axis</param>
             <returns>AxisCalibrationData</returns>
+        </member>
+        <member name="M:Rewired.CalibrationMap.GetAxis2DData(System.Int32)">
+            <summary>
+            Gets a struct containing the calibration data for an Axis2D at a particular index.
+            </summary>
+            <param name="index">Index of the Axis2D</param>
+            <returns>Axis2DCalibrationData</returns>
         </member>
         <member name="M:Rewired.CalibrationMap.ToXmlString">
             <summary>
@@ -15684,6 +16448,11 @@
         <member name="P:Rewired.AxisCalibration.deadZone">
             <summary>
             Gets or sets the dead zone. If the Axis's absolute value is less than or equal to the dead zone, it will return 0.
+            </summary>
+        </member>
+        <member name="P:Rewired.AxisCalibration.upperDeadZone">
+            <summary>
+            Gets or sets the upper dead zone. If the Axis's absolute value is greater than or equal to extents minus the upper dead zone, it will return min/max.
             </summary>
         </member>
         <member name="P:Rewired.AxisCalibration.calibratedZero">
@@ -15777,6 +16546,11 @@
             If the Axis's absolute value is less than or equal to the dead zone, it will return 0.
             </summary>
         </member>
+        <member name="F:Rewired.AxisCalibrationData.upperDeadZone">
+            <summary>
+            Gets or sets the upper dead zone. If the Axis's absolute value is greater than or equal to extents minus the upper dead zone, it will return min/max.
+            </summary>
+        </member>
         <member name="F:Rewired.AxisCalibrationData.zero">
             <summary>
             The zero value. This can be used to correct a non-zero resting state.
@@ -15825,6 +16599,11 @@
             Creates a default AxisCalibrationData.
             </summary>
         </member>
+        <member name="T:Rewired.Axis2DCalibration">
+            <summary>
+            Holds calibration information for two controller axes.
+            </summary>
+        </member>
         <member name="P:Rewired.Axis2DCalibration.deadZoneType">
             <summary>
             The calculation type for the dead zone.
@@ -15833,6 +16612,48 @@
         <member name="P:Rewired.Axis2DCalibration.sensitivityType">
             <summary>
             Calculation type for sensitivity on 2D axes.
+            </summary>
+        </member>
+        <member name="P:Rewired.Axis2DCalibration.clampType">
+            <summary>
+            Clamp type.
+            </summary>
+        </member>
+        <member name="M:Rewired.Axis2DCalibration.GetData">
+            <summary>
+            Gets a struct containing the calibration data.
+            </summary>
+            <returns>Axis2DCalibrationData</returns>
+        </member>
+        <member name="M:Rewired.Axis2DCalibration.SetData(Rewired.Axis2DCalibrationData)">
+            <summary>
+            Sets the calibration data.
+            </summary>
+            <param name="data">Calibration data</param>
+        </member>
+        <member name="M:Rewired.Axis2DCalibration.Reset">
+            <summary>
+            Resets all calibration setings to the hardware defaults.
+            </summary>
+        </member>
+        <member name="T:Rewired.Axis2DCalibrationData">
+            <summary>
+            A struct for working with 2d axis calibration data.
+            </summary>
+        </member>
+        <member name="P:Rewired.Axis2DCalibrationData.deadZoneType">
+            <summary>
+            The calculation type for the dead zone.
+            </summary>
+        </member>
+        <member name="P:Rewired.Axis2DCalibrationData.sensitivityType">
+            <summary>
+            Calculation type for sensitivity on 2D axes.
+            </summary>
+        </member>
+        <member name="P:Rewired.Axis2DCalibrationData.clampType">
+            <summary>
+            Clamp type.
             </summary>
         </member>
         <member name="T:Rewired.ControllerElementIdentifier">
@@ -15904,6 +16725,11 @@
             <summary>
             The key of the negative axis of the element identifier, if any.
             This is used for localization and glyph lookup.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerElementIdentifier.role">
+            <summary>
+            The role of this element.
             </summary>
         </member>
         <member name="M:Rewired.ControllerElementIdentifier.#ctor">
@@ -16597,6 +17423,18 @@
             Gets all Button ActionElementMaps in this controller map.
             </summary>
         </member>
+        <member name="P:Rewired.ControllerMap.modifiedTime">
+            <summary>
+            The last time the Controller Map was modified since it was created.
+            Returns 0 if the Controller Map was not modified or if <see cref="P:Rewired.ControllerMap.isModified"/> was set to false.
+            </summary>
+        </member>
+        <member name="P:Rewired.ControllerMap.isModified">
+            <summary>
+            Determines if the Controller Map has been modified since it was created.
+            If this is manually set to true, <see cref="P:Rewired.ControllerMap.modifiedTime"/> will also be set to the current time.
+            </summary>
+        </member>
         <member name="M:Rewired.ControllerMap.ContainsAction(System.String)">
             <summary>
             Does this controller map contain any ActionElementMaps that are bound to a particular Action?
@@ -16618,7 +17456,7 @@
             <param name="elementIdentifierId">The id of the element identifier.</param>
             <returns>True/False</returns>
         </member>
-        <member name="M:Rewired.ControllerMap.ContainsKeyboardKey(UnityEngine.KeyCode,Rewired.ModifierKeyFlags)">
+        <member name="M:Rewired.ControllerMap.ContainsKeyboardKey(Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags)">
             <summary>
             Does this controller map contain any ActionElementMaps that are bound to a particular keyboard key?
             </summary>
@@ -16674,32 +17512,32 @@
             <param name="result">The resulting ActionElementMap.</param>
             <returns>Success/Failure</returns>
         </member>
-        <member name="M:Rewired.ControllerMap.CreateElementMap(System.Int32,Rewired.Pole,UnityEngine.KeyCode,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ModifierKey)">
+        <member name="M:Rewired.ControllerMap.CreateElementMap(System.Int32,Rewired.Pole,Rewired.KeyboardKeyCode,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ModifierKey)">
             <summary>
             Creates an ActionElementMap in this controller map for a keyboard key assignment.
             </summary>
             <param name="actionId">The id of the Action to bind to.</param>
             <param name="axisContribution">When the key is pressed, does it return a positive or negative value?</param>
             <param name="keyCode">The keyboard key the Action will be bound to.</param>
-            <param name="modifierKey1">First modifier key for the keyboard key. KeyCode.None = no modifier.</param>
-            <param name="modifierKey2">Second modifier key for the keyboard key. KeyCode.None = no modifier.</param>
-            <param name="modifierKey3">Third modifier key for the keyboard key. KeyCode.None = no modifier.</param>
+            <param name="modifierKey1">First modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
+            <param name="modifierKey2">Second modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
+            <param name="modifierKey3">Third modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
             <returns>Success/Failure</returns>
         </member>
-        <member name="M:Rewired.ControllerMap.CreateElementMap(System.Int32,Rewired.Pole,UnityEngine.KeyCode,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ActionElementMap@)">
+        <member name="M:Rewired.ControllerMap.CreateElementMap(System.Int32,Rewired.Pole,Rewired.KeyboardKeyCode,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ActionElementMap@)">
             <summary>
             Creates an ActionElementMap in this controller map for a keyboard key assignment.
             </summary>
             <param name="actionId">The id of the Action to bind to.</param>
             <param name="axisContribution">When the key is pressed, does it return a positive or negative value?</param>
             <param name="keyCode">The keyboard key the Action will be bound to.</param>
-            <param name="modifierKey1">First modifier key for the keyboard key. KeyCode.None = no modifier.</param>
-            <param name="modifierKey2">Second modifier key for the keyboard key. KeyCode.None = no modifier.</param>
-            <param name="modifierKey3">Third modifier key for the keyboard key. KeyCode.None = no modifier.</param>
+            <param name="modifierKey1">First modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
+            <param name="modifierKey2">Second modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
+            <param name="modifierKey3">Third modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
             <param name="result">The resulting ActionElementMap.</param>
             <returns>Success/Failure</returns>
         </member>
-        <member name="M:Rewired.ControllerMap.CreateElementMap(System.Int32,Rewired.Pole,UnityEngine.KeyCode,Rewired.ModifierKeyFlags)">
+        <member name="M:Rewired.ControllerMap.CreateElementMap(System.Int32,Rewired.Pole,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags)">
             <summary>
             Creates an ActionElementMap in this controller map for a keyboard key assignment.
             </summary>
@@ -16709,7 +17547,7 @@
             <param name="modifierKeyFlags">Modifier key flags for the keyboard key. ModifierKeyFlags.None = no modifiers.</param>
             <returns>Success/Failure</returns>
         </member>
-        <member name="M:Rewired.ControllerMap.CreateElementMap(System.Int32,Rewired.Pole,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,Rewired.ActionElementMap@)">
+        <member name="M:Rewired.ControllerMap.CreateElementMap(System.Int32,Rewired.Pole,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,Rewired.ActionElementMap@)">
             <summary>
             Creates an ActionElementMap in this controller map for a keyboard key assignment.
             </summary>
@@ -16764,7 +17602,7 @@
             <param name="result">The resulting ActionElementMap.</param>
             <returns>Success/Failure</returns>
         </member>
-        <member name="M:Rewired.ControllerMap.ReplaceElementMap(System.Int32,System.Int32,Rewired.Pole,UnityEngine.KeyCode,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ModifierKey)">
+        <member name="M:Rewired.ControllerMap.ReplaceElementMap(System.Int32,System.Int32,Rewired.Pole,Rewired.KeyboardKeyCode,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ModifierKey)">
             <summary>
             Replaces an ActionElementMap in this controller map with a new keyboard key assignment.
             If the ActionElementMap is not found in this controller map, a new ActionElementMap will not be created.
@@ -16773,12 +17611,12 @@
             <param name="actionId">The id of the Action to bind to.</param>
             <param name="axisContribution">When the key is pressed, does it return a positive or negative value?</param>
             <param name="keyCode">The keyboard key the Action will be bound to.</param>
-            <param name="modifierKey1">First modifier key for the keyboard key. KeyCode.None = no modifier.</param>
-            <param name="modifierKey2">Second modifier key for the keyboard key. KeyCode.None = no modifier.</param>
-            <param name="modifierKey3">Third modifier key for the keyboard key. KeyCode.None = no modifier.</param>
+            <param name="modifierKey1">First modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
+            <param name="modifierKey2">Second modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
+            <param name="modifierKey3">Third modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
             <returns>Success/Failure</returns>
         </member>
-        <member name="M:Rewired.ControllerMap.ReplaceElementMap(System.Int32,System.Int32,Rewired.Pole,UnityEngine.KeyCode,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ActionElementMap@)">
+        <member name="M:Rewired.ControllerMap.ReplaceElementMap(System.Int32,System.Int32,Rewired.Pole,Rewired.KeyboardKeyCode,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ModifierKey,Rewired.ActionElementMap@)">
             <summary>
             Replaces an ActionElementMap in this controller map with a new keyboard key assignment.
             If the ActionElementMap is not found in this controller map, a new ActionElementMap will not be created.
@@ -16787,13 +17625,13 @@
             <param name="actionId">The id of the Action to bind to.</param>
             <param name="axisContribution">When the key is pressed, does it return a positive or negative value?</param>
             <param name="keyCode">The keyboard key the Action will be bound to.</param>
-            <param name="modifierKey1">First modifier key for the keyboard key. KeyCode.None = no modifier.</param>
-            <param name="modifierKey2">Second modifier key for the keyboard key. KeyCode.None = no modifier.</param>
-            <param name="modifierKey3">Third modifier key for the keyboard key. KeyCode.None = no modifier.</param>
+            <param name="modifierKey1">First modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
+            <param name="modifierKey2">Second modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
+            <param name="modifierKey3">Third modifier key for the keyboard key. KeyboardKeyCode.None = no modifier.</param>
             <param name="result">The resulting ActionElementMap.</param>
             <returns>Success/Failure</returns>
         </member>
-        <member name="M:Rewired.ControllerMap.ReplaceElementMap(System.Int32,System.Int32,Rewired.Pole,UnityEngine.KeyCode,Rewired.ModifierKeyFlags)">
+        <member name="M:Rewired.ControllerMap.ReplaceElementMap(System.Int32,System.Int32,Rewired.Pole,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags)">
             <summary>
             Replaces an ActionElementMap in this controller map with a new keyboard key assignment.
             If the ActionElementMap is not found in this controller map, a new ActionElementMap will not be created.
@@ -16805,7 +17643,7 @@
             <param name="modifierKeyFlags">Modifier key flags for the keyboard key. ModifierKeyFlags.None = no modifiers.</param>
             <returns>Success/Failure</returns>
         </member>
-        <member name="M:Rewired.ControllerMap.ReplaceElementMap(System.Int32,System.Int32,Rewired.Pole,UnityEngine.KeyCode,Rewired.ModifierKeyFlags,Rewired.ActionElementMap@)">
+        <member name="M:Rewired.ControllerMap.ReplaceElementMap(System.Int32,System.Int32,Rewired.Pole,Rewired.KeyboardKeyCode,Rewired.ModifierKeyFlags,Rewired.ActionElementMap@)">
             <summary>
             Replaces an ActionElementMap in this controller map with a new keyboard key assignment.
             If the ActionElementMap is not found in this controller map, a new ActionElementMap will not be created.
@@ -17785,6 +18623,15 @@
             <param name="skipDisabledMaps">Should disabled ActionElementMaps be skipped?</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
         </member>
+        <member name="M:Rewired.ControllerMap.Create(Rewired.Controller,System.Int32,System.Int32)">
+            <summary>
+            Creates a Controller Map for the specified Controller.
+            </summary>
+            <param name="controller">The Controller.</param>
+            <param name="categoryId">The map category id.</param>
+            <param name="layoutId">The layout id.</param>
+            <returns>Controller Map</returns>
+        </member>
         <member name="T:Rewired.ControllerMapWithAxes">
             <summary>
             Maps actions to controller elements for a controller with axes.
@@ -18270,7 +19117,7 @@
             Overload for Custom Controllers.
             </summary>
         </member>
-        <member name="M:Rewired.HardwareControllerMap_Game.#ctor(System.String,Rewired.Internal.Localization.DeviceLocalizationInfo,Rewired.HardwareControllerMapIdentifier,Rewired.JoystickType[],Rewired.ControllerElementIdentifier[],System.Int32[],System.Int32[],Rewired.AxisCalibrationData[],Rewired.AxisRange[],Rewired.Data.Mapping.HardwareAxisInfo[],Rewired.Data.Mapping.HardwareButtonInfo[],Rewired.Data.Mapping.HardwareJoystickMap.CompoundElement[])">
+        <member name="M:Rewired.HardwareControllerMap_Game.#ctor(System.String,Rewired.Internal.Localization.DeviceLocalizationInfo,Rewired.HardwareControllerMapIdentifier,Rewired.JoystickType[],Rewired.ControllerElementIdentifier[],System.Int32[],System.Int32[],Rewired.AxisCalibrationData[],Rewired.Axis2DCalibrationData[],Rewired.AxisRange[],Rewired.Data.Mapping.HardwareAxisInfo[],Rewired.Data.Mapping.HardwareButtonInfo[],Rewired.Data.Mapping.HardwareJoystickMap.CompoundElement[])">
             <summary>
             Overload for Joysticks.
             Also called by Keyboard/Mouse overload.
@@ -20952,6 +21799,17 @@
             <param name="controllerType">The controller type.</param>
             <returns></returns>
         </member>
+        <member name="M:Rewired.Player.ControllerHelper.SetLastActiveController(Rewired.Controller)">
+            <summary>
+            Sets the last active controller manually.
+            This overrides the last active controller temporarily, using the current time as the last active time for the controller.
+            When another mapped Action bound to a Controller returns input with a later timestamp, it will become the last active controller.
+            Required: The Controller must be connected and assigned to the Player.
+            Note that when setting this value, the last active controller event will not be sent until the next Rewired update.
+            </summary>
+            <param name="controller">The controller.</param>
+            <returns>True on success. False on failure.</returns>
+        </member>
         <member name="M:Rewired.Player.ControllerHelper.FindLastActiveControllerOfType(Rewired.ControllerType,Rewired.Controller@,System.Double@)">
             <summary>
             Don't use for Mouse/KB
@@ -22298,7 +23156,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Button Map found with the specified Action.</returns>
         </member>
@@ -22308,7 +23166,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Button Map found with the specified Action.</returns>
         </member>
@@ -22317,7 +23175,7 @@
             Get the first button ActionElementMap for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Button Map found with the specified Action.</returns>
         </member>
@@ -22326,7 +23184,7 @@
             Get the first button ActionElementMap for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Button Map found with the specified Action.</returns>
         </member>
@@ -22358,7 +23216,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Button Maps found with the specified Action.</returns>
         </member>
@@ -22368,7 +23226,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Button Maps found with the specified Action.</returns>
         </member>
@@ -22377,7 +23235,7 @@
             Enumerates all button ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Button Maps found with the specified Action.</returns>
         </member>
@@ -22386,7 +23244,7 @@
             Enumerates all button ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Button Maps found with the specified Action.</returns>
         </member>
@@ -22418,7 +23276,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22430,7 +23288,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22441,7 +23299,7 @@
             Gets a list of all button ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22452,7 +23310,7 @@
             Gets a list of all button ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22475,6 +23333,9 @@
             Gets a list of all button ActionElementMaps for a specific controller type that contains a specific Action.
             This overload applies to all Controllers of the specified type assigned to the Player.
             </summary>
+            <param name="controllerType">Controller type</param>
+            <param name="actionName">Name of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22483,6 +23344,8 @@
             <summary>
             Gets a list of all button ActionElementMaps for any controller type that contains a specific Action.
             </summary>
+            <param name="actionId">Id of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22491,6 +23354,8 @@
             <summary>
             Gets a list of all button ActionElementMaps for any controller type that contains a specific Action.
             </summary>
+            <param name="actionName">Name of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22501,7 +23366,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Axis Map found with the specified Action.</returns>
         </member>
@@ -22511,7 +23376,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Axis Map found with the specified Action.</returns>
         </member>
@@ -22520,7 +23385,7 @@
             Get the first axis ActionElementMap for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Axis Map found with the specified Action.</returns>
         </member>
@@ -22529,7 +23394,7 @@
             Get the first axis ActionElementMap for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Axis Map found with the specified Action.</returns>
         </member>
@@ -22561,7 +23426,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Axis Maps with the specified Action.</returns>
         </member>
@@ -22571,7 +23436,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Axis Maps with the specified Action.</returns>
         </member>
@@ -22580,7 +23445,7 @@
             Enumerates all axis ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Axis Maps found with the specified Action.</returns>
         </member>
@@ -22589,7 +23454,7 @@
             Enumerates all axis ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Axis Maps found with the specified Action.</returns>
         </member>
@@ -22621,7 +23486,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22633,7 +23498,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22644,7 +23509,7 @@
             Gets a list of all axis ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22655,7 +23520,7 @@
             Gets a list of all axis ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22666,6 +23531,9 @@
             Gets a list of all axis ActionElementMaps for a specific controller type that contains a specific Action.
             This overload applies to all Controllers of the specified type assigned to the Player.
             </summary>
+            <param name="controllerType">The type of controller.</param>
+            <param name="actionId">Id of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22675,6 +23543,9 @@
             Gets a list of all axis ActionElementMaps for a specific controller type that contains a specific Action.
             This overload applies to all Controllers of the specified type assigned to the Player.
             </summary>
+            <param name="controllerType">The type of controller.</param>
+            <param name="actionName">Name of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22683,6 +23554,8 @@
             <summary>
             Gets a list of all axis ActionElementMaps for any controller type that contains a specific Action.
             </summary>
+            <param name="actionId">Id of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22691,6 +23564,8 @@
             <summary>
             Gets a list of all axis ActionElementMaps for any controller type that contains a specific Action.
             </summary>
+            <param name="actionName">Name of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22701,7 +23576,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Action Element Map with the specified Action.</returns>
         </member>
@@ -22711,7 +23586,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Action Element Map with the specified Action.</returns>
         </member>
@@ -22720,7 +23595,7 @@
             Get the first ActionElementMap for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Action Element Map found with the specified Action.</returns>
         </member>
@@ -22729,7 +23604,7 @@
             Get the first ActionElementMap for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>The first Action Element Map found with the specified Action.</returns>
         </member>
@@ -22761,7 +23636,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Action Element Maps with the specified Action.</returns>
         </member>
@@ -22771,7 +23646,7 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Action Element Maps with the specified Action.</returns>
         </member>
@@ -22780,7 +23655,7 @@
             Enumerates all ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Action Element Maps found with the specified Action.</returns>
         </member>
@@ -22789,7 +23664,7 @@
             Enumerates all ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <returns>Enumeration of Action Element Maps found with the specified Action.</returns>
         </member>
@@ -22821,7 +23696,8 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22832,8 +23708,9 @@
             </summary>
             <param name="controllerType">The type of controller.</param>
             <param name="controllerId">Controller id - Get this from the Controller.id property. For Keyboard and Mouse, just use 0.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="results">The list that will be filled with the results.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
         </member>
@@ -22842,7 +23719,7 @@
             Gets a list of all ActionElementMaps for a specific controller that contains a specific Action.
             </summary>
             <param name="controller">The Controller.</param>
-            <param name="actionId">Id of the Action</param>
+            <param name="actionId">Id of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22852,7 +23729,7 @@
             <summary>
             Gets a list of all ActionElementMaps for a specific controller that contains a specific Action.
             </summary><param name="controller">The Controller.</param>
-            <param name="actionName">Name of the Action</param>
+            <param name="actionName">Name of the Action.</param>
             <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
@@ -22863,6 +23740,9 @@
             Gets a list of all ActionElementMaps for a specific controller type that contains a specific Action.
             This overload applies to all Controllers of the specified type assigned to the Player.
             </summary>
+            <param name="controllerType">The type of controller.</param>
+            <param name="actionId">Id of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22872,6 +23752,9 @@
             Gets a list of all ActionElementMaps for a specific controller type that contains a specific Action.
             This overload applies to all Controllers of the specified type assigned to the Player.
             </summary>
+            <param name="controllerType">The type of controller.</param>
+            <param name="actionName">Name of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22880,6 +23763,8 @@
             <summary>
             Gets a list of all ActionElementMaps for any controller type that contains a specific Action.
             </summary>
+            <param name="actionId">Id of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
             <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
@@ -22888,7 +23773,9 @@
             <summary>
             Gets a list of all ActionElementMaps for any controller type that contains a specific Action.
             </summary>
-            <param name="results">The list that will be filled with the results.</param>
+            <param name="actionName">Name of the Action.</param>
+            <param name="skipDisabledMaps">Should disabled Controller Maps and Action Element Maps be skipped?</param>
+            /// <param name="results">The list that will be filled with the results.</param>
             <exception cref="T:System.ArgumentNullException">results is null</exception>
             <returns>Number of maps found.</returns>
         </member>
@@ -23588,7 +24475,7 @@
         </member>
         <member name="P:Rewired.ReInput.usingUnityInput">
             <summary>
-            Is Unity (fallback) input currently being used to drive input?
+            Is UnityEngine.Input input currently being used to drive input?
             </summary>
         </member>
         <member name="P:Rewired.ReInput.unityJoystickIdentificationRequired">
@@ -23710,9 +24597,9 @@
             </summary>
             <param name="updateLoop"></param>
         </member>
-        <member name="M:Rewired.ReInput.UnityMainThreadUpdate">
+        <member name="M:Rewired.ReInput.UnityMainThreadUpdate(Rewired.UpdateLoopType)">
             <summary>
-            This runs every once every main Unity thread update at the beginning
+            This runs once every main Unity thread update at the beginning
             of FixedUpdate or Update, whichever runs first.
             </summary>
         </member>
@@ -23739,6 +24626,11 @@
             Provides access to all localization-related members.
             </summary>
         </member>
+        <member name="E:Rewired.ReInput.LocalizationHelper.ReloadedEvent">
+            <summary>
+            Event triggered after localized strings are reloaded.
+            </summary>
+        </member>
         <member name="P:Rewired.ReInput.LocalizationHelper.localizedStringProvider">
             <summary>
             Assign an object that implements <see cref="T:Rewired.Interfaces.ILocalizedStringProvider"/>
@@ -23761,6 +24653,16 @@
         <member name="T:Rewired.ReInput.GlyphHelper">
             <summary>
             Provides access to all glyph-related members.
+            </summary>
+        </member>
+        <member name="E:Rewired.ReInput.GlyphHelper.ReloadedEvent">
+            <summary>
+            Event triggered after glyphs are reloaded.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.GlyphHelper.glyphProvider">
+            <summary>
+            Assign an object that implements <see cref="T:Rewired.Interfaces.IGlyphProvider"/> to handle glyph lookups.
             </summary>
         </member>
         <member name="P:Rewired.ReInput.GlyphHelper.prefetch">
@@ -23811,7 +24713,13 @@
         </member>
         <member name="P:Rewired.ReInput.ConfigHelper.osxStandalonePrimaryInputSource">
             <summary>
-            Changes the primary input source in OSX Standalone during runtime. Rewired will be completely reset if this value is changed.
+            Changes the primary input source in MacOS Standalone during runtime. Rewired will be completely reset if this value is changed.
+            Deprecated: Use <see cref="P:Rewired.ReInput.ConfigHelper.macOSStandalonePrimaryInputSource"/> instead.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.macOSStandalonePrimaryInputSource">
+            <summary>
+            Changes the primary input source in MacOS Standalone during runtime. Rewired will be completely reset if this value is changed.
             </summary>
         </member>
         <member name="P:Rewired.ReInput.ConfigHelper.linuxStandalonePrimaryInputSource">
@@ -23839,10 +24747,11 @@
             Rewired will be completely reset if this value is changed.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "P:Rewired.ReInput.ConfigHelper.useAppleGameControllerFramework" -->
-        <member name="P:Rewired.ReInput.ConfigHelper.xboxOnePrimaryInputSource">
+        <member name="P:Rewired.ReInput.ConfigHelper.useAppleGameControllerFramework">
             <summary>
-            Changes the primary input source in Xbox One during runtime. Rewired will be completely reset if this value is changed.
+            Use Apple Game Controller Framework for compatible devices.
+            Only applies to platforms that support Game Controller Framework.
+            Rewired will be completely reset if this value is changed.
             </summary>
         </member>
         <member name="P:Rewired.ReInput.ConfigHelper.ps4PrimaryInputSource">
@@ -23850,9 +24759,34 @@
             Changes the primary input source in PS4 during runtime. Rewired will be completely reset if this value is changed.
             </summary>
         </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.ps5PrimaryInputSource">
+            <summary>
+            Changes the primary input source in PS5 during runtime. Rewired will be completely reset if this value is changed.
+            </summary>
+        </member>
         <member name="P:Rewired.ReInput.ConfigHelper.webGLPrimaryInputSource">
             <summary>
             Changes the primary input source in WebGL during runtime. Rewired will be completely reset if this value is changed.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.androidPrimaryInputSource">
+            <summary>
+            Changes the primary input source in Android during runtime. Rewired will be completely reset if this value is changed.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.iOSPrimaryInputSource">
+            <summary>
+            Changes the primary input source in iOS during runtime. Rewired will be completely reset if this value is changed.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.tvOSPrimaryInputSource">
+            <summary>
+            Changes the primary input source in tvOS during runtime. Rewired will be completely reset if this value is changed.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.visionOSPrimaryInputSource">
+            <summary>
+            Changes the primary input source in VisionOS during runtime. Rewired will be completely reset if this value is changed.
             </summary>
         </member>
         <member name="P:Rewired.ReInput.ConfigHelper.alwaysUseUnityInput">
@@ -23900,6 +24834,7 @@
         <member name="P:Rewired.ReInput.ConfigHelper.android_supportUnknownGamepads">
             <summary>
             Toggles the support of unknown gamepads on the Android platform during runtime. Rewired will be completely reset if this value is changed.
+            This only has an effect if <see cref="P:Rewired.ReInput.ConfigHelper.androidPrimaryInputSource"/> is set to <see cref="F:Rewired.Platforms.AndroidPrimaryInputSource.UnityInputManager"/>.
             </summary>
         </member>
         <member name="P:Rewired.ReInput.ConfigHelper.defaultJoystickAxis2DDeadZoneType">
@@ -24033,6 +24968,48 @@
             Gets or sets a copy of the list of all the device types excluded from Enhanced Device Support.
             This will not return any values if the current platform does not support Enhanced Device Support.
             Rewired will be completely reset if this value is set.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.disableAxis2dClamping">
+            <summary>
+            Overrides Axis2D clamping for all Axis2Ds and sets the value to <see cref="F:Rewired.Axis2DClampType.None"/>.
+            This setting only exists to make Axis2D calibration behave as it did
+            before the 1.1.61.0 update which added radial clamping to all gamepad sticks.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.supportXRControllers">
+            <summary>
+            Gets or sets XR controller support.
+            XR Controller support requires Unity Input System to be enabled in the Unity Player settings and a supported version
+            of the Unity Input System package to be installed.
+            This will not return any values if the current platform does not support XR controllers.
+            Rewired will be completely reset if this value is set.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.showSystemKeyLabels">
+            <summary>
+            Gets or sets whether system key labels will be displayed.
+            Not all input sources displaying system key labels.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.tvOS_enableBackButtonReturnsHome">
+            <summary>
+            If enabled, the Menu button on remotes and the B button on gamepads will return to the home screen.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.tvOS_useAbsoluteRemoteTouchpadMode">
+            <summary>
+            Gets or sets whether remote touchpad values are reported in absolute or relative terms.
+            If true, a press on the touchpad will return the absolute value of the point of touch.
+            If false, a press on the touchpad will initially return 0, 0 and the swipe direction
+            will determine the input vector from the initial starting position.
+            Changing this value will change the value in all connected remotes.
+            </summary>
+        </member>
+        <member name="P:Rewired.ReInput.ConfigHelper.tvOS_allowRemoteDPadRotation">
+            <summary>
+            Gets or sets whether remote D-Pad values are reported relative to the device's current orientation.
+            Changing this value will change the value in all connected remotes.
             </summary>
         </member>
         <member name="T:Rewired.ReInput.ControllerHelper">
@@ -24433,6 +25410,17 @@
             If there is no last active controller, ControllerType.Keyboard is returned.
             </summary>
             <returns>Last active Controller</returns>
+        </member>
+        <member name="M:Rewired.ReInput.ControllerHelper.SetLastActiveController(Rewired.Controller)">
+            <summary>
+            Sets the last active controller manually.
+            This overrides the last active controller temporarily, using the current time as the last active time for the controller.
+            When another Controller returns input with a later timestamp, it will become the last active controller.
+            Required: The Controller must be connected.
+            Note that when setting this value, the last active controller event will not be sent until the next Rewired update.
+            </summary>
+            <param name="controller">The controller.</param>
+            <returns>True on success. False on failure.</returns>
         </member>
         <member name="M:Rewired.ReInput.ControllerHelper.AddLastActiveControllerChangedDelegate(Rewired.ActiveControllerChangedDelegate)">
             <summary>
@@ -25650,6 +26638,13 @@
             This value does not match UnityEngine.Time.frameCount.
             </summary>
         </member>
+        <member name="P:Rewired.ReInput.TimeHelper.absFrame">
+            <summary>
+            The current absolute frame.
+            Every time Rewired updates in any update loop, the absolute frame counter is incremented.
+            This value does not match UnityEngine.Time.frameCount.
+            </summary>
+        </member>
         <member name="T:Rewired.ReInput.TimeManager">
             <summary>
             Manages unscaled time.
@@ -25658,6 +26653,7 @@
         <member name="T:Rewired.ReInput.UnityTouch">
             <summary>
             Provides access to touch-related members.
+            This is just a wrapper for Unity's touch input.
             </summary>
         </member>
         <member name="T:Rewired.ReInput.UnityVariableWatcher">

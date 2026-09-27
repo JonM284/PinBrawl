@@ -21,5 +21,5 @@ MonoBehaviour:
   shieldChangeOverTick: 0
   statusGameObject: {fileID: 1176647651618543623, guid: 1cfd996cb663a5343ad01a17ff87dd31, type: 3}
   amountOfTimePerTick: 1
-  amountChangePerTick: 10
+  amountChangePerTick: 1
   isHealing: 0

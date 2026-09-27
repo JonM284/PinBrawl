@@ -166,6 +166,10 @@ namespace Rewired {
             platform = Rewired.Platforms.Platform.tvOS;
 #endif
 
+#if UNITY_VISIONOS
+            platform = Rewired.Platforms.Platform.VisionOS;
+#endif
+
 #if UNITY_PS3
             platform = Rewired.Platforms.Platform.PS3;
 #endif
@@ -214,6 +218,10 @@ namespace Rewired {
 
 #if UNITY_SWITCH
             platform = Rewired.Platforms.Platform.Switch;
+#endif
+
+#if UNITY_SWITCH2 || UNITY_OUNCE
+            platform = Rewired.Platforms.Platform.Switch2;
 #endif
 
 #if UNITY_FLASH

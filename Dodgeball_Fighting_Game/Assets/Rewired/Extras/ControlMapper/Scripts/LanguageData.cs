@@ -129,6 +129,8 @@ namespace Rewired.UI.ControlMapper {
         [SerializeField]
         private string _calibrateWindow_deadZoneSliderLabel = "Dead Zone:";
         [SerializeField]
+        private string _calibrateWindow_upperDeadZoneSliderLabel = "Upper Dead Zone:";
+        [SerializeField]
         private string _calibrateWindow_zeroSliderLabel = "Zero:";
         [SerializeField]
         private string _calibrateWindow_sensitivitySliderLabel = "Sensitivity:";
@@ -209,6 +211,7 @@ namespace Rewired.UI.ControlMapper {
             }
         }
         public override string calibrateWindow_deadZoneSliderLabel { get { return _calibrateWindow_deadZoneSliderLabel; } }
+        public override string calibrateWindow_upperDeadZoneSliderLabel { get { return _calibrateWindow_upperDeadZoneSliderLabel; } }
         public override string calibrateWindow_zeroSliderLabel { get { return _calibrateWindow_zeroSliderLabel; } }
         public override string calibrateWindow_sensitivitySliderLabel { get { return _calibrateWindow_sensitivitySliderLabel; } }
         public override string calibrateWindow_invertToggleLabel { get { return _calibrateWindow_invertToggleLabel; } }
@@ -276,7 +279,7 @@ namespace Rewired.UI.ControlMapper {
             if(element == null) return string.Empty;
             return eid.GetDisplayName(element.type, axisRange);
         }
-        public override string GetElementIdentifierName(KeyCode keyCode, ModifierKeyFlags modifierKeyFlags) {
+        public override string GetElementIdentifierName(KeyboardKeyCode keyCode, ModifierKeyFlags modifierKeyFlags) {
             if(isLocalizationSystemEnabled) return Keyboard.GetKeyName(keyCode, modifierKeyFlags); // always prefer localization system if in use
             if(modifierKeyFlags != ModifierKeyFlags.None) {
                 return string.Format(

@@ -19,10 +19,18 @@ namespace Rewired.Glyphs.UnityUI {
         [UnityEngine.SerializeField]
         private string _actionName;
 
+        [UnityEngine.Tooltip("The second Action name for 2D Actions. (Optional)")]
+        [UnityEngine.SerializeField]
+        private string _actionName2;
+
         [System.NonSerialized]
         private int _actionId = -1;
         [System.NonSerialized]
         private bool _actionIdCached = false;
+        [System.NonSerialized]
+        private int _actionId2 = -1;
+        [System.NonSerialized]
+        private bool _actionId2Cached = false;
 
         /// <summary>
         /// The Player id.
@@ -39,13 +47,41 @@ namespace Rewired.Glyphs.UnityUI {
             }
             set {
                 if (!ReInput.isReady) return;
-                var action = ReInput.mapping.GetAction(value);
-                if (action == null) {
-                    UnityEngine.Debug.LogError("Invalid Action id: " + value);
-                    return;
+                if (value >= 0) {
+                    var action = ReInput.mapping.GetAction(value);
+                    if (action == null) {
+                        UnityEngine.Debug.LogError("Invalid Action id: " + value);
+                        return;
+                    }
+                    _actionName = action.name;
+                } else {
+                    _actionName = string.Empty;
                 }
-                _actionName = action.name;
                 CacheActionId();
+            }
+        }
+
+        /// <summary>
+        /// The second Action id for 2D Actions. (Optional)
+        /// </summary>
+        public override int actionId2 {
+            get {
+                if (!_actionId2Cached) CacheActionId2();
+                return _actionId2;
+            }
+            set {
+                if (!ReInput.isReady) return;
+                if (value >= 0) {
+                    var action = ReInput.mapping.GetAction(value);
+                    if (action == null) {
+                        UnityEngine.Debug.LogError("Invalid Action id 2: " + value);
+                        return;
+                    }
+                    _actionName2 = action.name;
+                } else {
+                    _actionName2 = string.Empty;
+                }
+                CacheActionId2();
             }
         }
 
@@ -57,8 +93,41 @@ namespace Rewired.Glyphs.UnityUI {
                 return _actionName;
             }
             set {
+                if (ReInput.isReady) {
+                    if (!string.IsNullOrEmpty(value)) {
+                        var action = ReInput.mapping.GetAction(value);
+                        if (action == null) {
+                            UnityEngine.Debug.LogError("Invalid Action Name: " + value);
+                            return;
+                        }
+                        value = action.name;
+                    }
+                }
                 _actionName = value;
                 CacheActionId();
+            }
+        }
+
+        /// <summary>
+        /// The second Action name for 2D Actions. (Optional)
+        /// </summary>
+        public string actionName2 {
+            get {
+                return _actionName2;
+            }
+            set {
+                if (ReInput.isReady) {
+                    if (!string.IsNullOrEmpty(value)) {
+                        var action = ReInput.mapping.GetAction(value);
+                        if (action == null) {
+                            UnityEngine.Debug.LogError("Invalid Action Name 2: " + value);
+                            return;
+                        }
+                        value = action.name;
+                    }
+                }
+                _actionName2 = value;
+                CacheActionId2();
             }
         }
 
@@ -69,14 +138,25 @@ namespace Rewired.Glyphs.UnityUI {
             _actionIdCached = true;
         }
 
+        private void CacheActionId2() {
+            if (!ReInput.isReady) return;
+            var action = ReInput.mapping.GetAction(_actionName2);
+            _actionId2 = action != null ? action.id : -1;
+            _actionId2Cached = true;
+        }
+
 #if UNITY_EDITOR
 
         private Rewired.Utils.Classes.Data.InspectorValue<string> _inspector_actionName = new Rewired.Utils.Classes.Data.InspectorValue<string>();
+        private Rewired.Utils.Classes.Data.InspectorValue<string> _inspector_actionName2 = new Rewired.Utils.Classes.Data.InspectorValue<string>();
 
         protected override void CheckInspectorValues(ref System.Action actions) {
             base.CheckInspectorValues(ref actions);
             if (_inspector_actionName.SetIfChanged(_actionName)) {
                 actions += () => actionName = _actionName;
+            }
+            if (_inspector_actionName2.SetIfChanged(_actionName2)) {
+                actions += () => actionName2 = _actionName2;
             }
         }
 #endif

@@ -14,6 +14,10 @@
 #define UNITY_2021_PLUS
 #endif
 
+#if UNITY_2022_PLUS || (UNITY_2021_PLUS && (UNITY_2021_2 || UNITY_2021_3 || UNITY_2021_2_OR_NEWER || UNITY_2021_3_OR_NEWER))
+#define UNITY_2021_2_PLUS
+#endif
+
 #if UNITY_2020 || UNITY_2021_PLUS
 #define UNITY_2020_PLUS
 #endif
@@ -24,6 +28,10 @@
 
 #if UNITY_2018 || UNITY_2019_PLUS
 #define UNITY_2018_PLUS
+#endif
+
+#if UNITY_2019_PLUS || (UNITY_2018_PLUS && (UNITY_2018_2 || UNITY_2018_3 || UNITY_2018_4 || UNITY_2018_2_OR_NEWER || UNITY_2018_3_OR_NEWER || UNITY_2018_4_OR_NEWER))
+#define UNITY_2018_2_PLUS
 #endif
 
 #if UNITY_2017 || UNITY_2018_PLUS
@@ -74,12 +82,12 @@
 #define SUPPORTS_UNITY_UI
 #endif
 
-#if (UNITY_PS4 && UNITY_2018_PLUS) || REWIRED_DEBUG_UNITY_PS4_2018_PLUS
-#define UNITY_PS4_2018_PLUS
+#if !UNITY_2019_PLUS || ENABLE_LEGACY_INPUT_MANAGER
+#define SUPPORTS_UNITY_INPUT_MANAGER
 #endif
 
-#if UNITY_2018_PLUS || UNITY_2017_4_OR_NEWER
-#define PS4INPUT_NEW_PAD_API
+#if UNITY_2021_2_PLUS && ENABLE_INPUT_SYSTEM
+#define SUPPORTS_UNITY_INPUT_SYSTEM
 #endif
 
 // Copyright (c) 2015 Augie R. Maddox, Guavaman Enterprises. All rights reserved.
@@ -114,7 +122,7 @@ namespace Rewired.Utils {
 #if UNITY_2018_PLUS
             UnityEditor.EditorApplication.pauseStateChanged += OnEditorPauseStateChanged;
 #else
-            UnityEditor.EditorApplication.update += OnEditorUpdate;            
+            UnityEditor.EditorApplication.update += OnEditorUpdate;
 #endif
             _isEditorPaused = UnityEditor.EditorApplication.isPaused; // get initial state
 #endif
@@ -154,7 +162,7 @@ namespace Rewired.Utils {
         private void OnEditorUpdate() {
             // Watch EditorApplication.isPaused state
             bool isPaused = UnityEditor.EditorApplication.isPaused;
-            if(isPaused != _isEditorPaused) {
+            if (isPaused != _isEditorPaused) {
                 _isEditorPaused = isPaused;
                 var evt = _EditorPausedStateChangedEvent;
                 if (evt != null) evt(_isEditorPaused);
@@ -175,6 +183,12 @@ namespace Rewired.Utils {
             return Rewired.Utils.Platforms.WebGL.Main.GetPlatformInitializer();
 #elif UNITY_ANDROID && !UNITY_EDITOR
             return Rewired.Utils.Platforms.Android.Main.GetPlatformInitializer();
+#elif UNITY_TVOS && !UNITY_EDITOR
+            return Rewired.Utils.Platforms.tvOS.Main.GetPlatformInitializer();
+#elif UNITY_VISIONOS && !UNITY_EDITOR
+            return Rewired.Utils.Platforms.VisionOS.Main.GetPlatformInitializer();
+#elif (UNITY_IPHONE || UNITY_IOS) && !UNITY_EDITOR
+            return Rewired.Utils.Platforms.iOS.Main.GetPlatformInitializer();
 #else
             if(_getPlatformInitializerDelegate != null) return _getPlatformInitializerDelegate();
             else return null;
@@ -222,10 +236,28 @@ namespace Rewired.Utils {
 #endif
         }
 
+#if UNITY_2019_PLUS
+        public bool isUnityInputManagerEnabled {
+            get {
+                return Static.IsUnityInputManagerEnabled();
+            }
+        }
+
+        public bool isUnityInputSystemEnabled {
+            get {
+                return Static.IsUnityInputSystemEnabled();
+            }
+        }
+#endif
+
         // Linux Tools
 #if UNITY_5_PLUS && UNITY_STANDALONE_LINUX
         public bool LinuxInput_IsJoystickPreconfigured(string name) {
+#if SUPPORTS_UNITY_INPUT_MANAGER
             return UnityEngine.Input.IsJoystickPreconfigured(name);
+#else
+            return false;
+#endif
         }
 #else
         public bool LinuxInput_IsJoystickPreconfigured(string name) {
@@ -233,6 +265,8 @@ namespace Rewired.Utils {
 
         }
 #endif
+
+#if !UNITY_2022_PLUS
 
         // Xbox One Tools
 
@@ -346,6 +380,8 @@ namespace Rewired.Utils {
         public void XboxOne_Gamepad_PulseVibrateMotor(ulong xboxOneJoystickId, int motorInt, float startLevel, float endLevel, ulong durationMS) { }
 #endif
 
+#endif
+
 #if UNITY_ANDROID && !UNITY_EDITOR
 
         const int API_LEVEL_HONEYCOMB = 9;
@@ -430,6 +466,104 @@ namespace Rewired.Utils {
 
         #endregion
 
+        #region tvOS
+
+#if UNITY_5_PLUS
+        
+        // tvOS
+
+        public bool tvOS_allowExitToHome {
+            get {
+#if UNITY_5_3_PLUS && UNITY_TVOS && !UNITY_EDITOR
+#if UNITY_2018_2_PLUS
+                return UnityEngine.tvOS.Remote.allowExitToHome;
+#else
+                return UnityEngine.Apple.TV.Remote.allowExitToHome;
+#endif
+#else
+                return false;
+#endif
+            }
+            set {
+#if UNITY_5_3_PLUS && UNITY_TVOS && !UNITY_EDITOR
+#if UNITY_2018_2_PLUS
+                UnityEngine.tvOS.Remote.allowExitToHome = value;
+#else
+                UnityEngine.Apple.TV.Remote.allowExitToHome = value;
+#endif
+#endif
+            }
+        }
+        public bool tvOS_allowRemoteRotation {
+            get {
+#if UNITY_5_3_PLUS && UNITY_TVOS && !UNITY_EDITOR
+#if UNITY_2018_2_PLUS
+                return UnityEngine.tvOS.Remote.allowRemoteRotation;
+#else
+                return UnityEngine.Apple.TV.Remote.allowRemoteRotation;
+#endif
+#else
+                return false;
+#endif
+            }
+            set {
+#if UNITY_5_3_PLUS && UNITY_TVOS && !UNITY_EDITOR
+#if UNITY_2018_2_PLUS
+                UnityEngine.tvOS.Remote.allowRemoteRotation = value;
+#else
+                UnityEngine.Apple.TV.Remote.allowRemoteRotation = value;
+#endif
+#endif
+            }
+        }
+        public bool tvOS_remoteReportAbsoluteDpadValues {
+            get {
+#if UNITY_5_3_PLUS && UNITY_TVOS && !UNITY_EDITOR
+#if UNITY_2018_2_PLUS
+                return UnityEngine.tvOS.Remote.reportAbsoluteDpadValues;
+#else
+                return UnityEngine.Apple.TV.Remote.reportAbsoluteDpadValues;
+#endif
+#else
+                return false;
+#endif
+            }
+            set {
+#if UNITY_5_3_PLUS && UNITY_TVOS && !UNITY_EDITOR
+#if UNITY_2018_2_PLUS
+                UnityEngine.tvOS.Remote.reportAbsoluteDpadValues = value;
+#else
+                UnityEngine.Apple.TV.Remote.reportAbsoluteDpadValues = value;
+#endif
+#endif
+            }
+        }
+        public bool tvOS_remoteTouchesEnabled {
+            get {
+#if UNITY_5_3_PLUS && UNITY_TVOS && !UNITY_EDITOR
+#if UNITY_2018_2_PLUS
+                return UnityEngine.tvOS.Remote.touchesEnabled;
+#else
+                return UnityEngine.Apple.TV.Remote.touchesEnabled;
+#endif
+#else
+                return false;
+#endif
+            }
+            set {
+#if UNITY_5_3_PLUS && UNITY_TVOS && !UNITY_EDITOR
+#if UNITY_2018_2_PLUS
+                UnityEngine.tvOS.Remote.touchesEnabled = value;
+#else
+                UnityEngine.Apple.TV.Remote.touchesEnabled = value;
+#endif
+#endif
+            }
+        }
+#endif
+
+        #endregion
+
         #region Unity UI
 
 
@@ -456,38 +590,6 @@ namespace Rewired.Utils {
 
         #endregion
 
-        #region Touch
-
-        public bool UnityInput_IsTouchPressureSupported {
-            get {
-#if UNITY_5_3_PLUS
-                return UnityEngine.Input.touchPressureSupported;
-#else
-                return false;
-#endif
-            }
-        }
-
-        public float UnityInput_GetTouchPressure(ref UnityEngine.Touch touch) {
-#if UNITY_5_3_PLUS
-            return touch.pressure;
-#else
-            return touch.phase != UnityEngine.TouchPhase.Ended &&
-                touch.phase != UnityEngine.TouchPhase.Canceled
-                ? 1.0f : 0.0f;
-#endif
-        }
-
-        public float UnityInput_GetTouchMaximumPossiblePressure(ref UnityEngine.Touch touch) {
-#if UNITY_5_3_PLUS
-            return touch.maximumPossiblePressure;
-#else
-            return 1.0f;
-#endif
-        }
-
-        #endregion
-
         #region Controller Templates
 
         public IControllerTemplate CreateControllerTemplate(System.Guid typeGuid, object payload) {
@@ -503,5 +605,26 @@ namespace Rewired.Utils {
         }
 
         #endregion
+
+        public static class Static {
+
+#if UNITY_2019_PLUS
+            public static bool IsUnityInputManagerEnabled() {
+#if SUPPORTS_UNITY_INPUT_MANAGER
+                return true;
+#else
+                return false;
+#endif
+            }
+
+            public static bool IsUnityInputSystemEnabled() {
+#if SUPPORTS_UNITY_INPUT_SYSTEM
+                return true;
+#else
+                return false;
+#endif
+            }
+#endif
+        }
     }
 }

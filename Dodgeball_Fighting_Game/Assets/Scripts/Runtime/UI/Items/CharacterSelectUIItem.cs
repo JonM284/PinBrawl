@@ -128,7 +128,7 @@ namespace Runtime.UI.Items
             CheckController(assignedPlayer);
             
             manager = _characterSelectDataModel;
-            
+            ChangeSelectedAbility(MatchGameController.Instance.GetFirstAbilityData());
             DisconnectPlayer();
             m_isInitialized = true;
         }

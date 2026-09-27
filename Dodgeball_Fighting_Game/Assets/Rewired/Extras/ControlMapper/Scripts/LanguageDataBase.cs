@@ -51,6 +51,7 @@ namespace Rewired.UI.ControlMapper {
         public abstract string mapCategoriesGroupLabel { get; }
         public abstract string restoreDefaultsWindowMessage { get; }
         public abstract string calibrateWindow_deadZoneSliderLabel { get; }
+        public abstract string calibrateWindow_upperDeadZoneSliderLabel { get; }
         public abstract string calibrateWindow_zeroSliderLabel { get; }
         public abstract string calibrateWindow_sensitivitySliderLabel { get; }
         public abstract string calibrateWindow_invertToggleLabel { get; }
@@ -74,7 +75,7 @@ namespace Rewired.UI.ControlMapper {
         public abstract string GetControllerName(Controller controller);
         public abstract string GetElementIdentifierName(ActionElementMap actionElementMap);
         public abstract string GetElementIdentifierName(Controller controller, int elementIdentifierId, AxisRange axisRange);
-        public abstract string GetElementIdentifierName(KeyCode keyCode, ModifierKeyFlags modifierKeyFlags);
+        public abstract string GetElementIdentifierName(KeyboardKeyCode keyCode, ModifierKeyFlags modifierKeyFlags);
         public abstract string GetActionName(int actionId);
         public abstract string GetActionName(int actionId, AxisRange axisRange);
         public abstract string GetMapCategoryName(int id);

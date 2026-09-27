@@ -19,14 +19,14 @@ MonoBehaviour:
   abilityKnockbackAmount: 5
   abilityDamageAmount: 50
   abilityRange: 8
-  abilityScale: 1
-  abilityAnimationTime: 0.15
-  isHaultMovement: 0
-  isHitOnce: 0
-  isReactivatable: 0
+  abilityScale: 5
+  isUltimateAbility: 0
+  isHaltMovement: 1
+  activationType: 0
+  abilityActivationWaitTimeMax: 1
   reactivationTime: 1
-  knockbackDirectionMod: 1
-  ballHitStrength: 0
+  KnockbackDirectionType: 0
+  ballHitStrengthType: 0
   collisionDetectionLayers:
     serializedVersion: 2
     m_Bits: 704
@@ -35,19 +35,20 @@ MonoBehaviour:
   applicableStatusesOnHit: []
   abilityGameObject: {fileID: 4351572726978402741, guid: 0299e847645882f4eb2eb636e309e116, type: 3}
   projectileMaxLifetime: 1.25
-  projectileShootSpeed: 25
+  projectileShootSpeed: 15
   projectileDetectionRange: 1
   projectileExplosionRange: 1
   projectileEndType: 0
   isPassThroughObjects: 0
   isMultiStage: 0
   isSpreadShotOnStart: 0
-  projectileAmount: 3
+  isGenericCharacterPrefab: 0
+  projectileAmount: 1
   projectileSpread: 45
   timeBetweenShots: 0.1
   amountOfStages: 0
   isSlowDownOverTime: 0
   slowDownModifier: 0
   slowDownType: 0
-  projeciltePrefab: {fileID: 6272625073605954814, guid: 90e918f6593d6c746b45f94e639a4655, type: 3}
+  projeciltePrefab: {fileID: 6892974132429643465, guid: 92ac2fa65cc73c34f8cdc925e78d1869, type: 3}
   endCreatable: {fileID: 0}

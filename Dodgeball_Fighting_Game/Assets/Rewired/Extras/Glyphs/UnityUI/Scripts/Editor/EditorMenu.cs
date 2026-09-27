@@ -7,9 +7,8 @@
 namespace Rewired.Glyphs.UnityUI.Editor {
     using System;
 
-    public static class EditorMenu {
+    public static partial class EditorMenu {
 
-        private const string logPrefix = "Rewired: ";
         private const string gameObjectMenuCreate = "GameObject/Create Other/Rewired/Glyphs/Unity UI/";
         private const string helpMenuCreate = "Window/Rewired/Create/Glyphs/Unity UI/";
 

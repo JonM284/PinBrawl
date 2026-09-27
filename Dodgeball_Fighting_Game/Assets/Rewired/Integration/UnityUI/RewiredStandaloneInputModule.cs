@@ -634,10 +634,10 @@ namespace Rewired.Integration.UnityUI {
             // Touch input
             if (isTouchAllowed) {
                 for(int i = 0; i < defaultTouchInputSource.touchCount; ++i) {
-                    Touch touch = defaultTouchInputSource.GetTouch(i);
-                    shouldActivate |= touch.phase == TouchPhase.Began
-                        || touch.phase == TouchPhase.Moved
-                        || touch.phase == TouchPhase.Stationary;
+                    Rewired.UnityTouch touch = defaultTouchInputSource.GetTouch(i);
+                    shouldActivate |= touch.phase == Rewired.UnityTouch.TouchPhase.Began
+                        || touch.phase == Rewired.UnityTouch.TouchPhase.Moved
+                        || touch.phase == Rewired.UnityTouch.TouchPhase.Stationary;
                 }
             }
 
@@ -686,10 +686,10 @@ namespace Rewired.Integration.UnityUI {
             if (!isTouchAllowed) return false;
 
             for(int i = 0; i < defaultTouchInputSource.touchCount; ++i) {
-                Touch touch = defaultTouchInputSource.GetTouch(i);
+                Rewired.UnityTouch touch = defaultTouchInputSource.GetTouch(i);
 
 #if UNITY_5_3_OR_NEWER
-                if(touch.type == TouchType.Indirect)
+                if(touch.type == Rewired.UnityTouch.TouchType.Indirect)
                     continue;
 #endif
 

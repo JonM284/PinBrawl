@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 974083050612809949}
+  - component: {fileID: -5330471745533700834}
   m_Layer: 0
   m_Name: Kazama@CharacterModel
   m_TagString: Untagged
@@ -32,6 +33,21 @@ Transform:
   - {fileID: 3447229048587530968}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-5330471745533700834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5440341712856961590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36e0b452b21e420cba8a16fc66e4fa97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MeshRenderer: {fileID: 4583582855965723063}
+  characterMeshRenderer: {fileID: 0}
+  anim: {fileID: 0}
 --- !u!1001 &2908689786980717875
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -124,5 +140,10 @@ PrefabInstance:
 --- !u!4 &3447229048587530968 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 73128948668b3484fb1e734caf580f0c, type: 3}
+  m_PrefabInstance: {fileID: 2908689786980717875}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4583582855965723063 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 73128948668b3484fb1e734caf580f0c, type: 3}
   m_PrefabInstance: {fileID: 2908689786980717875}
   m_PrefabAsset: {fileID: 0}

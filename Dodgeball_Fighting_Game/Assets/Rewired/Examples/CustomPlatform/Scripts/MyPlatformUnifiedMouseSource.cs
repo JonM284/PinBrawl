@@ -1,5 +1,47 @@
 ﻿// Copyright (c) 2024 Augie R. Maddox, Guavaman Enterprises. All rights reserved.
 
+#if UNITY_6000 || UNITY_6000_0_OR_NEWER
+#define UNITY_6000_PLUS
+#endif
+
+#if UNITY_2023 || UNITY_6000_PLUS
+#define UNITY_2023_PLUS
+#endif
+
+#if UNITY_2022 || UNITY_2023_PLUS
+#define UNITY_2022_PLUS
+#endif
+
+#if UNITY_2021 || UNITY_2022_PLUS
+#define UNITY_2021_PLUS
+#endif
+
+#if UNITY_2020 || UNITY_2021_PLUS
+#define UNITY_2020_PLUS
+#endif
+
+#if UNITY_2019 || UNITY_2020_PLUS
+#define UNITY_2019_PLUS
+#endif
+
+#if UNITY_2018 || UNITY_2019_PLUS
+#define UNITY_2018_PLUS
+#endif
+
+#if UNITY_2017 || UNITY_2018_PLUS
+#define UNITY_2017_PLUS
+#endif
+
+#if UNITY_5 || UNITY_2017_PLUS
+#define UNITY_5_PLUS
+#endif
+
+#if !UNITY_2019_PLUS || ENABLE_LEGACY_INPUT_MANAGER
+#define SUPPORTS_UNITY_INPUT_MANAGER
+#endif
+
+#if SUPPORTS_UNITY_INPUT_MANAGER
+
 namespace Rewired.Demos.CustomPlatform {
 
     /// <summary>
@@ -41,3 +83,5 @@ namespace Rewired.Demos.CustomPlatform {
         }
     }
 }
+
+#endif

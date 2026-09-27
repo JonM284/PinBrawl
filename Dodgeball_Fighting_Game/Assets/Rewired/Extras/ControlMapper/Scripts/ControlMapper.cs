@@ -2,7 +2,23 @@
 
 #define REWIRED_CONTROL_MAPPER_USE_TMPRO
 
-#if UNITY_2020 || UNITY_2021 || UNITY_2022 || UNITY_2023 || UNITY_6000 || UNITY_6000_0_OR_NEWER
+#if UNITY_6000 || UNITY_6000_0_OR_NEWER
+#define UNITY_6000_PLUS
+#endif
+
+#if UNITY_2023 || UNITY_6000_PLUS
+#define UNITY_2023_PLUS
+#endif
+
+#if UNITY_2022 || UNITY_2023_PLUS
+#define UNITY_2022_PLUS
+#endif
+
+#if UNITY_2021 || UNITY_2022_PLUS
+#define UNITY_2021_PLUS
+#endif
+
+#if UNITY_2020 || UNITY_2021_PLUS
 #define UNITY_2020_PLUS
 #endif
 
@@ -768,6 +784,9 @@ namespace Rewired.UI.ControlMapper
             ReInput.EditorRecompileEvent -= OnEditorRecompile;
 #endif
             UnsubscribeMenuControlInputEvents();
+            if (ReInput.isReady) {
+                ReInput.localization.ReloadedEvent -= OnLocalizedStringsReloaded;
+            }
         }
 
         #endregion
@@ -793,7 +812,13 @@ namespace Rewired.UI.ControlMapper
 #endif
 
             if(_rewiredInputManager == null) {
+#if UNITY_6000_PLUS
+                _rewiredInputManager = Object.FindAnyObjectByType<Rewired.InputManager>();
+#elif UNITY_2023_PLUS
+                _rewiredInputManager = Object.FindFirstObjectByType<Rewired.InputManager>();
+#else
                 _rewiredInputManager = Object.FindObjectOfType<Rewired.InputManager>();
+#endif
                 if(_rewiredInputManager == null) {
                     Debug.LogError("Rewired Control Mapper: A Rewired Input Manager was not assigned in the inspector or found in the current scene! Control Mapper will not function.");
                     return;
@@ -902,6 +927,8 @@ namespace Rewired.UI.ControlMapper
             // Set up events in fixed UI elements
             SubscribeFixedUISelectionEvents();
 
+            ReInput.localization.ReloadedEvent += OnLocalizedStringsReloaded;
+
             initialized = true;
         }
 
@@ -1000,7 +1027,7 @@ namespace Rewired.UI.ControlMapper
         }
 
         // Private
-
+        
         private void OnPlayerSelected(int playerId, bool redraw) {
             if(!initialized) return;
             currentPlayerId = playerId;
@@ -1178,7 +1205,7 @@ namespace Rewired.UI.ControlMapper
                 AxisRange swapAxisRange = origAemToReplaceCopy.axisRange;
                 ControllerElementType swapElementType = origAemToReplaceCopy.elementType;
                 int swapElementIdentifierId = origAemToReplaceCopy.elementIdentifierId;
-                KeyCode swapKeyCode = origAemToReplaceCopy.keyCode;
+                KeyboardKeyCode swapKeyCode = origAemToReplaceCopy.keyCode;
                 ModifierKeyFlags swapModifierKeyFlags = origAemToReplaceCopy.modifierKeyFlags;
 
                 if(swapElementType == firstConflictAEM.elementType && swapElementType == ControllerElementType.Axis) {
@@ -2943,8 +2970,8 @@ namespace Rewired.UI.ControlMapper
 
             // Check all keys being pressed at present so we can handle modifier keys
             foreach(ControllerPollingInfo info in ReInput.controllers.Keyboard.PollForAllKeys()) {
-                KeyCode key = info.keyboardKey;
-                if(key == KeyCode.AltGr) continue; // skip AltGr key because it gets fired when alt and control are held on some keyboards
+                KeyboardKeyCode key = info.keyboardKey;
+                if(key == KeyboardKeyCode.AltGr) continue; // skip AltGr key because it gets fired when alt and control are held on some keyboards
 
                 // determine if a modifier key is being pressed
                 if(Keyboard.IsModifierKey(info.keyboardKey)) { // a modifier key is pressed
@@ -2955,14 +2982,14 @@ namespace Rewired.UI.ControlMapper
 
                 } else { // this is not a modifier key
 
-                    if(nonModifierKeyInfo.keyboardKey != KeyCode.None) continue; // skip after the first one detected, we only need one non-modifier key press
+                    if(nonModifierKeyInfo.keyboardKey != KeyboardKeyCode.None) continue; // skip after the first one detected, we only need one non-modifier key press
                     nonModifierKeyInfo = info; // store the polling info
                 }
 
             }
 
             // Commit immediately if a non-modifier key was pressed
-            if(nonModifierKeyInfo.keyboardKey != KeyCode.None) { // a regular key was pressed
+            if(nonModifierKeyInfo.keyboardKey != KeyboardKeyCode.None) { // a regular key was pressed
 
                 // Make sure the primary button is in a down state or else we'll get immediate confirmation if using the keyboard to navigate
                 if(!ReInput.controllers.Keyboard.GetKeyDown(nonModifierKeyInfo.keyboardKey)) return; // fail because key is not in a down state
@@ -3239,6 +3266,10 @@ namespace Rewired.UI.ControlMapper
             inputFieldInvertToggleStateChangedDelegate = null;
 
             isPollingForInput = false;
+            
+            if (ReInput.isReady) {
+                ReInput.localization.ReloadedEvent -= OnLocalizedStringsReloaded;
+            }
         }
 
         public void Reset() {
@@ -3599,6 +3630,10 @@ namespace Rewired.UI.ControlMapper
                 if(themedElements == null) continue;
                 themedElements[i].ApplyTheme();
             }
+        }
+        
+        private void OnLocalizedStringsReloaded() {
+            Reset();
         }
 
         #endregion

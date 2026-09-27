@@ -35,6 +35,8 @@ namespace Runtime.GameControllers
 
         public readonly string defaultProjectilePoolNameFormat = "{0}_player_{1}_{2}_projectile";
 
+        public readonly string defaultWallBounceVFXName = "wall_bounce_vfx";
+
         #endregion
 
         #region Nested Classes
@@ -563,6 +565,12 @@ namespace Runtime.GameControllers
                 
                 await _newlyCreatedBaseCharacter.InitializeCharacter(m_selectedCharacters[i].characterData, m_selectedCharacters[i].chosenAbilityData,
                     i, m_selectedCharacters[i].assignedPlayer, m_groundMask, m_wallMask, token);
+
+                if (_characterModel.TryGetComponent(out CharacterModelController characterModelController))
+                {
+                    //ToDo: change to skinned mesh renderer when characters have animations.
+                    await _newlyCreatedBaseCharacter.AssignCharacterModelController(characterModelController);
+                }
                 
                 _healthBar.Initialize(_newlyCreatedBaseCharacter, m_selectedCharacters[i].characterData.characterArmorAmount,
                     100f, m_currentLevelManager.GetStaticHealthParent());

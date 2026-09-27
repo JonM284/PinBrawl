@@ -159,6 +159,24 @@ MonoBehaviour:
       joystickId: 10
       joystickId2: 0
       splitAxis: 0
+  - id: 6
+    name: Yawman Arrow
+    joystickGuid: 0d77609d-c6fd-49d8-9e02-4dd1d4d8d4ea
+    fileGuid: ebd805d8d820986439aecf22bd2e94bf
+    elementIdentifierMappings:
+    - templateId: 2
+      joystickId: 3
+      joystickId2: 2
+      splitAxis: 1
+  - id: 7
+    name: Honeycomb Aeronautical Echo Aviation Controller
+    joystickGuid: 482f567b-c624-4eef-a15a-58241cb18735
+    fileGuid: e71f1f9fe04bae443b048def55e83ae8
+    elementIdentifierMappings:
+    - templateId: 2
+      joystickId: 3
+      joystickId2: 2
+      splitAxis: 1
   specialElements: []
   elementIdentifierIdCounter: 3
-  joystickIdCounter: 6
+  joystickIdCounter: 8
